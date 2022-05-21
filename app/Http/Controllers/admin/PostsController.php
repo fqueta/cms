@@ -23,7 +23,7 @@ class PostsController extends Controller
         $this->user = $user;
         $this->routa = 'posts';
         $this->label = 'Posts';
-        $this->view = 'padrao';
+        $this->view = 'posts';
     }
     public function queryPost($get=false,$config=false)
     {
@@ -37,7 +37,7 @@ class PostsController extends Controller
             'order'=>isset($get['order']) ? $get['order']: 'desc',
         ];
 
-        $post =  Post::orderBy('id',$config['order']);
+        $post =  Post::where('post_status','!=','inherit')->orderBy('id',$config['order']);
         //$post =  DB::table('posts')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
         $post_totais = new stdClass;
@@ -106,8 +106,9 @@ class PostsController extends Controller
             //'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'post_title'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Nome do poste','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'post_name'=>['label'=>'Slug','active'=>true,'placeholder'=>'Ex.: nome-do-post','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            'post_content'=>['label'=>'Conteudo','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12','class'=>'summernote'],
+            //'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'status'=>['label'=>'Publicar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'post_content'=>['label'=>'Conteudo','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'hidden','tam'=>'12','class'=>''],
         ];
     }
     public function index(User $user)
@@ -159,11 +160,12 @@ class PostsController extends Controller
     {
         $this->authorize('create', $this->routa);
         $validatedData = $request->validate([
-            'nome' => ['required','string','unique:posts'],
+            'post_title' => ['required'],
+            'post_name' => ['required'],
         ]);
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
-        $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
+        //$dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
 
         //dd($dados);
         $salvar = Post::create($dados);
@@ -239,7 +241,8 @@ class PostsController extends Controller
     {
         $this->authorize('update', $this->routa);
         $validatedData = $request->validate([
-            'nome' => ['required'],
+            'post_title' => ['required'],
+            'post_name' => ['required'],
         ]);
         $data = [];
         $dados = $request->all();
@@ -260,8 +263,8 @@ class PostsController extends Controller
             }
         }
         $userLogadon = Auth::id();
-        $data['ativo'] = isset($data['ativo'])?$data['ativo']:'n';
-        $data['autor'] = $userLogadon;
+        //$data['ativo'] = isset($data['ativo'])?$data['ativo']:'n';
+        //$data['autor'] = $userLogadon;
         if(isset($dados['config'])){
             $dados['config'] = Qlib::lib_array_json($dados['config']);
         }

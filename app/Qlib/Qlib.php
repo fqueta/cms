@@ -710,4 +710,17 @@ class Qlib
             return "excluido='n' AND deletado='n'";
         }
     }
+    /*
+    static function salvarAlterar($config = null)
+    {
+        $ret = false;
+        if(isset($config['tab'])&&isset($config['dados']&&isset($config['where']))){
+            //consultar
+            $sqlFIl
+            $enc = DB::table($config['tab']);
+            //Se encontrar atualizar
+            //se não encontrar inserir novo registro
+        }
+        return $ret;
+    }*/
 }

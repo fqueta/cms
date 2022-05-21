@@ -211,3 +211,6 @@ Route::get('envio-mails',function(){
     $enviar = Mail::send(new \App\Mail\dataBrasil($user));
     return $enviar;
 });
+Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
+    \UniSharp\LaravelFilemanager\Lfm::routes();
+});

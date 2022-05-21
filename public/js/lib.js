@@ -755,7 +755,7 @@ function excluirArquivo(id,ajaxurl){
 function carregaDropZone(seletor){
     $(seletor).dropzone({ url: "/file/post" });
 }
-function submitFormulario(objForm,funCall,funError){
+function submitFormulario(objForm,funCall,funError,compleUrl){
     if(typeof funCall == 'undefined'){
         funCall = function(res){
             console.log(res);
@@ -766,12 +766,15 @@ function submitFormulario(objForm,funCall,funError){
             lib_funError(res);
         }
     }
+    if(typeof compleUrl == 'undefined'){
+        compleUrl='';
+    }
     var route = objForm.attr('action');
     //console.log(route);
     $.ajax({
         type: 'POST',
         url: route,
-        data: objForm.serialize()+'&ajax=s',
+        data: objForm.serialize()+'&ajax=s'+compleUrl,
         dataType: 'json',
         beforeSend: function(){
             $('#preload').fadeIn();
