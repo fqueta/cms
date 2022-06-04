@@ -52,7 +52,7 @@
                     alert('erros');
                     console.log(res.errors);
                 }
-            },'&post_content='+content);
+            },'&post_content='+content+'&'+$('#imagem-detacada').serialize());
         });
     });
 </script>

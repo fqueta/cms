@@ -44,40 +44,6 @@ Route::prefix('users')->group(function(){
     Route::put('/{id}',[UserController::class,'update'])->where('id', '[0-9]+')->name('users.update');
     Route::delete('/{id}',[UserController::class,'destroy'])->where('id', '[0-9]+')->name('users.destroy');
 });
-/*
-Route::prefix('permissions')->group(function(){
-    Route::get('/',[UserPermissions::class,'index'])->name('permissions.index');
-    Route::get('/create',[UserPermissions::class,'create'])->name('permissions.create');
-    Route::post('/',[UserPermissions::class,'store'])->name('permissions.store');
-    Route::get('/{id}/show',[UserPermissions::class,'show'])->where('id', '[0-9]+')->name('permissions.show');
-    Route::get('/{id}/edit',[UserPermissions::class,'edit'])->where('id', '[0-9]+')->name('permissions.edit');
-    Route::put('/{id}',[UserPermissions::class,'update'])->where('id', '[0-9]+')->name('permissions.update');
-    Route::delete('/{id}',[UserPermissions::class,'destroy'])->where('id', '[0-9]+')->name('permissions.destroy');
-});*/
-Route::prefix('familias')->group(function(){
-    Route::get('/',[FamiliaController::class,'index'])->name('familias.index');
-    Route::get('/create',[FamiliaController::class,'create'])->name('familias.create');
-    Route::post('/',[FamiliaController::class,'store'])->name('familias.store');
-    Route::get('/{id}/show',[FamiliaController::class,'show'])->name('familias.show');
-    Route::get('/{id}/edit',[FamiliaController::class,'edit'])->name('familias.edit');
-    Route::put('/{id}',[FamiliaController::class,'update'])->where('id', '[0-9]+')->name('familias.update');
-    Route::delete('/{id}',[FamiliaController::class,'destroy'])->where('id', '[0-9]+')->name('familias.destroy');
-    Route::get('export/all', [FamiliaController::class, 'exportAll'])->name('familias.export_all');
-    Route::get('export/filter', [FamiliaController::class, 'exportFilter'])->name('familias.export_filter');
-    Route::get('campos', [FamiliaController::class, 'camposJson'])->name('familias.campos');
-    Route::post('ajax', [FamiliaController::class, 'ajaxPost'])->name('familias.ajax');
-});
-Route::prefix('bairros')->group(function(){
-    Route::get('/',[BairroController::class,'index'])->name('bairros.index');
-    Route::get('/create',[BairroController::class,'create'])->name('bairros.create');
-    Route::post('/',[BairroController::class,'store'])->name('bairros.store');
-    Route::get('/{id}/show',[BairroController::class,'show'])->name('bairros.show');
-    Route::get('/{id}/edit',[BairroController::class,'edit'])->name('bairros.edit');
-    Route::put('/{id}',[BairroController::class,'update'])->where('id', '[0-9]+')->name('bairros.update');
-    Route::delete('/{id}',[BairroController::class,'destroy'])->where('id', '[0-9]+')->name('bairros.destroy');
-    Route::get('export/all', [BairroController::class, 'exportAll'])->name('bairros.export_all');
-    Route::get('export/filter', [BairroController::class, 'exportFilter'])->name('bairros.export_filter');
-});
 
 Route::prefix('escolaridades')->group(function(){
     Route::get('/',[EscolaridadeController::class,'index'])->name('escolaridades.index');
@@ -114,20 +80,11 @@ Route::prefix('relatorios')->group(function(){
     Route::get('/social',[RelatoriosController::class,'realidadeSocial'])->name('relatorios.social');
     Route::get('/evolucao',[RelatoriosController::class,'create'])->name('relatorios.evolucao');
     Route::get('export/filter', [RelatoriosController::class, 'exportFilter'])->name('relatorios.export_filter');
-    //Route::post('/',[RelatoriosController::class,'store'])->name('relatorios.store');
-    //Route::get('/{id}/show',[RelatoriosController::class,'show'])->name('relatorios.show');
-    //Route::get('/{id}/edit',[RelatoriosController::class,'edit'])->name('relatorios.edit');
-    //Route::put('/{id}',[RelatoriosController::class,'update'])->where('id', '[0-9]+')->name('relatorios.update');
-    //Route::post('/{id}',[RelatoriosController::class,'update'])->where('id', '[0-9]+')->name('relatorios.update-ajax');
-    //Route::delete('/{id}',[RelatoriosController::class,'destroy'])->where('id', '[0-9]+')->name('relatorios.destroy');
 });
 Route::prefix('sistema')->group(function(){
     Route::get('/pefil',[EtapaController::class,'index'])->name('sistema.perfil');
     Route::get('/config',[EtapaController::class,'config'])->name('sistema.config');
     Route::post('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('sistema.update-ajax');
-});
-Route::prefix('mapas')->group(function(){
-    Route::get('/quadras/{id}',[MapasController::class,'quadras'])->name('mapas.quadras');
 });
 Route::prefix('uploads')->group(function(){
     Route::get('/',[uploadController::class,'index'])->name('uploads.index');
@@ -150,21 +107,20 @@ Route::prefix('teste')->group(function(){
     Route::get('/ajax',[App\Http\Controllers\TesteController::class,'ajax'])->name('teste.ajax');
 });
 
-Route::post('/upload',[App\Http\Controllers\UploadFile::class,'upload'])->name('teste.upload');
-
+//Route::post('/upload',[App\Http\Controllers\UploadFile::class,'upload'])->name('teste.upload');
+/*
 Route::resource('beneficiarios','\App\Http\Controllers\BeneficiariosController',['parameters' => [
 'beneficiarios' => 'id'
 ]]);
-Route::resource('lotes','\App\Http\Controllers\LotesController',['parameters' => [
-'lotes' => 'id'
-]]);
-Route::get('/lotes/lista-ocupantes/{lotes}',[LotesController::class,'listagemOcupantes'])->name('lotes.ocupantes');
-Route::get('/lotes/ficha-ocupantes/{lote}/{familia}',[LotesController::class,'FichaOcupantes'])->name('lotes.ficha_ocupantes');
-Route::resource('quadras','\App\Http\Controllers\QuadrasController',['parameters' => [
-'quadras' => 'id'
-]]);
+*/
 Route::resource('posts','\App\Http\Controllers\admin\PostsController',['parameters' => [
     'posts' => 'id'
+]]);
+Route::resource('api-wp','\App\Http\Controllers\wp\ApiWpController',['parameters' => [
+    'api-wp' => 'id'
+]]);
+Route::resource('pages','\App\Http\Controllers\admin\PostsController',['parameters' => [
+    'pages' => 'id'
 ]]);
 Route::resource('documentos','\App\Http\Controllers\DocumentosController',['parameters' => [
     'documentos' => 'id'
@@ -211,6 +167,7 @@ Route::get('envio-mails',function(){
     $enviar = Mail::send(new \App\Mail\dataBrasil($user));
     return $enviar;
 });
+/*
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
     \UniSharp\LaravelFilemanager\Lfm::routes();
-});
+});*/

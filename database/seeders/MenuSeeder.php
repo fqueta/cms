@@ -43,15 +43,16 @@ class MenuSeeder extends Seeder
                 'route'=>'posts.index',
                 'pai'=>'cad-conteudo'
             ],
-            /*[
+            [
                 'categoria'=>'',
-                'description'=>'Beneficiários',
-                'icon'=>'fas fa-list',
+                'description'=>'Paginas',
+                'icon'=>'fas fa-file',
                 'actived'=>true,
-                'url'=>'beneficiarios',
-                'route'=>'beneficiarios.index',
+                'url'=>'pages',
+                'route'=>'pages.index',
                 'pai'=>'cad-conteudo'
             ],
+            /*
             [
                 'categoria'=>'',
                 'description'=>'Lotes',

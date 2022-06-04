@@ -61,6 +61,27 @@ function redirect_blank(url) {
   a.href=url;
   a.click();
 }
+function lib_urlAmigavel(valor){
+	valor = valor.replace('?', "");
+	//valor = valor.replace('-', '');
+	//valor = valor.replace('-', '');
+	valor = valor.replace(/[á|ã|â|à]/gi, "a");
+	valor = valor.replace(/[é|ê|è]/gi, "e");
+	valor = valor.replace(/[í|ì|î]/gi, "i");
+	valor = valor.replace(/[õ|ò|ó|ô]/gi, "o");
+	valor = valor.replace(/[ú|ù|û]/gi, "u");
+	valor = valor.replace(/[ç]/gi, "c");
+	valor = valor.replace(/[ñ]/gi, "n");
+	valor = valor.replace(/[á|ã|â]/gi, "a");
+	valor = valor.replace('(', "");
+	valor = valor.replace('}', "");
+	valor = valor.replace('/', "");
+	valor = valor.replace(/[\s]/gi, '-'); //Transforma espaço em traço
+	valor = valor.replace('---', "-");
+	valor = valor.replace('--', "-");
+	valor = valor.toLowerCase();
+	return valor;
+}
 function encodeArray(arr){
     var ar = JSON.stringify(arr);
     var encode = btoa(ar);
@@ -144,53 +165,11 @@ function abrirjanelaPadraoConsulta(url){
 	}
 	abrirjanela(url, "consultaCliente", wid, height, "left="+meio+",toolbar=no, location=no, directories=no, status=no, menubar=no");
 }
-
 function openPageLink(ev,url,ano){
   ev.preventDefault();
   var u = url.trim()+'?ano='+ano;
 	abrirjanelaPadrao(u);
 	//window.location = u;
-}
-function gerenteAtividade(obj,ac){
-  var id = obj.attr('id');
-  var temaImput = '<input type="{type}" {seletor} style="width:{wid}px" name="{name}" value="{value}" class="form-control text-center"> {btn}';
-  var arr = ['publicacao','video','hora','revisita','estudo','obs'];
-  var selId = $('#'+id);
-  var exec = selId.attr('exec');
-  if(exec=='s'){
-    return
-  }
-  for (var i = 0; i < arr.length; i++) {
-    var eq = (i+1);
-    var s = $('#'+id+' td:eq('+eq+')');
-    if(i==0){
-      selId.attr('exec','s');
-    }
-    if(i==5){
-       var wid='200';
-       var t='text';
-       var b='<button type="button" onclick="submitRelatorio(\''+id+'\',\''+ac+'\')" title="Salvar" class="btn btn-primary" name="button"><i class="fa fa-check"></i></button>'+
-       '<button type="button" onclick="cancelEdit(\''+id+'\')" title="Cancelar edição" data-toggle="tooltip"  class="btn btn-secondary" name="button"><i class="fa fa-times"></i></button>';
-			 if(ac=='alt'){
-				 b += '<button type="button" onclick="delRegistro(\''+id+'\')" title="Apagar registro" data-toggle="tooltip"  class="btn btn-danger" name="button"><i class="fa fa-trash"></i></button>';
-			 }
-       s.addClass('d-flex');
-    }else{
-      var wid='100';
-      var b='';
-      var t='number';
-    }
-    var v = s.html();
-    var c = temaImput.replace('{name}',id+arr[i]);
-    c = c.replace('{value}',v);
-    c = c.replace('{wid}',wid);
-    c = c.replace('{type}',t);
-    c = c.replace('{btn}',b);
-    c = c.replace('{seletor}',arr[i]);
-    s.html(c);
-    //array[i]
-  }
-  $('#'+id+' td:eq(1) input').select();
 }
 function cancelEdit(id,ac){
   //var temaImput = '<input type="{type}" style="width:{wid}px" name="{name}" value="{value}" class="form-control text-center"> {btn}';
@@ -229,149 +208,6 @@ function cancelEdit(id,ac){
     td.html(c);
   }
 }
-function delRegistro(id){
-  var don = $('#'+id+' input');
-  //console.log(don);
-  var arr = [];
-  var seriali = '';
-  $.each(don,function(i,k){
-    var ke = k.name;
-    ke = ke.replace(id,'');
-     arr[ke] = k.value;
-     seriali += ke+'='+k.value+'&';
-    //console.log(k.name);
-  });
-  //var var_cartao = atob(arr['var_cartao']);
-    $.ajaxSetup({
-         headers: {
-             'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
-         }
-     });
-
-     var formData = seriali,state = jQuery('#btn-save').val();
-     if(ac=='del'){
-       var type = "DELETE";
-     }else{
-       var type = "POST";
-     }
-     var ac='del',ajaxurl = $('[name="routAjax_'+ac+'"]').val();
-     $.ajax({
-         type: type,
-         url: ajaxurl,
-         data: formData,
-         dataType: 'json',
-         success: function (data) {
-
-           if(data.exec){
-             cancelEdit(id,'del');
-             if(data.mens){
-               lib_formatMensagem('.mens',data.mens,'success');
-             }
-           }else{
-             lib_formatMensagem('.mens',data.mens,'danger');
-           }
-           if(data.cartao.totais){
-             var array = data.cartao.totais;
-             var id_pub = data.cartao.dados.id;
-             var eq = 1;
-             $.each(array,function(i,k){
-                $('#pub-'+id_pub+' .tf-1 th:eq('+(eq)+')').html(k);
-               eq++;
-             });
-           }
-           if(data.cartao.medias){
-             var array = data.cartao.medias;
-             var id_pub = data.cartao.dados.id;
-             var eq = 1;
-             $.each(array,function(i,k){
-                $('#pub-'+id_pub+' .tf-2 th:eq('+(eq)+')').html(k);
-               eq++;
-             });
-           }
-           if(data.salvarRelatorios.obs && data.salvarRelatorios.mes){
-             var selector = '#'+id_pub+'_'+data.salvarRelatorios.mes+' td';
-             $(selector).last().html(data.salvarRelatorios.obs);
-           }
-
-         },
-         error: function (data) {
-             console.log(data);
-         }
-     });
-}
-/*
-function submitRelatorio(id,ac){
-  var don = $('#'+id+' input');
-  console.log(don);
-  var arr = [];
-  var seriali = '';
-  $.each(don,function(i,k){
-    var ke = k.name;
-    ke = ke.replace(id,'');
-     arr[ke] = k.value;
-     seriali += ke+'='+k.value+'&';
-    //console.log(k.name);
-  });
-  var var_cartao = atob(arr['var_cartao']);
-    $.ajaxSetup({
-           headers: {
-               'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
-           }
-       });
-
-       var formData = seriali+'compilado=s';
-       var state = jQuery('#btn-save').val();
-       if(ac=='cad'){
-         var type = "POST";
-       }else{
-         var type = "POST";
-       }
-       var ajaxurl = $('[name="routAjax_'+ac+'"]').val();
-       $.ajax({
-           type: type,
-           url: ajaxurl,
-           data: formData,
-           dataType: 'json',
-           success: function (data) {
-             if(data.exec){
-               cancelEdit(id);
-							 if(data.mens){
-								 lib_formatMensagem('.mens',data.mens,'success');
-							 }
-						 }else{
-							 lib_formatMensagem('.mens',data.mens,'danger');
-						 }
-             if(data.cartao.totais){
-               var array = data.cartao.totais;
-               var id_pub = data.cartao.dados.id;
-               var eq = 1;
-               $.each(array,function(i,k){
-                  $('#pub-'+id_pub+' .tf-1 th:eq('+(eq)+')').html(k);
-                 eq++;
-               });
-             }
-             if(data.cartao.medias){
-               var array = data.cartao.medias;
-               var id_pub = data.cartao.dados.id;
-               var eq = 1;
-               $.each(array,function(i,k){
-                  $('#pub-'+id_pub+' .tf-2 th:eq('+(eq)+')').html(k);
-                 eq++;
-               });
-             }
-             if(data.salvarRelatorios.obs && data.salvarRelatorios.mes){
-               var selector = '#'+id_pub+'_'+data.salvarRelatorios.mes+' td';
-               $(selector).last().html(data.salvarRelatorios.obs);
-             }
-
-           },
-           error: function (data) {
-               console.log(data);
-           }
-       });
-  //console.log(arr);
-}
-*/
 function alerta(msg,id,title,tam,fechar,time,fecha){
 
 	if(typeof(fechar) == 'undefined')
@@ -504,21 +340,6 @@ function salvarAssitencia(frm,dados){
                $('[sele="media_1_7"] span').html(mediaR1);
              }
 
-             /*
-             if(data.cartao.medias){
-               var array = data.cartao.medias;
-               var id_pub = data.cartao.dados.id;
-               var eq = 1;
-               $.each(array,function(i,k){
-                  $('#pub-'+id_pub+' .tf-2 th:eq('+(eq)+')').html(k);
-                 eq++;
-               });
-             }
-             if(data.salvarRelatorios.obs && data.salvarRelatorios.mes){
-               var selector = '#'+id_pub+'_'+data.salvarRelatorios.mes+' td';
-               $(selector).last().html(data.salvarRelatorios.obs);
-             }
-              */
            },
            error: function (data) {
                console.log(data);
@@ -1933,4 +1754,19 @@ function lib_infoMaps(config){
 }
 function lib_fechaCardOc(){
     $('.mini-card').removeClass('active').html('');
+}
+function lib_typeSlug(obj){
+    let v = obj.value;
+    let s = lib_urlAmigavel(v);
+    $('[type_slug="true"]').val(s);
+}
+function lib_carregaImageLfm(obj){
+    let urlImg = obj.value;
+    if(urlImg){
+        $('#holder').attr('src',urlImg);
+        $('#lfm').hide();
+        $('#lfm-remove').removeClass('d-none').addClass('d-block');
+    }
+    //console.log(obj);
+
 }

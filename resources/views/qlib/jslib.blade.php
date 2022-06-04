@@ -44,11 +44,10 @@
         $('.summernote').summernote({
             height: 400,
             placeholder: 'Digite o conteudo',
-            /*
-            onImageUpload: function(files, editor, welEditable) {
-                alert('enviar imagem')
-                //sendFile(files[0],editor,welEditable);
-            }*/
+        });
+        $('[type_slug="true"]').on('keyup',function(e){
+            let text = lib_urlAmigavel($(this).val());
+            $(this).val(text);
         });
     });
 </script>

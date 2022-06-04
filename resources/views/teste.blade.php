@@ -10,10 +10,25 @@
 <section class="content">
     <div class="row">
 
-        {!! $docs !!}
+        <form id="file-upload" action="{{route('teste.index')}}" method="post" class="dropzone" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="token_produto" value="tes111" />
+            <input type="hidden" name="pasta" value="storage" />
+            <input type="hidden" name="arquivos" value="jpg,png" />
+            <input type="hidden" name="typeN" value="{{@$config['typeN']}}" />
+            <input type="hidden" name="wp_ep" value="media" />
+            <div class="fallback">
+                <input name="file" type="file" multiple />
+            </div>
+            <button type="submit">Enviar</button>
+        </form>
 
     </div>
-
+@php
+    if(isset($_FILE['file']['tmp_name'])){
+       echo $_FILE['file']['tmp_name'];
+    }
+@endphp
 
 </section>
 @stop
