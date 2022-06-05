@@ -172,6 +172,7 @@
         lfm('lfm', 'image', {prefix: route_prefix});
         </script>
     @endif
+    @if (App\Qlib\Qlib::qoption('editor_padrao')=='laraberg')
     <script>
         Laraberg.init('post_content', {
             laravelFilemanager: true,
@@ -198,6 +199,7 @@
         Laraberg.registerCategory(title, slug)
         Laraberg.registerBlock('my-namespace/my-block', myBlock)*/
     </script>
+    @endif
     <script type="text/javascript">
         $(function(){
             $('a.print-card').on('click',function(e){

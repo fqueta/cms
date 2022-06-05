@@ -7,34 +7,54 @@
 @stop
 
 @section('content')
-<section class="content">
-    <div class="row">
-
-        <form id="file-upload" action="{{route('teste.index')}}" method="post" class="dropzone" enctype="multipart/form-data">
-            @csrf
-            <input type="hidden" name="token_produto" value="tes111" />
-            <input type="hidden" name="pasta" value="storage" />
-            <input type="hidden" name="arquivos" value="jpg,png" />
-            <input type="hidden" name="typeN" value="{{@$config['typeN']}}" />
-            <input type="hidden" name="wp_ep" value="media" />
-            <div class="fallback">
-                <input name="file" type="file" multiple />
-            </div>
-            <button type="submit">Enviar</button>
-        </form>
-
+<div class="content">
+    <div class="title m-b-md">
+        Laravel
     </div>
-@php
-    if(isset($_FILE['file']['tmp_name'])){
-       echo $_FILE['file']['tmp_name'];
-    }
-@endphp
-
-</section>
+    <form action="{{ route('tinymce.store') }}" method="POST">
+        @csrf
+        <textarea class="form-control" name="content" id="description-textarea" rows="8"></textarea>
+        <br/>
+        <br/>
+        <button type="submit">Save</button>
+    </form>
+</div>
 @stop
 
 @section('css')
     <link rel="stylesheet" href=" {{url('/')}}/css/lib.css">
+    <style>
+        html, body {
+            background-color: #fff;
+            color: #636b6f;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 100;
+            height: 100vh;
+            margin: ;
+        }
+        .content {
+            text-align: center;
+        }
+        .title {
+            font-size: 84px;
+        }
+        .m-b-md {
+            margin-bottom: 30px;
+        }
+        button {
+            display: inline-block;
+            font-weight: 500;
+            cursor:pointer;
+            border: 1px solid transparent;
+            padding: 0.59rem 1rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            color: #ffffff;
+            background-color: #4c84ff;
+            border-color: #4c84ff;
+        }
+    </style>
 <style>
     #conteudo{
         height:200px;
@@ -45,78 +65,39 @@
 
 @section('js')
     <script src=" {{url('/')}}/js/lib.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.9.5/tinymce.min.js"></script>
     <script>
-        function converJsonHTML(res,tema2){
-            if(typeof tema2 == 'undefined'){
-                tema2 = atob($('tema2').html());
-            }
-            var ret = '';
-            if(res.data){
-               var d = res.data;
-               for (let i = 0; i < d.length; i++) {
-                   //const element = array[i];
-                   ret += tema2.replaceAll('{nome}',d[i].file_file_name);
-                   ret = ret.replaceAll('{data}',d[i].date);
-               }
-            }
-            //console.log(ret);
-            return ret;
+        /*
+        var editor_config = {
+            selector: '#description-textarea',
+            directionality: document.dir,
+            path_absolute: "/",
+            menubar: 'edit insert view format table',
+            plugins: [
+                "advlist autolink lists link image charmap preview hr anchor pagebreak",
+                "searchreplace wordcount visualblocks visualchars code fullscreen",
+                "insertdatetime media save table contextmenu directionality",
+                "paste textcolor colorpicker textpattern"
+            ],
+            toolbar: "insertfile undo redo | formatselect styleselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | fullscreen code",
+            relative_urls: false,
+            language: document.documentElement.lang,
+            height: 300,
         }
-        function requisicao(select,url,data){
-            if(typeof url == 'undefined'){
-                return;
-            }
-            if(typeof data == 'undefined'){
-                data = '';
-            }
-            $.ajax({
-                url:url, //Página PHP que seleciona postagens
-                type:'GET', // método post, GET ...
-                data: data, //seus paramêtros
-                dataType:'json',
-                beforeSend: function(){
-                    $('#preload').fadeIn();
-                },
-                complete: function(){
-                    $('#preload').fadeOut("fast");
-                },
-                success: function(res){ // sucesso de retorno executar função
-                    var cont = converJsonHTML(res);
-                    $(select).append(cont); // adiciona o resultado na div #conteudo
-                } // fim success
-            }); // fim ajax
-        }
-        function paginacaoInfinita(select,limit,page){
-            if(typeof select == 'undefined'){
-                return;
-            }
-            if(typeof limit == 'undefined'){
-                limit = 20;
-            }
-            if(typeof page == 'undefined'){
-                page = 2;
-            }
-            //var page = 1;
-            $(select).scroll(function() {
-                console.log($(this).get(0).scrollHeight);
-                if ($(this).scrollTop() + $(this).height() == $(this).get(0).scrollHeight) {
-                    requisicao(select,'{{route('teste.ajax')}}?limit='+limit+'&page='+page);
-                //$(select).append($(select).html());
-                    page++;
-                 }
-            });
+        tinymce.init(editor_config);*/
 
-        }
-        $(document).ready(function() {
-            //paginacaoInfinita('#conteudo');
-            var page = 2;
-            $('[rel="mais"]').on('click',function(e){
-                e.preventDefault();
-                requisicao('#conteudo','{{route('teste.ajax')}}?limit=20&page='+page);
+        tinymce.init({
+            selector: '.editor-padrao',
+            language: 'pt_BR',
+            plugins: 'image code a11ychecker advcode casechange formatpainter linkchecker lists checklist media mediaembed pageembed permanentpen powerpaste table advtable tinymcespellchecker',
+            toolbar: ' link image casechange checklist code formatpainter pageembed permanentpen table',
+            image_title: true,
+            automatic_uploads: true,
+            file_picker_types: 'image',
+            external_filemanager_path:"{{url('tinymce/filemanager')}}/",
+                    filemanager_title:"Uploads de Arquivos" ,
+                    external_plugins: { "filemanager" : "{{url('tinymce')}}/filemanager/plugin.min.js"},
 
-                //alert('gora');
-                page++;
-            });
         });
     </script>
 @stop

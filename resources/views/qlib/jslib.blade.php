@@ -51,3 +51,39 @@
         });
     });
 </script>
+@if (App\Qlib\Qlib::qoption('editor_padrao')=='tinymce')
+    @php
+        $BASE = '/';
+    @endphp
+    <script>
+        var BASE = '{{$BASE}}';
+    </script>
+    <script src="{{$BASE}}vendor/tinymce/tinymce.min.js"></script>
+    <script>
+        $(function(){
+            tinymce.init({
+                selector: ".editor-padrao",theme: "modern",height: 600,
+                language: 'pt_BR',
+                setup: function (editor) {
+                    editor.on('change', function () {
+                        editor.save();
+                    });
+                },
+                relative_urls: false,
+                remove_script_host : false,
+                plugins: [
+                        "advlist autolink link image lists charmap print preview hr anchor pagebreak",
+                        "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
+                        "table contextmenu directionality emoticons paste textcolor responsivefilemanager code"
+                ],
+                toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect",
+                toolbar2: "| responsivefilemanager | link unlink anchor | image media | forecolor backcolor  | print preview code ",
+                image_advtab: true ,
+
+                external_filemanager_path:"/vendor/filemanager/",
+                filemanager_title:"Responsive Filemanager" ,
+                external_plugins: { "filemanager" : "/vendor/filemanager/plugin.min.js"}
+            });
+        });
+    </script>
+@endif

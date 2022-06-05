@@ -5,6 +5,12 @@
             e.preventDefault();
             let btn_press = $(this).attr('btn');
             let content = Laraberg.getContent();
+            @if (App\Qlib\Qlib::qoption('editor_padrao')=='laraberg')
+                let compleurl = '&post_content='+content+'&'+$('#imagem-detacada').serialize();
+            @else
+                let compleurl = '';
+            @endif
+
             submitFormulario($('#{{$config['frm_id']}}'),function(res){
                 if(res.exec){
                     lib_formatMensagem('.mens',res.mens,res.color);
@@ -52,7 +58,7 @@
                     alert('erros');
                     console.log(res.errors);
                 }
-            },'&post_content='+content+'&'+$('#imagem-detacada').serialize());
+            },compleurl);
         });
     });
 </script>

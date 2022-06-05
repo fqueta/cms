@@ -15,6 +15,7 @@ use App\Http\Controllers\EstadocivilController;
 use App\Http\Controllers\LotesController;
 use App\Http\Controllers\RelatoriosController;
 use App\Http\Controllers\MapasController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
@@ -138,6 +139,10 @@ Auth::routes();
 Route::get('/',function(){
   return redirect()->route('login');
 });
+Route::post('/tinymce', function (Request $request) {
+    $content = $request->content;
+    return view('testes.show')->with(compact('content'));
+})->name('tinymce.store');
 /*
 Route::prefix('admin')->group(function(){
     Route::get('/home', [App\Http\Controllers\admin\homeController::class, 'index'])->name('home.admin');
