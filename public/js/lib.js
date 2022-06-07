@@ -475,19 +475,21 @@ function lib_trataRemoveUrl(campo,valor,urlinic){
 	}
 	return ret;
 }
-function visualizaArquivos(token_produto,ajaxurl){
-
+function visualizaArquivos(token_produto,ajaxurl,painel){
+    if(typeof painel=='undefined'){
+        painel = '';
+    }
     $.ajax({
         type: 'GET',
         url: ajaxurl,
         data: {
-            token_produto:token_produto,
+            token_produto:token_produto,//ou post_id
         },
         dataType: 'json',
         success: function (data) {
 
           if(data.exec && data.arquivos){
-            var list = listFiles(data.arquivos,token_produto);
+            var list = listFiles(data.arquivos,token_produto,painel);
             $('#lista-files').html(list);
             if(data.mens){
               lib_formatMensagem('.mens',data.mens,'success');
@@ -501,38 +503,59 @@ function visualizaArquivos(token_produto,ajaxurl){
         }
     });
 }
-function listFiles(arquivos,token_produto){
+function listFiles(arquivos,token_produto,painel){
     if(typeof token_produto == 'undefined'){
         token_produto = '';
     }
+    if(typeof painel == 'undefined'){
+        painel = '';
+    }
     if(arquivos.length>0){
-        var tema1 = '<ul class="list-group">{li}</ul>';
-        var tema2 = '<li class="list-group-item d-flex justify-content-between align-items-center" id="item-{id}">'+
-        '<a href="{href}" target="_blank">{icon} {nome}</a>'+
-        '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button></li>';
+        if(painel=='i_wp'){
+            var tema1 = '<div class="list-group">{li}</div>';
+            var tema2 = '<div class="list-group-item d-flex justify-content-between align-items-center px-0" id="item-{id}">'+
+            '<a href="{href}" class="venobox"><img src="{href}" alt="{nome}" style="width: 100%"></a>'+
+            '<span style="position: absolute;top:2px;right:2px">'+
+            '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button>'+
+            '</span>'+
+            '</div>';
+        }else{
+            var tema1 = '<ul class="list-group">{li}</ul>';
+            var tema2 = '<li class="list-group-item d-flex justify-content-between align-items-center" id="item-{id}">'+
+            '<a href="{href}" target="_blank">{icon} {nome}</a>'+
+            '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button></li>';
+        }
         var li = '';
         var temaIcon = '<i class="fas fa-file-{tipo} fa-2x"></i>';
         for (let index = 0; index < arquivos.length; index++) {
             const arq = arquivos[index];
-            var event = 'onclick="excluirArquivo(\''+arq.id+'\',\'/uploads/'+arq.id+'\')"';
-            var href = '/storage/'+arq.pasta;
+            if(painel=='i_wp'){
+                var href = arq.guid;
+                var id = arq.ID;
+            }else{
+                var id = arq.id;
+                var href = '/storage/'+arq.pasta;
+            }
+            var event = 'onclick="excluirArquivo(\''+id+'\',\'/uploads/'+id+'\')"';
             var icon = '';
-            li += tema2.replace('{event}',event);
-            li = li.replace('{nome}',arq.nome);
-            li = li.replace('{id}',arq.id);
-            li = li.replace('{href}',href);
-            if(conf = arq.config){
-                var config = JSON.parse(conf);
-                if(config.extenssao == 'jpg' || config.extenssao=='png' || config.extenssao == 'jpeg'){
-                    var tipo = 'image';
-                }else if(config.extenssao == 'doc' || config.extenssao == 'docx') {
-                    var tipo = 'word';
-                }else if(config.extenssao == 'xls' || config.extenssao == 'xlsx') {
-                    var tipo = 'excel';
-                }else{
-                    var tipo = 'download';
+            li += tema2.replaceAll('{event}',event);
+            li = li.replaceAll('{nome}',arq.nome);
+            li = li.replaceAll('{id}',id);
+            li = li.replaceAll('{href}',href);
+            if(painel=='i_wp'){
+                if(conf = arq.config){
+                    var config = JSON.parse(conf);
+                    if(config.extenssao == 'jpg' || config.extenssao=='png' || config.extenssao == 'jpeg'){
+                        var tipo = 'image';
+                    }else if(config.extenssao == 'doc' || config.extenssao == 'docx') {
+                        var tipo = 'word';
+                    }else if(config.extenssao == 'xls' || config.extenssao == 'xlsx') {
+                        var tipo = 'excel';
+                    }else{
+                        var tipo = 'download';
+                    }
+                    icon = temaIcon.replace('{tipo}',tipo);
                 }
-                icon = temaIcon.replace('{tipo}',tipo);
             }
             li = li.replace('{icon}',icon);
         }
@@ -544,7 +567,7 @@ function listFiles(arquivos,token_produto){
 function excluirArquivo(id,ajaxurl){
     $.ajaxSetup({
         headers: {
-            'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
+           'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
         }
     });
     $.ajax({
@@ -555,13 +578,12 @@ function excluirArquivo(id,ajaxurl){
         },
         dataType: 'json',
         success: function (data) {
-
-          if(data.exec){
-            //cancelEdit(id,'del');
-            $('#item-'+id).remove();
-            if(data.dele_file){
-              lib_formatMensagem('.mens','Arquivo excluido com sucesso!','success');
-            }
+           if(data.exec){
+                if(data.dele_file){
+                   lib_formatMensagem('.mens','Arquivo excluido com sucesso!','success');
+                   $('#item-'+id).remove();
+                   $('#enviar-arquivo').show();
+                }
           }else{
             lib_formatMensagem('.mens','Erro ao excluir entre em contato com o suporte','danger');
           }

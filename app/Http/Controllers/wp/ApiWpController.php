@@ -21,7 +21,7 @@ class ApiWpController extends Controller
     public function __construct()
     {
         //$this->key = 'ZmVybmFuZG9AbWFpc2FxdWkuY29tLmJyOmZlcnF1ZXRh';
-        $this->key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3RcL3dvcmRwcmVzcyIsImlhdCI6MTY1MzgyNjQ1OSwibmJmIjoxNjUzODI2NDU5LCJleHAiOjE2NTQ0MzEyNTksImRhdGEiOnsidXNlciI6eyJpZCI6MSwiZGV2aWNlIjoiIiwicGFzcyI6ImEwMDBlMDQ5ZmQyZjhhYTczYTY3NjUwMzU3YzYyMmM1In19fQ.BOfgYz2p7EPPUdhUzB29aSSVGNMyrc-oeTOx_6vYerA';
+        $this->key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3RcL3dvcmRwcmVzcyIsImlhdCI6MTY1NDUyNzI4MSwibmJmIjoxNjU0NTI3MjgxLCJleHAiOjE2NTUxMzIwODEsImRhdGEiOnsidXNlciI6eyJpZCI6MSwiZGV2aWNlIjoiIiwicGFzcyI6ImEwMDBlMDQ5ZmQyZjhhYTczYTY3NjUwMzU3YzYyMmM1In19fQ.XDx8qlt8GOkASzHQPtqpuzji5fr-VCuy0Xll-Be2gUA';
         $this->url_base = 'http://localhost/wordpress/';
         //$this->url_api = 'wp-json/wp/v2';
         $this->url_api = 'wp-json/api-cms';
@@ -117,6 +117,94 @@ class ApiWpController extends Controller
         }else{
             $ret['exec'] = false;
         }
+        $strtotime = 1655132081;
+
+        $ret['ex'] = date('d M Y H:i:s',$strtotime);
+
+        return $ret;
+    }
+    public function list($config = null)
+    {
+        /*
+            $api_wp = new ApiWpController([
+                'endPoint'=>'posts',
+                'method'=>'GET',
+                'params'=>''
+            ]);
+         */
+        $endPoint = isset($config['endPoint'])?$config['endPoint']:'post';
+        $method = isset($config['method'])?$config['method']:'GET';
+        $params = isset($config['params'])?$config['params']:false;
+        $url = $this->url.'/'.$endPoint.$params;
+        //$json = json_encode($params);
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => $method,
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer '.$this->key,
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $ret['json'] = $response;
+        $ret['arr'] = Qlib::lib_json_array($response);
+        if($response){
+            $ret['exec'] = true;
+        }else{
+            $ret['exec'] = false;
+        }
+        return $ret;
+    }
+    public function delete($config = null)
+    {
+        /*
+            $api_wp = new ApiWpController([
+                'endPoint'=>'post',
+                'method'=>'GET',
+                'params'=>'/{id_post}'
+            ]);
+         */
+        $endPoint = isset($config['endPoint'])?$config['endPoint']:'post';
+        $method = isset($config['method'])?$config['method']:'DELETE';
+        $params = isset($config['params'])?$config['params']:false;
+        $url = $this->url.'/'.$endPoint.$params;
+        //$json = json_encode($params);
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => $method,
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer '.$this->key,
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $ret['json'] = $response;
+        $ret['arr'] = Qlib::lib_json_array($response);
+        if($response){
+            $ret['exec'] = true;
+        }else{
+            $ret['exec'] = false;
+        }
         return $ret;
     }
     public function postFiles($config = null)
@@ -142,14 +230,14 @@ class ApiWpController extends Controller
         $type = isset($config['type'])?$config['type']:'jpeg';
         if($params && is_array($params))
             $params = '?'.http_build_query($params);
-        $url = $this->url.'/'.$endPoint.$params;
+            $url = $this->url.'/'.$endPoint.$params;
         //$url = 'http://localhost/wordpress/wp-json/api/midia';
         //echo $url;
         //exit;
         if($file){
             $cfile = new \CURLFile($_FILES['file']['tmp_name'],$_FILES['file']['type'],$_FILES['file']['name']);
             $data = array('file'=>$cfile);
-
+            $data['post_id'] = isset($_POST['post_id'])?$_POST['post_id']:NULL;
 
             $curl = curl_init();
             curl_setopt_array($curl, array(
@@ -182,7 +270,7 @@ class ApiWpController extends Controller
         $ret = $this->exec([
             'endPoint'=>'posts'
         ]);
-        dd($ret);
+        //dd($ret);
         return $ret;
     }
 
@@ -208,7 +296,7 @@ class ApiWpController extends Controller
         $file = $request->file('file');
         $ret = false;
         if(isset($post['wp_ep']) && isset($_FILES['file']) && $file){
-            if($post['wp_ep']=='media'){
+            if($post['wp_ep']=='midia'){
                 $filenameWithExt = $file->getClientOriginalName();
                 // Get just filename
                 $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);

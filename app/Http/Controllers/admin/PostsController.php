@@ -228,20 +228,8 @@ class PostsController extends Controller
         if($this->i_wp=='s' && isset($dados['post_type'])){
             //$endPoint = isset($dados['endPoint'])?$dados['endPoint']:$dados['post_type'].'s';
             $endPoint = 'post';
-            $arr_parm = [
-                'post_name'=>'post_name',
-                'post_title'=>'post_title',
-                'post_content'=>'post_content',
-                'post_excerpt'=>'post_excerpt',
-                'post_status'=>'post_status',
-                'post_type'=>'post_type',
-            ];
-            $params = false;
-            foreach ($dados as $kp => $vp) {
-                if(isset($arr_parm[$kp])){
-                    $params[$kp] = $dados[$kp];
-                }
-            }
+            $params = $this->geraParmsWp($dados);
+
             if($params){
                 $salvar = $this->wp_api->exec2([
                     'endPoint'=>$endPoint,
@@ -298,6 +286,27 @@ class PostsController extends Controller
     {
         //
     }
+    public function geraParmsWp($dados=false)
+    {
+        $params=false;
+        if($dados && is_array($dados)){
+
+            $arr_parm = [
+                'post_name'=>'post_name',
+                'post_title'=>'post_title',
+                'post_content'=>'post_content',
+                'post_excerpt'=>'post_excerpt',
+                'post_status'=>'post_status',
+                'post_type'=>'post_type',
+            ];
+            foreach ($dados as $kp => $vp) {
+                if(isset($arr_parm[$kp])){
+                    $params[$kp] = $dados[$kp];
+                }
+            }
+        }
+        return $params;
+    }
 
     public function edit($post,User $user)
     {
@@ -315,8 +324,17 @@ class PostsController extends Controller
             }
             $listFiles = false;
             $campos = $this->campos();
-            if(isset($dados[0]['token'])){
-                $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
+            if($this->i_wp=='s' && !empty($dados[0]['post_name'])){
+                $dadosApi = $this->wp_api->list([
+                    'params'=>'/'.$dados[0]['post_name'].'?_type='.$dados[0]['post_type'],
+                ]);
+                if(isset($dadosApi['arr']['arquivos'])){
+                    $listFiles = $dadosApi['arr']['arquivos'];
+                }
+            }else{
+                if(isset($dados[0]['token'])){
+                    $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
+                }
             }
             $config = [
                 'ac'=>'alt',
@@ -382,17 +400,14 @@ class PostsController extends Controller
         }
         foreach ($dados as $key => $value) {
             if($key!='_method'&&$key!='_token'&&$key!='ac'&&$key!='ajax'){
-                if($key=='data_batismo' || $key=='data_nasci'){
+                /*if($key=='data_batismo' || $key=='data_nasci'){
                     if($value=='0000-00-00' || $value=='00/00/0000'){
                     }else{
                         $data[$key] = Qlib::dtBanco($value);
                     }
-                }elseif($key == 'renda_familiar') {
-                    $value = str_replace('R$','',$value);
-                    $data[$key] = Qlib::precoBanco($value);
-                }else{
+                }else{*/
                     $data[$key] = $value;
-                }
+                //}
             }
         }
         $userLogadon = Auth::id();
@@ -404,7 +419,7 @@ class PostsController extends Controller
         }
         $atualizar=false;
         if(!empty($data)){
-            if($this->i_wp=='s' && isset($data['post_type'])){
+            if($this->i_wp=='s' && isset($dados['post_type'])){
                 $endPoint = 'post/'.$id;
                 $arr_parm = [
                     'post_name'=>'post_name',
@@ -412,13 +427,9 @@ class PostsController extends Controller
                     'post_content'=>'post_content',
                     'post_excerpt'=>'post_excerpt',
                     'post_status'=>'post_status',
+                    'post_type'=>'post_type',
                 ];
-                $params = false;
-                foreach ($dados as $kp => $vp) {
-                    if(isset($arr_parm[$kp])){
-                        $params[$kp] = $dados[$kp];
-                    }
-                }
+                $params = $this->geraParmsWp($dados);
                 if($params){
                     $atualizar = $this->wp_api->exec2([
                         'endPoint'=>$endPoint,

@@ -22,7 +22,6 @@
                             return;
                     }
                     var redirect = $('[btn-volter="true"]').attr('redirect');
-
                     if(redirect){
                         if(pop){
                             window.opener.popupCallback(function(){

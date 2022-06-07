@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\wp\ApiWpController;
 use App\Models\_upload;
+use App\Models\Post;
 use App\Qlib\Qlib;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Request;
@@ -10,16 +12,30 @@ use Illuminate\Support\Facades\Storage;
 
 class UploadController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public $i_wp;//integração com wp
+    public $wp_api;//integração com wp
+    public function __construct()
+    {
+        $this->i_wp = Qlib::qoption('i_wp');//indegração com Wp s para sim
+        $this->wp_api = new ApiWpController();
+    }
     public function index(Request $request)
     {
         $ret['exec'] = false;
+        $arquivos = false;
         if($request->has('token_produto')){
-            $arquivos = _upload::where('token_produto','=',$request->get('token_produto'))->get();
+            $id=$request->get('token_produto');
+            if($this->i_wp=='s'){
+                $dados = Post::where('id',$id)->get();
+                $dadosApi = $this->wp_api->list([
+                    'params'=>'/'.$dados[0]['post_name'].'?_type='.$dados[0]['post_type'],
+                ]);
+                if(isset($dadosApi['arr']['arquivos'])){
+                    $arquivos = $dadosApi['arr']['arquivos'];
+                }
+            }else{
+                $arquivos = _upload::where('token_produto','=',$id)->get();
+            }
             if($arquivos){
                 $ret['exec'] = true;
                 $ret['arquivos'] = $arquivos;
@@ -137,32 +153,32 @@ class UploadController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        $dados = _upload::find($id);
-        $dele_file = false;
-        if (Storage::exists($dados->pasta))
+        if($this->i_wp=='s'){
+            $ret = $this->wp_api->delete([
+                'params'=>'/'.$id,
+            ]);
+            $ret['dele_file'] = false;
+            if(isset($ret['exec'])){
+                $ret['dele_file'] = true;
+            }
+            return $ret;
+
+        }else{
+
+            $dados = _upload::find($id);
+            $dele_file = false;
+            if (Storage::exists($dados->pasta))
             $dele_file = Storage::delete($dados->pasta);
 
-        $delete = _upload::where('id',$id)->delete();
-        return response()->json(['exec'=>$delete,'dele_file'=>$dele_file]);
+            $delete = _upload::where('id',$id)->delete();
+            return response()->json(['exec'=>$delete,'dele_file'=>$dele_file]);
+        }
     }
 }

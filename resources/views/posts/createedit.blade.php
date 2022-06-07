@@ -29,6 +29,7 @@
             </div>
         </div>
     </div>
+    @if($config['ac']=='alt')
     <div class="col-md-4">
         <div class="row">
             <div class="col-md-12">
@@ -45,6 +46,7 @@
                         @if(App\Qlib\Qlib::qoption('i_wp')=='s')
                             {{App\Qlib\Qlib::gerUploadWp([
                                 'pasta'=>$config['route'].'/'.date('Y').'/'.date('m'),
+                                'id'=>@$config['id'],
                                 'token_produto'=>$value['token'],
                                 'tab'=>$config['route'],
                                 'listFiles'=>@$listFiles,
@@ -111,6 +113,7 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 
 @stop
