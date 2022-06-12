@@ -1790,5 +1790,24 @@ function lib_carregaImageLfm(obj){
         $('#lfm-remove').removeClass('d-none').addClass('d-block');
     }
     //console.log(obj);
-
+}
+function selectTipoUser(tipo){
+    var url = window.location.href;
+    if(tipo=='pf'){
+        $('.div-pf').addClass('d-block').removeClass('d-none');
+        $('.div-pj').addClass('d-none').removeClass('d-block');
+        var lab_nome = 'Nome completo *';
+        var lab_cpf = 'CPF *';
+        url = url.replace('/pj','/'+tipo);
+    }
+    if(tipo=='pj'){
+        url = url.replace('/pf','/'+tipo);
+        $('.div-pf').addClass('d-none').removeClass('d-block');
+        $('.div-pj').addClass('d-block').removeClass('d-none');
+        var lab_nome = 'Nome do responsável *';
+        var lab_cpf = 'CPF do responsável*';
+    }
+    window.history.pushState("object", "Title", url);
+    $('[for="nome"]').html(lab_nome);
+    $('[for="cpfcnpj"]').html(lab_cpf);
 }

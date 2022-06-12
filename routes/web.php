@@ -15,6 +15,7 @@ use App\Http\Controllers\EstadocivilController;
 use App\Http\Controllers\LotesController;
 use App\Http\Controllers\RelatoriosController;
 use App\Http\Controllers\MapasController;
+use App\Http\Controllers\portalController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -29,8 +30,41 @@ use Illuminate\Support\Facades\Mail;
 | contains the "web" middleware group. Now create something great!
 |
 */
+$prefixo_admin = config('app.prefixo_admin');
+$prefixo_site = config('app.prefixo_site');
+Route::prefix($prefixo_admin)->group(function(){
 
-Route::prefix('users')->group(function(){
+    Route::resource('posts','\App\Http\Controllers\admin\PostsController',['parameters' => [
+        'posts' => 'id'
+    ]]);
+    Route::resource('api-wp','\App\Http\Controllers\wp\ApiWpController',['parameters' => [
+        'api-wp' => 'id'
+    ]]);
+    Route::resource('pages','\App\Http\Controllers\admin\PostsController',['parameters' => [
+        'pages' => 'id'
+    ]]);
+    Route::resource('documentos','\App\Http\Controllers\DocumentosController',['parameters' => [
+        'documentos' => 'id'
+    ]]);
+    Route::resource('qoptions','\App\Http\Controllers\admin\QoptionsController',['parameters' => [
+        'qoptions' => 'id'
+    ]]);
+    Route::resource('permissions','\App\Http\Controllers\admin\UserPermissions',['parameters' => [
+        'permissions' => 'id'
+    ]]);
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/',function(){
+        return redirect()->route('login');
+    });
+});
+Route::get($prefixo_site,[App\Http\Controllers\portalController::class, 'index'])->name('portal');
+
+Route::prefix($prefixo_site.'internautas')->group(function(){
+    Route::get('/',[App\Http\Controllers\portalController::class, 'cadInternautas'])->name('internautas.index');
+    Route::get('/cadastrar/{tipo}',[portalController::class, 'cadInternautas'])->name('cad.internautas');
+    Route::post('/cadastrar',[portalController::class,'storeInternautas'])->name('internautas.store');
+});
+Route::prefix($prefixo_admin.'/users')->group(function(){
     Route::get('/',[UserController::class,'index'])->name('users.index');
 
     Route::get('/ajax',[UserController::class,'paginacaoAjax'])->name('users.ajax');
@@ -46,7 +80,7 @@ Route::prefix('users')->group(function(){
     Route::delete('/{id}',[UserController::class,'destroy'])->where('id', '[0-9]+')->name('users.destroy');
 });
 
-Route::prefix('escolaridades')->group(function(){
+Route::prefix($prefixo_admin.'/escolaridades')->group(function(){
     Route::get('/',[EscolaridadeController::class,'index'])->name('escolaridades.index');
     Route::get('/create',[EscolaridadeController::class,'create'])->name('escolaridades.create');
     Route::post('/',[EscolaridadeController::class,'store'])->name('escolaridades.store');
@@ -56,7 +90,7 @@ Route::prefix('escolaridades')->group(function(){
     Route::post('/{id}',[EscolaridadeController::class,'update'])->where('id', '[0-9]+')->name('escolaridades.update-ajax');
     Route::delete('/{id}',[EscolaridadeController::class,'destroy'])->where('id', '[0-9]+')->name('escolaridades.destroy');
 });
-Route::prefix('estado-civil')->group(function(){
+Route::prefix($prefixo_admin.'/estado-civil')->group(function(){
     Route::get('/',[EstadocivilController::class,'index'])->name('estado-civil.index');
     Route::get('/create',[EstadocivilController::class,'create'])->name('estado-civil.create');
     Route::post('/',[EstadocivilController::class,'store'])->name('estado-civil.store');
@@ -66,7 +100,7 @@ Route::prefix('estado-civil')->group(function(){
     Route::post('/{id}',[EstadocivilController::class,'update'])->where('id', '[0-9]+')->name('estado-civil.update-ajax');
     Route::delete('/{id}',[EstadocivilController::class,'destroy'])->where('id', '[0-9]+')->name('estado-civil.destroy');
 });
-Route::prefix('etapas')->group(function(){
+Route::prefix($prefixo_admin.'/etapas')->group(function(){
     Route::get('/',[EtapaController::class,'index'])->name('etapas.index');
     Route::get('/create',[EtapaController::class,'create'])->name('etapas.create');
     Route::post('/',[EtapaController::class,'store'])->name('etapas.store');
@@ -76,13 +110,13 @@ Route::prefix('etapas')->group(function(){
     Route::post('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('etapas.update-ajax');
     Route::delete('/{id}',[EtapaController::class,'destroy'])->where('id', '[0-9]+')->name('etapas.destroy');
 });
-Route::prefix('relatorios')->group(function(){
+Route::prefix($prefixo_admin.'/relatorios')->group(function(){
     Route::get('/',[RelatoriosController::class,'index'])->name('relatorios.index');
     Route::get('/social',[RelatoriosController::class,'realidadeSocial'])->name('relatorios.social');
     Route::get('/evolucao',[RelatoriosController::class,'create'])->name('relatorios.evolucao');
     Route::get('export/filter', [RelatoriosController::class, 'exportFilter'])->name('relatorios.export_filter');
 });
-Route::prefix('sistema')->group(function(){
+Route::prefix($prefixo_admin.'/sistema')->group(function(){
     Route::get('/pefil',[EtapaController::class,'index'])->name('sistema.perfil');
     Route::get('/config',[EtapaController::class,'config'])->name('sistema.config');
     Route::post('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('sistema.update-ajax');
@@ -114,31 +148,12 @@ Route::resource('beneficiarios','\App\Http\Controllers\BeneficiariosController',
 'beneficiarios' => 'id'
 ]]);
 */
-Route::resource('posts','\App\Http\Controllers\admin\PostsController',['parameters' => [
-    'posts' => 'id'
-]]);
-Route::resource('api-wp','\App\Http\Controllers\wp\ApiWpController',['parameters' => [
-    'api-wp' => 'id'
-]]);
-Route::resource('pages','\App\Http\Controllers\admin\PostsController',['parameters' => [
-    'pages' => 'id'
-]]);
-Route::resource('documentos','\App\Http\Controllers\DocumentosController',['parameters' => [
-    'documentos' => 'id'
-]]);
-Route::resource('qoptions','\App\Http\Controllers\admin\QoptionsController',['parameters' => [
-    'qoptions' => 'id'
-]]);
-Route::resource('permissions','\App\Http\Controllers\admin\UserPermissions',['parameters' => [
-    'permissions' => 'id'
-]]);
+
 
 
 Auth::routes();
 
-Route::get('/',function(){
-  return redirect()->route('login');
-});
+
 Route::post('/tinymce', function (Request $request) {
     $content = $request->content;
     return view('testes.show')->with(compact('content'));
@@ -162,7 +177,6 @@ Route::prefix('admin')->group(function(){
         'questoes' => 'id'
     ]]);
 });*/
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('envio-mails',function(){
     $user = new stdClass();

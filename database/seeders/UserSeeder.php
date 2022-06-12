@@ -17,19 +17,19 @@ class UserSeeder extends Seeder
     {
         $arr = [
             [
-                'name' => 'Fernando Queta',
+                'nome' => 'Fernando Queta',
                 'email' => 'fernando@maisaqui.com.br',
                 'password' => Hash::make('ferqueta'),
                 'status' => 'actived',
-                'profile' => 'dev',
+                'verificado' => 'n',
                 'id_permission' => '1',
             ],
             [
-                'name' => 'Usuario de teste',
+                'nome' => 'Usuario de teste',
                 'email' => 'teste@databrasil.app.br',
                 'password' => Hash::make('mudar123'),
                 'status' => 'actived',
-                'profile' => 'admin',
+                'verificado' => 'n',
                 'id_permission' => '2',
             ],
         ];

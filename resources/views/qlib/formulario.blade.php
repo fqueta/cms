@@ -1,10 +1,11 @@
 @php
-    $config = $conf['config'];
-    $campos = $conf['campos'];
-    $value = $conf['value'];
+    $config     = $conf['config'];
+    $campos     = $conf['campos'];
+    $value      = $conf['value'];
+    $ambiente   = isset($config['ambiente'])?$config['ambiente']:'back'; //back = bakend  //front =  frontend
 @endphp
 
-<form id="{{$config['frm_id']}}" class="" action="@if($config['ac']=='cad'){{ route($config['route'].'.store') }}@elseif($config['ac']=='alt'){{ route($config['route'].'.update',['id'=>$config['id']]) }}@endif" method="post">
+<form id="{{$config['frm_id']}}" class="{{@$config['frm_class']}}" action="@if($config['ac']=='cad'){{ route($config['route'].'.store') }}@elseif($config['ac']=='alt'){{ route($config['route'].'.update',['id'=>$config['id']]) }}@endif" method="post" {{@$config['event']}}>
     @if($config['ac']=='alt')
     @method('PUT')
     @endif
@@ -60,7 +61,10 @@
             @endforeach
         @endif
         @csrf
-
-        @include('qlib.btnsalvar')
+        @if ($ambiente=='back')
+            @include('qlib.btnsalvar')
+        @elseif($ambiente=='front')
+            @include('portal.btnsalvar')
+        @endif
     </div>
 </form>

@@ -27,7 +27,7 @@ class PostsController extends Controller
     public function __construct(User $user)
     {
         $this->middleware('auth');
-        $seg1 = request()->segment(1);
+        $seg1 = request()->segment(2);
         $type = false;
         if($seg1){
             $type = substr($seg1,0,-1);

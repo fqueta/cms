@@ -184,7 +184,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => ['required','string','unique:users'],
+            'nome' => ['required','string','unique:users'],
         ]);
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';

@@ -76,6 +76,19 @@
                 @endforeach
             </div>
         </div>
+    @elseif ($config['type']=='radio_btn')
+        <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}} @error($config['campo']) is-invalid @enderror">
+            <div class="btn-group col-12 px-0" data-toggle="buttons">
+                @if ($config['label'])
+                    <label for="{{$config['campo']}}">{{$config['label']}}</label>
+                @endif
+                @foreach ($config['arr_opc'] as $k=>$v)
+                <label class="{{ $config['class'] }} @if(isset($config['value']) && $config['value'] == $k) active @endif ">
+                    <input type="radio" name="{{ $config['campo']}}" hidden {{$config['event']}} value="{{$k}}" id="" autocomplete="off" @if(isset($config['value']) && $config['value'] == $k) checked @endif > {{ $v }}
+                </label>
+                @endforeach
+            </div>
+        </div>
     @elseif ($config['type']=='hidden')
         <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}} d-none" div-id="{{$config['campo']}}" >
             @if ($config['label'])
