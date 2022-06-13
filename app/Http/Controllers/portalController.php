@@ -7,6 +7,7 @@ use App\Http\Controllers\wp\ApiWpController;
 use App\Http\Controllers\UserController;
 use App\Http\Requests\StoreBeneficiarioRequest;
 use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\StoreUserRequest;
 use Illuminate\Http\Request;
 use stdClass;
 use App\Models\Post;
@@ -97,7 +98,9 @@ class portalController extends Controller
             $displayPj = '';
         }
         $hidden_editor = '';
+        $info_obs = '<div class="alert alert-info alert-dismissable" role="alert"><button class="close" type="button" data-dismiss="alert" aria-hidden="true">×</button><i class="fa fa-info-circle"></i>&nbsp;<span class="sw_lato_black">Obs</span>: campos com asterisco (<i class="swfa fas fa-asterisk cad_asterisco" aria-hidden="true"></i>) são obrigatórios.</div>';
         $ret = [
+            'sep0'=>['label'=>'informações','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Informe seus dados').'</h4><hr>','script_show'=>''],
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'tipo_pessoa'=>[
                 'label'=>'',
@@ -110,14 +113,16 @@ class portalController extends Controller
                 'value'=>$sec,
                 'class'=>'btn btn-outline-primary',
             ],
+            'info_obs'=>['label'=>'Informações obs','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>$info_obs,'script_show'=>''],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'email'=>['label'=>'E-mail *','active'=>false,'type'=>'email','exibe_busca'=>'d-none','event'=>'required','tam'=>'6','placeholder'=>''],
             'password'=>['label'=>'Senha *','active'=>false,'type'=>'password','exibe_busca'=>'d-none','event'=>'required','tam'=>'3','placeholder'=>''],
-            'password_conf'=>['label'=>'Confirmar Senha *','active'=>false,'type'=>'password','exibe_busca'=>'d-none','event'=>'required','tam'=>'3','placeholder'=>''],
+            'password_confirmation'=>['label'=>'Confirmar Senha *','active'=>false,'type'=>'password','exibe_busca'=>'d-none','event'=>'required','tam'=>'3','placeholder'=>''],
             'nome'=>['label'=>$lab_nome,'active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'9','placeholder'=>''],
-            'cpfcnpj'=>['label'=>$lab_cpf,'active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cpf','tam'=>'3'],
-            'razao'=>['label'=>'Razão social *','active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'6','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
-            'config[nome_fantasia]'=>['label'=>'Nome fantasia','active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'6','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
+            'cpf'=>['label'=>$lab_cpf,'active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cpf','tam'=>'3'],
+            'cnpj'=>['label'=>'CNPJ *','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cnpj','tam'=>'4','class_div'=>'div-pj '.$displayPj],
+            'razao'=>['label'=>'Razão social *','active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'4','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
+            'config[nome_fantasia]'=>['label'=>'Nome fantasia','active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'4','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
             'config[celular]'=>['label'=>'Telefone celular','active'=>true,'type'=>'tel','tam'=>'4','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','cp_busca'=>'config][celular'],
             'config[telefone_residencial]'=>['label'=>'Telefone residencial','active'=>true,'type'=>'tel','tam'=>'4','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','cp_busca'=>'config][telefone_residencial'],
             'config[telefone_comercial]'=>['label'=>'Telefone comercial','active'=>true,'type'=>'tel','tam'=>'4','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','cp_busca'=>'config][telefone_comercial'],
@@ -154,6 +159,7 @@ class portalController extends Controller
                 'class'=>'select2',
                 'cp_busca'=>'config][nascimento',
             ],
+            'sep1'=>['label'=>'Endereço','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Endereço').'</h4><hr>','script_show'=>''],
             'config[cep]'=>['label'=>'CEP','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'mask-cep onchange=buscaCep1_0(this.value)','tam'=>'3'],
             'config[endereco]'=>['label'=>'Endereço','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'7','cp_busca'=>'config][endereco'],
             'config[numero]'=>['label'=>'Numero','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2','cp_busca'=>'config][numero'],
@@ -161,15 +167,20 @@ class portalController extends Controller
             'config[cidade]'=>['label'=>'Cidade','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6','cp_busca'=>'config][cidade'],
             'config[uf]'=>['label'=>'UF','active'=>false,'js'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'2','cp_busca'=>'config][uf'],
             //'foto_perfil'=>['label'=>'Foto','active'=>false,'js'=>true,'placeholder'=>'','type'=>'file','exibe_busca'=>'d-none','event'=>'','tam'=>'12'],
+            'sep2'=>['label'=>'Preferencias','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>','script_show'=>''],
+            'preferecias[newslatter]'=>['label'=>'Desejo receber e-mails com as novidades','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+
+
         ];
         return $ret;
     }
-    public function storeInternautas(Request $request)
+    public function storeInternautas(StoreUserRequest $request)
     {
+        /*
         $validatedData = $request->validate([
             'nome' => ['required','string','unique:users'],
             'email' => ['required','string','unique:users'],
-        ]);
+        ]);*/
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
@@ -180,6 +191,9 @@ class portalController extends Controller
                 unset($dados['password']);
             }
         }
+        $dados['id_permission'] = Qlib::qoption('id_permission_front')? Qlib::qoption('id_permission_front'): 5;
+        dd($dados);
+
         $salvar = User::create($dados);
         $route = $this->routa.'.index';
         $ret = [

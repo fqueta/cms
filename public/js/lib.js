@@ -98,7 +98,8 @@ function lib_formatMensagem(locaExive,mess,style,tempo){
 	var mess = "<div class=\"alert alert-"+style+" alert-dismissable\" role=\"alert\"><button class=\"close\" type=\"button\" data-dismiss=\"alert\" aria-hidden=\"true\">X</button><i class=\"fa fa-exclamation-triangle\"></i>&nbsp;"+mess+"</div>";
 	if(typeof(tempo) == 'undefined')
 		var tempo = 4000;
-	setTimeout(function(){$(".alert").hide('slow')}, tempo);
+    if(tempo>0)
+	setTimeout(function(){$(".alert-"+style+"").hide('slow')}, tempo);
 	$(locaExive).html(mess);
 }
 function abrirjanela(url, nome, w, h, param){
@@ -739,8 +740,9 @@ function lib_funError(res){
                 s.removeClass('is-invalid');
             }
         }
+        console.log(s);
     });
-    lib_formatMensagem('.mens',mens,'danger');
+    lib_formatMensagem('.mens',mens,'danger',0);
 
 }
 function modalGeral(id,titulo,conteudo){
@@ -1799,6 +1801,7 @@ function selectTipoUser(tipo){
         var lab_nome = 'Nome completo *';
         var lab_cpf = 'CPF *';
         url = url.replace('/pj','/'+tipo);
+        $('[name="cpf"]').inputmask('999.999.999-99');
     }
     if(tipo=='pj'){
         url = url.replace('/pf','/'+tipo);
@@ -1806,8 +1809,9 @@ function selectTipoUser(tipo){
         $('.div-pj').addClass('d-block').removeClass('d-none');
         var lab_nome = 'Nome do responsável *';
         var lab_cpf = 'CPF do responsável*';
+        //$('[name="cpf"]').inputmask('999.999.999/9999-99');
     }
     window.history.pushState("object", "Title", url);
     $('[for="nome"]').html(lab_nome);
-    $('[for="cpfcnpj"]').html(lab_cpf);
+    $('[for="cpf"]').html(lab_cpf);
 }

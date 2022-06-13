@@ -141,6 +141,15 @@
         @endphp
         <div class="col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
             @if ($config['script'])
+                {!!$config['script']!!}
+            @endif
+        </div>
+    @elseif ($config['type']=='html_blade')
+        @php
+           $config['script'] = isset($config['script'])?$config['script']:false;
+        @endphp
+        <div class="col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
+            @if ($config['script'])
                 @if(isset($config['dados']))
                     @include($config['script'],@$config['dados'])
                 @else

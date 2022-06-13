@@ -17,8 +17,9 @@ class CreateUsersTable extends Migration
             $table->id();
             $table->enum('tipo_pessoa',['pf','pj']); //pf = pessoa fisica, pj = pessoa juridica
             $table->string('nome');
-            $table->string('razao');
-            $table->string('cpfcnpj')->nullable();
+            $table->string('razao')->nullable();
+            $table->string('cpf')->nullable();
+            $table->string('cnpj')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
