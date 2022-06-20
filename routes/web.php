@@ -60,9 +60,16 @@ Route::prefix($prefixo_admin)->group(function(){
 Route::get($prefixo_site,[App\Http\Controllers\portalController::class, 'index'])->name('portal');
 
 Route::prefix($prefixo_site.'internautas')->group(function(){
-    Route::get('/',[App\Http\Controllers\portalController::class, 'cadInternautas'])->name('internautas.index');
+    Route::get('/',[App\Http\Controllers\portalController::class, 'index'])->name('internautas.index');
     Route::get('/cadastrar/{tipo}',[portalController::class, 'cadInternautas'])->name('cad.internautas');
     Route::post('/cadastrar',[portalController::class,'storeInternautas'])->name('internautas.store');
+    Route::get('/cadastrar/ac/{tipo}/{id}',[portalController::class,'acaoInternautas'])->name('internautas.acao.get');
+    Route::get('/login',[portalController::class,'loginInternautas'])->name('internautas.login');
+    Route::get('/logout',[portalController::class,'logoutInternautas'])->name('internautas.logout');
+    Route::resource('sic','\App\Http\Controllers\portal\sicController',['parameters' => [
+        'sic' => 'id'
+    ]]);
+
 });
 Route::prefix($prefixo_admin.'/users')->group(function(){
     Route::get('/',[UserController::class,'index'])->name('users.index');
@@ -143,11 +150,6 @@ Route::prefix('teste')->group(function(){
 });
 
 //Route::post('/upload',[App\Http\Controllers\UploadFile::class,'upload'])->name('teste.upload');
-/*
-Route::resource('beneficiarios','\App\Http\Controllers\BeneficiariosController',['parameters' => [
-'beneficiarios' => 'id'
-]]);
-*/
 
 
 
@@ -186,6 +188,15 @@ Route::get('envio-mails',function(){
     $enviar = Mail::send(new \App\Mail\dataBrasil($user));
     return $enviar;
 });
+Route::get('envio-mails-veriuser',function(){
+    $user = new stdClass();
+    $user->name = 'Fernando Queta';
+    $user->email = 'ferqueta@yahoo.com.br';
+    //return new \App\Mail\veriUser($user);
+    $enviar = Mail::send(new \App\Mail\veriUser($user));
+    return $enviar;
+});
+
 /*
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
     \UniSharp\LaravelFilemanager\Lfm::routes();

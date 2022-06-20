@@ -442,6 +442,9 @@ class Qlib
     }
     static function ver_PermAdmin($perm=false,$url=false){
         $ret = false;
+        if(!Auth::check()){
+            return $ret;
+        }
         if(!$url){
             $url = URL::current();
             $arr_url = explode('/',$url);
@@ -761,4 +764,36 @@ class Qlib
         }
         return $ret;
     }*/
+    /***
+     * Busca um tipo de routa padrão do sistema
+     * Ex.: routa que será aberta ao logar
+     *
+     */
+    static function redirectLogin($ambiente='back')
+    {
+        $ret = '/';
+        if(!Auth::check()){
+            return $ret;
+        }
+        $id_permission = auth()->user()->id_permission;
+        $dPermission = Permission::FindOrFail($id_permission);
+        $ret = isset($dPermission['redirect_login']) ? $dPermission['redirect_login']:'/';
+        return $ret;
+    }
+    /***
+     * Informa o ambiente da página aberta
+     * Ex.: routa que será aberta ao logar
+     *
+     */
+    static function ambiente()
+    {
+        $seg1 = request()->segment(1);
+        $prefixo_admin = config('app.prefixo_admin');
+        $prefixo_site = config('app.prefixo_site');
+        if($seg1==$prefixo_admin){
+            return 'back';
+        }else{
+            return 'front';
+        }
+    }
 }

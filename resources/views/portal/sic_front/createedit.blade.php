@@ -33,5 +33,5 @@
 
 @section('js')
     @include('portal.js')
-    @include('portal.js_submit')
+    @include('portal.sic_front.js_submit')
 @endsection

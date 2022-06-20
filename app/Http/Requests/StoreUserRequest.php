@@ -26,6 +26,7 @@ class StoreUserRequest extends FormRequest
      */
     public function rules()
     {
+        $this->sanitize();
         return [
             'nome'=>['required',new FullName],
             'email'=>['required','string','unique:users'],
@@ -46,5 +47,21 @@ class StoreUserRequest extends FormRequest
             'password_confirmation.required' => __('É obribatório confirmar a senha'),
             //'password_conf.confirmed' => __('As senhas são diferentes'),
         ];
+    }
+    public function sanitize()
+    {
+        $data = $this->all();
+        foreach ($data as $key => $value) {
+            if(is_array($value)){
+                foreach ($value as $k => $v) {
+                    $data[$key][$k] = strip_tags($v);
+                    $data[$key][$k] = addslashes($data[$key][$k]);
+                }
+            }else{
+                $data[$key] = strip_tags($value);
+                $data[$key] = addslashes($data[$key]);
+            }
+        }
+        $this->replace($data);
     }
 }

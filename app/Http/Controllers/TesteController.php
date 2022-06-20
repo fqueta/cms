@@ -19,7 +19,9 @@ class TesteController extends Controller
     public function index()
     {
 
-        $user = Auth::user();
+       $ret = Qlib::redirectLogin();
+       dd($ret);
+       //$user = Auth::user();
         //$doc = new LotesController($user);
         $lote = isset($_GET['lote'])?$_GET['lote']:201;
         $oc = isset($_GET['oc'])?$_GET['oc']:289;

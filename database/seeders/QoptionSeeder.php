@@ -32,7 +32,13 @@ class QoptionSeeder extends Seeder
                 'url'=>'editor_padrao',
                 'valor'=>'tinymce',
                 'obs'=>'opçoes: Laraberg, summernonet ou tinymce',
-            ]
+            ],
+            [
+                'nome'=>'Nome da Empresa',
+                'url'=>'empresa',
+                'valor'=>'AMS marketing',
+                'obs'=>'',
+            ],
         ]);
     }
 }

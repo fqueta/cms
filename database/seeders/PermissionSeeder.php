@@ -33,31 +33,36 @@ class PermissionSeeder extends Seeder
         DB::table('permissions')->insert([
             [
                 'name'=>'Master',
+                'redirect_login'=>'/admin/home',
                 'description'=>'Desenvolvedores',
                 'active'=>'s',
                 'id_menu'=>json_encode($arrPermiss['master']),
             ],
             [
                 'name'=>'Adminstrador',
+                'redirect_login'=>'/admin/home',
                 'description'=>'Adiminstradores do sistema',
                 'active'=>'s',
                 'id_menu'=>json_encode($arrPermiss['admin']),
             ],
             [
                 'name'=>'Gerente',
+                'redirect_login'=>'/admin/home',
                 'description'=>'Gerente do sistema menos que administrador secundário',
                 'active'=>'s',
                 'id_menu'=>json_encode([]),
             ],
             [
                 'name'=>'Escritório',
+                'redirect_login'=>'/admin/home',
                 'description'=>'Pessoas do escritório',
                 'active'=>'s',
                 'id_menu'=>json_encode([]),
             ],
             [
-                'name'=>'Clientes',
-                'description'=>'Somente clientes, Sem privilêgios de administração acesso a área restrita do site','active'=>'s',
+                'name'=>'Internautas',
+                'redirect_login'=>'/internautas',
+                'description'=>'Somente Internautas, Sem privilêgios de administração acesso a área restrita do site','active'=>'s',
                 'id_menu'=>json_encode([]),
             ],
         ]);

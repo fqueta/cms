@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProfissaosTable extends Migration
+class CreateSicsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,18 @@ class CreateProfissaosTable extends Migration
      */
     public function up()
     {
-        Schema::create('profissaos', function (Blueprint $table) {
+        Schema::create('sics', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('nome','150')->nullable();
+            $table->string('token','60')->nullable();
+            $table->string('nome')->nullable();
+            $table->string('type')->nullable();
+            $table->string('status')->nullable();
             $table->enum('ativo',['s','n']);
             $table->longText('obs')->nullable();
+            $table->json('meta')->nullable();
+            $table->json('config')->nullable();
             $table->integer('autor')->nullable();
-            $table->string('token','60')->nullable();
             $table->enum('excluido',['n','s']);
             $table->text('reg_excluido')->nullable();
             $table->enum('deletado',['n','s']);
@@ -35,6 +39,6 @@ class CreateProfissaosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('profissaos');
+        Schema::dropIfExists('sics');
     }
 }

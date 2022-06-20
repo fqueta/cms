@@ -14,9 +14,11 @@ use App\Models\Post;
 use App\Qlib\Qlib;
 use App\Models\User;
 use App\Models\_upload;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class portalController extends Controller
 {
@@ -48,15 +50,21 @@ class portalController extends Controller
         $this->view = 'portal';
         $this->i_wp = Qlib::qoption('i_wp');//indegração com Wp s para sim
         $this->wp_api = new ApiWpController();
+        //$this->routeIndex = route('internautas.index');
     }
     public function index($config = null)
     {
-        if($this->pg==NULL){
+        //if($this->pg==NULL){
+            $user = Auth::user();
+            //dd($user);
             return view('portal.index',['prefixo_site'=>$this->prefixo_site,'prefixo_admin'=>$this->prefixo_admin]);
-        }
+        //}
     }
     public function cadInternautas($tipo = null)
     {
+        if(Auth::check()){
+            return redirect()->route('internautas.index');
+        }
         $tp = $tipo?$tipo:'pf';
         $config = [
             'ac'=>'cad',
@@ -90,12 +98,16 @@ class portalController extends Controller
             $lab_cpf = 'CPF *';
             $displayPf = '';
             $displayPj = 'd-none';
-        }
-        if($sec=='pj'){
+        }elseif($sec=='pj'){
             $lab_nome = 'Nome do responsável *';
             $lab_cpf = 'CPF do responsável*';
             $displayPf = 'd-none';
             $displayPj = '';
+        }else{
+            $lab_nome = 'Nome completo *';
+            $lab_cpf = 'CPF *';
+            $displayPf = '';
+            $displayPj = 'd-none';
         }
         $hidden_editor = '';
         $info_obs = '<div class="alert alert-info alert-dismissable" role="alert"><button class="close" type="button" data-dismiss="alert" aria-hidden="true">×</button><i class="fa fa-info-circle"></i>&nbsp;<span class="sw_lato_black">Obs</span>: campos com asterisco (<i class="swfa fas fa-asterisk cad_asterisco" aria-hidden="true"></i>) são obrigatórios.</div>';
@@ -182,6 +194,7 @@ class portalController extends Controller
             'email' => ['required','string','unique:users'],
         ]);*/
         $dados = $request->all();
+        //dd($dados);
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
         if(isset($dados['password']) && !empty($dados['password'])){
@@ -192,15 +205,37 @@ class portalController extends Controller
             }
         }
         $dados['id_permission'] = Qlib::qoption('id_permission_front')? Qlib::qoption('id_permission_front'): 5;
-        dd($dados);
+        $dados['ativo'] = 's';
+        //dd($dados);
 
         $salvar = User::create($dados);
         $route = $this->routa.'.index';
+        $enviarEmail = false;
+        if($id=$salvar->id){
+            $mens = 'Cadastro realizado com sucesso. ';
+            $salvos = User::FindOrFail($id);
+            if($salvos){
+                Auth::attempt([
+                    'email'=>$dados['email'],
+                    'password'=>$dados['password'],
+                ]);
+                $enviarEmail = Mail::send(new \App\Mail\veriUser($salvos));
+                if(count(Mail::failures()) > 0){
+                    $mens .= 'Falha ao enviar e-mail entre em contato com o nosso suporte!';
+                }else{
+                    $mens .= 'Um e-mail foi enviado para sua caixa de e-mails, contendo um link para ativação do seu cadastro. Caso não encontre na caixa de entrada, por favor consulte o spam. <p>Lembre-se é <b>obrigatório a confirmação do E-mail</b> para ativação do seu cadastro e poder utilizar os <b>serviços do portal.</b></p>';
+                }
+            }else{
+                $mens .= ' Mais não foi encontrado!';
+
+            }
+        }
         $ret = [
-            'mens'=>$this->label.' cadastrada com sucesso!',
+            'mens'=>$mens,
             'color'=>'success',
             'idCad'=>$salvar->id,
             'exec'=>true,
+            'enviarEmail'=>$enviarEmail,
             'dados'=>$dados
         ];
 
@@ -209,6 +244,47 @@ class portalController extends Controller
             return response()->json($ret);
         }else{
             return redirect()->route($route,$ret);
+        }
+    }
+    public function loginInternautas($var = null)
+    {
+        return $this->manualLogin(11);
+    }
+    public function logoutInternautas($var = null)
+    {
+        Auth::logout();
+        return redirect()->route('internautas.index');
+
+    }
+    public function manualLogin($id){
+        $user = User::find($id);
+        Auth::login($user);
+        if(Auth::check()){
+            return 'usuario '.$user->nome.'Locado com sucesso';
+        }
+        return redirect('/');
+    }
+    public function acaoInternautas( $tipo,$id)
+    {
+        $ret['exec'] = false;
+        if($tipo=='veriuser'){
+            //Verifica usuarios
+            $email = base64_decode($id);
+            if($email){
+                $atualiza = User::where('email','=',$email)->update([
+                   'verificado'=>'s',
+                ]);
+                if($atualiza){
+                    $user = User::where('email','=',$email)->get();
+                    if($id=$user[0]->id){
+                        $ret['mens'] = $this->manualLogin($id);
+                        if($user[0]->verificado=='s'){
+                            $ret['exec'] = true;
+                        }
+                    }
+                }
+            }
+            return redirect()->route('internautas.index',$ret);
         }
     }
 }

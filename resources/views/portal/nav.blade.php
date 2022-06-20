@@ -9,6 +9,9 @@
         <li class="nav-item active">
           <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
         </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{{route('sic.create')}}">E-Sic<span class="sr-only">(current)</span></a>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="{{route('cad.internautas',['tipo'=>'pf'])}}">Cadastrar P.F</a>
         </li>
@@ -31,8 +34,13 @@
           <a class="nav-link disabled">Disabled</a>
         </li>-->
       </ul>
-      <form class="form-inline my-2 my-lg-0">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logar</button>
-      </form>
+      @can('is_user_front')
+      <a href="/internautas/logout" class="btn btn-outline-danger my-2 my-sm-0">Sair</a>
+      @elsecan('is_user_back')
+      <a href="/internautas/logout" class="btn btn-outline-secondary my-2 my-sm-0">Logado como admin, Sair?</a>
+      <a href="/admin/home" class="btn btn-outline-primary my-2 my-sm-0">Painel</a>
+      @else
+      <a href="/login" class="btn btn-outline-success my-2 my-sm-0">Logar</a>
+      @endcan
     </div>
   </nav>

@@ -1,51 +1,49 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\portal;
 
-use App\Models\_upload;
-use App\Models\User;
+use App\Http\Controllers\Controller;
+
 use stdClass;
-use App\Qlib\Qlib;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
+use App\Qlib\Qlib;
+use App\Models\User;
+use App\Models\_upload;
+use App\Models\Sic;
 use Illuminate\Support\Facades\Auth;
-use DataTables;
+use Illuminate\Support\Facades\DB;
 
-class UserController extends Controller
+class sicController extends Controller
 {
     protected $user;
     public $routa;
     public $label;
-    public $view;
+    public $ambiente;
     public function __construct(User $user)
     {
         $this->middleware('auth');
         $this->user = $user;
-        $this->routa = 'users';
-        $this->label = 'Usuários';
+        $this->routa = 'sic';
+        $this->label = 'Sic';
+        $this->ambiente = Qlib::ambiente(); //Verifica se estamos no backend ou no frontend
         $this->view = 'padrao';
     }
-    public function queryUsers($get=false,$config=false)
+    public function querySic($get=false,$config=false)
     {
         $ret = false;
         $get = isset($_GET) ? $_GET:[];
         $ano = date('Y');
         $mes = date('m');
+        //$todasFamilias = Familia::where('excluido','=','n')->where('deletado','=','n');
         $config = [
             'limit'=>isset($get['limit']) ? $get['limit']: 50,
             'order'=>isset($get['order']) ? $get['order']: 'desc',
         ];
-        $logado = Auth::user();
-        $user =  User::where('id_permission','>=',$logado->id_permission)->orderBy('id',$config['order']);
-        //$user =  DB::table('users')->where('ativo','s')->orderBy('id',$config['order']);
+        $sic =  Sic::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        //$sic =  DB::table('sics')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
-        $users = new stdClass;
-        $campos = isset($_SESSION['campos_users_exibe']) ? $_SESSION['campos_users_exibe'] : $this->campos();
+        $sic_totais = new stdClass;
+        $campos = isset($_SESSION['campos_sics_exibe']) ? $_SESSION['campos_sics_exibe'] : $this->campos();
         $tituloTabela = 'Lista de todos cadastros';
         $arr_titulo = false;
         if(isset($get['filter'])){
@@ -54,11 +52,11 @@ class UserController extends Controller
                 foreach ($get['filter'] as $key => $value) {
                     if(!empty($value)){
                         if($key=='id'){
-                            $user->where($key,'LIKE', $value);
+                            $sic->where($key,'LIKE', $value);
                             $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
                             $arr_titulo[$campos[$key]['label']] = $value;
                         }else{
-                            $user->where($key,'LIKE','%'. $value. '%');
+                            $sic->where($key,'LIKE','%'. $value. '%');
                             if($campos[$key]['type']=='select'){
                                 $value = $campos[$key]['arr_opc'][$value];
                             }
@@ -70,110 +68,97 @@ class UserController extends Controller
                 }
                 if($titulo_tab){
                     $tituloTabela = 'Lista de: &'.$titulo_tab;
+                                //$arr_titulo = explode('&',$tituloTabela);
                 }
-                $fm = $user;
+                $fm = $sic;
                 if($config['limit']=='todos'){
-                    $user = $user->get();
+                    $sic = $sic->get();
                 }else{
-                    $user = $user->paginate($config['limit']);
+                    $sic = $sic->paginate($config['limit']);
                 }
         }else{
-            $fm = $user;
+            $fm = $sic;
             if($config['limit']=='todos'){
-                $user = $user->get();
+                $sic = $sic->get();
             }else{
-                $user = $user->paginate($config['limit']);
+                $sic = $sic->paginate($config['limit']);
             }
         }
-        $users->todos = $fm->count();
-        $users->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->get()->count();
-        $users->ativos = $fm->where('ativo','=','s')->get()->count();
-        $users->inativos = $fm->where('ativo','=','n')->get()->count();
-        //dd($user);
-        $ret['user'] = $user;
-        $ret['user_totais'] = $users;
+        $sic_totais->todos = $fm->count();
+        $sic_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
+        $sic_totais->ativos = $fm->where('ativo','=','s')->count();
+        $sic_totais->inativos = $fm->where('ativo','=','n')->count();
+        $ret['sic'] = $sic;
+        $ret['sic_totais'] = $sic_totais;
         $ret['arr_titulo'] = $arr_titulo;
         $ret['campos'] = $campos;
         $ret['config'] = $config;
         $ret['tituloTabela'] = $tituloTabela;
         $ret['config']['resumo'] = [
-            'todos_registro'=>['label'=>'Todos cadastros','value'=>$users->todos,'icon'=>'fas fa-calendar'],
-            'todos_mes'=>['label'=>'Cadastros recentes','value'=>$users->esteMes,'icon'=>'fas fa-calendar-times'],
-            'todos_ativos'=>['label'=>'Cadastros ativos','value'=>$users->ativos,'icon'=>'fas fa-check'],
-            'todos_inativos'=>['label'=>'Cadastros inativos','value'=>$users->inativos,'icon'=>'fas fa-archive'],
+            'todos_registro'=>['label'=>'Todos cadastros','value'=>$sic_totais->todos,'icon'=>'fas fa-calendar'],
+            'todos_mes'=>['label'=>'Cadastros recentes','value'=>$sic_totais->esteMes,'icon'=>'fas fa-calendar-times'],
+            'todos_ativos'=>['label'=>'Cadastros ativos','value'=>$sic_totais->ativos,'icon'=>'fas fa-check'],
+            'todos_inativos'=>['label'=>'Cadastros inativos','value'=>$sic_totais->inativos,'icon'=>'fas fa-archive'],
         ];
         return $ret;
     }
-    public function campos($dados=false){
-        $user = Auth::user();
-        $permission = new admin\UserPermissions($user);
-
-        $ret = [
+    public function campos(){
+        return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'id_permission'=>[
-                'label'=>'Permissão*',
-                'active'=>true,
-                'type'=>'select',
-                'data_selector'=>[
-                    'campos'=>$permission->campos(),
-                    'route_index'=>route('permissions.index'),
-                    'id_form'=>'frm-permission',
-                    'action'=>route('permissions.store'),
-                    'campo_id'=>'id',
-                    'campo_bus'=>'nome',
-                    'label'=>'Permissão',
-                ],'arr_opc'=>Qlib::sql_array("SELECT id,name FROM permissions WHERE active='s' AND id >='".$user->id_permission."'",'name','id'),'exibe_busca'=>'d-block',
-                'event'=>'',
-                'tam'=>'6',
-            ],
-            'nome'=>['label'=>'Nome completo','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'email'=>['label'=>'Email','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
-            'password'=>['label'=>'Senha','active'=>false,'type'=>'password','value'=>'','exibe_busca'=>'d-none','event'=>'','tam'=>'6'],
-            'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'2','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            //'email'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'nome'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Ensino médio completo','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'ativo'=>['label'=>'Ativado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
         ];
-        return $ret;
     }
     public function index(User $user)
     {
-        $this->authorize('is_admin', $user);
-        $title = 'Usuários Cadastrados';
+        $this->authorize('ler', $this->routa);
+        $title = 'Cadastro de sic';
         $titulo = $title;
-        $queryUsers = $this->queryUsers($_GET);
-        $queryUsers['config']['exibe'] = 'html';
+        $querySic = $this->querySic($_GET);
+        $querySic['config']['exibe'] = 'html';
         $routa = $this->routa;
-        $view = $this->view;
-
-        return view($routa.'.index',[
-            'dados'=>$queryUsers['user'],
+        return view($this->view.'.index',[
+            'dados'=>$querySic['sic'],
             'title'=>$title,
             'titulo'=>$titulo,
-            'campos_tabela'=>$queryUsers['campos'],
-            'user_totais'=>$queryUsers['user_totais'],
-            'titulo_tabela'=>$queryUsers['tituloTabela'],
-            'arr_titulo'=>$queryUsers['arr_titulo'],
-            'config'=>$queryUsers['config'],
+            'campos_tabela'=>$querySic['campos'],
+            'sic_totais'=>$querySic['sic_totais'],
+            'titulo_tabela'=>$querySic['tituloTabela'],
+            'arr_titulo'=>$querySic['arr_titulo'],
+            'config'=>$querySic['config'],
             'routa'=>$routa,
-            'view'=>$view,
+            'view'=>$this->view,
             'i'=>0,
         ]);
     }
     public function create(User $user)
     {
-        $this->authorize('is_admin', $user);
-        $title = __('Cadastrar usuário');
+        if(auth()->user()->id_permission==Qlib::qoption('id_permission_front')){
+            $this->authorize('is_user_front');
+        }else{
+            $this->authorize('create', $this->routa);
+        }
+        $local = $this->ambiente;
+        $title = 'Cadastrar sic';
         $titulo = $title;
         $config = [
             'ac'=>'cad',
-            'frm_id'=>'frm-users',
+            'frm_id'=>'frm-sics',
             'route'=>$this->routa,
+            'ambiente'=>$local,
         ];
         $value = [
             'token'=>uniqid(),
         ];
         $campos = $this->campos();
-        return view($this->routa.'.createedit',[
+
+        $view = $this->view;
+        if($local=='front'){
+            $view = 'portal.sic_front';
+        }
+        return view($view.'.createedit',[
             'config'=>$config,
             'title'=>$title,
             'titulo'=>$titulo,
@@ -183,21 +168,21 @@ class UserController extends Controller
     }
     public function store(Request $request)
     {
+        if(auth()->user()->id_permission==Qlib::qoption('id_permission_front')){
+            $this->authorize('is_user_front');
+        }else{
+            $this->authorize('create', $this->routa);
+        }
+        $local = $this->ambiente;
         $validatedData = $request->validate([
-            'nome' => ['required','string','unique:users'],
+            'nome' => ['required','string','unique:sics'],
         ]);
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
-        if(isset($dados['password']) && !empty($dados['password'])){
-            $dados['password'] = Hash::make($dados['password']);
-        }else{
-            if(empty($dados['password'])){
-                unset($dados['password']);
-            }
-        }
+
         //dd($dados);
-        $salvar = User::create($dados);
+        $salvar = Sic::create($dados);
         $route = $this->routa.'.index';
         $ret = [
             'mens'=>$this->label.' cadastrada com sucesso!',
@@ -209,6 +194,7 @@ class UserController extends Controller
 
         if($ajax=='s'){
             $ret['return'] = route($route).'?idCad='.$salvar->id;
+            $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
             return response()->json($ret);
         }else{
             return redirect()->route($route,$ret);
@@ -220,31 +206,32 @@ class UserController extends Controller
         //
     }
 
-    public function edit($user)
+    public function edit($sic,User $user)
     {
-        $id = $user;
-        $dados = User::where('id',$id)->get();
-        $routa = 'users';
-        $this->authorize('is_admin', $user);
+        $id = $sic;
+        $dados = Sic::where('id',$id)->get();
+        $routa = 'sics';
+        $this->authorize('ler', $this->routa);
 
         if(!empty($dados)){
-            $title = 'Editar Cadastro de users';
+            $title = 'Editar cadastro de sic';
             $titulo = $title;
             $dados[0]['ac'] = 'alt';
             if(isset($dados[0]['config'])){
                 $dados[0]['config'] = Qlib::lib_json_array($dados[0]['config']);
             }
             $listFiles = false;
+            $campos = $this->campos();
             if(isset($dados[0]['token'])){
                 $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
             }
             $config = [
                 'ac'=>'alt',
-                'frm_id'=>'frm-users',
+                'frm_id'=>'frm-sics',
                 'route'=>$this->routa,
                 'id'=>$id,
             ];
-            $campos = $this->campos();
+
             $ret = [
                 'value'=>$dados[0],
                 'config'=>$config,
@@ -255,7 +242,7 @@ class UserController extends Controller
                 'exec'=>true,
             ];
 
-            return view($routa.'.createedit',$ret);
+            return view($this->view.'.createedit',$ret);
         }else{
             $ret = [
                 'exec'=>false,
@@ -266,6 +253,7 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
+        $this->authorize('update', $this->routa);
         $validatedData = $request->validate([
             'nome' => ['required'],
         ]);
@@ -279,8 +267,9 @@ class UserController extends Controller
                     }else{
                         $data[$key] = Qlib::dtBanco($value);
                     }
-                }elseif($key=='password'){
-                    $data[$key] = Hash::make($value);
+                }elseif($key == 'renda_familiar') {
+                    $value = str_replace('R$','',$value);
+                    $data[$key] = Qlib::precoBanco($value);
                 }else{
                     $data[$key] = $value;
                 }
@@ -293,11 +282,8 @@ class UserController extends Controller
             $dados['config'] = Qlib::lib_array_json($dados['config']);
         }
         $atualizar=false;
-        if(empty($data['passaword'])){
-            unset($data['passaword']);
-        }
         if(!empty($data)){
-            $atualizar=User::where('id',$id)->update($data);
+            $atualizar=Sic::where('id',$id)->update($data);
             $route = $this->routa.'.index';
             $ret = [
                 'exec'=>$atualizar,
@@ -326,10 +312,11 @@ class UserController extends Controller
 
     public function destroy($id,Request $request)
     {
+        $this->authorize('delete', $this->routa);
         $config = $request->all();
         $ajax =  isset($config['ajax'])?$config['ajax']:'n';
-        $routa = 'users';
-        if (!$post = User::find($id)){
+        $routa = $this->routa;
+        if (!$post = Sic::find($id)){
             if($ajax=='s'){
                 $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route($this->routa.'.index')]);
             }else{
@@ -338,7 +325,7 @@ class UserController extends Controller
             return $ret;
         }
 
-        User::where('id',$id)->delete();
+        Sic::where('id',$id)->delete();
         if($ajax=='s'){
             $ret = response()->json(['mens'=>__('Registro '.$id.' deletado com sucesso!'),'color'=>'success','return'=>route($this->routa.'.index')]);
         }else{

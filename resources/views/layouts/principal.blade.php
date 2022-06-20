@@ -15,11 +15,12 @@
   </head>
 
   <body>
-
+    <div id="preload">
+        <div class="lds-dual-ring"></div>
+    </div>
     <header>
       @yield('nav')
     </header>
-
     <main role="main">
         @yield('content')
     </main>

@@ -35,6 +35,21 @@ class AuthServiceProvider extends ServiceProvider
             }
         });
 
+        Gate::define('is_user_back', function ($user) {
+            if(($user->id_permission!=Qlib::qoption('id_permission_front')) && $user->ativo=='s'){
+                return Response::allow();
+            }else{
+                return Response::deny('Você deve ser um administrador.');
+            }
+        });
+        Gate::define('is_user_front', function ($user) {
+            if(($user->id_permission==Qlib::qoption('id_permission_front')) && $user->ativo=='s'){
+                return Response::allow();
+            }else{
+                return Response::deny('Você deve ser um internauta.');
+            }
+        });
+
         Gate::define('ler', function($user,$pagina=false){
             $ret = false;
             if($user->ativo=='s'){
