@@ -32,6 +32,14 @@ class UserSeeder extends Seeder
                 'verificado' => 'n',
                 'id_permission' => '2',
             ],
+            [
+                'nome' => 'Usuario de teste front',
+                'email' => 'ger.maisaqui1@gmail.com',
+                'password' => Hash::make('mudar123'),
+                'status' => 'actived',
+                'verificado' => 'n',
+                'id_permission' => '5',
+            ],
         ];
         foreach ($arr as $key => $value) {
             User::create($value);

@@ -17,6 +17,7 @@
         </div>
         @php
             $_GET['redirect'] = route('internautas.index');
+            //$config['event'] = 'enctype="multipart/form-data"';
         @endphp
         {{App\Qlib\Qlib::formulario([
             'campos'=>$campos,

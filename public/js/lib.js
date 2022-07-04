@@ -638,6 +638,61 @@ function submitFormulario(objForm,funCall,funError,compleUrl){
         }
     });
 }
+function submitFormFile(objForm,funCall,funError,compleUrl){
+    if(typeof funCall == 'undefined'){
+        funCall = function(res){
+            console.log(res);
+        }
+    }
+    if(typeof funError == 'undefined'){
+        funError = function(res){
+            lib_funError(res);
+        }
+    }
+    if(typeof compleUrl == 'undefined'){
+        compleUrl='';
+    }
+    var formData = new FormData();
+    var files = $('input[type=file]');
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].value != "" || files[i].value != null) {
+            formData.append(files[i].name, files[i].files[0]);
+        }
+    }
+    var formSerializeArray = objForm.serializeArray();
+    for (var i = 0; i < formSerializeArray.length; i++) {
+        formData.append(formSerializeArray[i].name, formSerializeArray[i].value)
+    }
+    formData.append('ajax','s');
+    var route = objForm.attr('action');
+    //console.log(route);
+    $.ajax({
+        type: 'POST',
+        url: route,
+        //data: formData+'&ajax=s'+compleUrl,
+        data: formData,
+        dataType: 'json',
+        beforeSend: function(){
+            $('#preload').fadeIn();
+        },
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (data) {
+            $('#preload').fadeOut("fast");
+            funCall(data);
+        },
+        error: function (data) {
+            $('#preload').fadeOut("fast");
+            if(data.responseJSON.errors){
+                funError(data.responseJSON.errors);
+                console.log(data.responseJSON.errors);
+            }else{
+                lib_formatMensagem('.mens','Erro','danger');
+            }
+        }
+    });
+}
 function getAjax(config,funCall,funError){
 
     if(typeof config.url == 'undefined'){

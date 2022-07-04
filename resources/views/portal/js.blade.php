@@ -8,6 +8,7 @@
 <script src="{{url('/')}}/js/jquery-ui.min.js"></script>
 <script src="{{url('/')}}/js/jquery.inputmask.bundle.min.js"></script>
 <script src="{{url('/')}}/summernote/summernote.min.js"></script>
+<script src="{{url('/')}}/js/jquery.validate.min.js"></script>
 <script src=" {{url('/')}}/js/lib.js"></script>
 <script type="text/javascript">
     $(function(){
