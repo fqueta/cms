@@ -10,6 +10,7 @@
         <div class="col-md-12 mens">
         </div>
     </div>
+    @can('is_user_front_v')
         <div class = "page-header">
             <h1 class="text-center">
                 {{$titulo}}
@@ -19,11 +20,15 @@
             $_GET['redirect'] = route('internautas.index');
             //$config['event'] = 'enctype="multipart/form-data"';
         @endphp
+
         {{App\Qlib\Qlib::formulario([
             'campos'=>$campos,
             'config'=>$config,
             'value'=>$value,
         ])}}
+    @elsecannot('is_user_front_v')
+        <h6 class="text-center">Somente internautas com cadastro verificados podem usar este serviço</h6>
+    @endcan
 
 </div>
 @endsection

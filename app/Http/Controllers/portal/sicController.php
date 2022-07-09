@@ -142,6 +142,8 @@ class sicController extends Controller
             //'ativo'=>['label'=>'Ativado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'mensagem'=>['label'=>'Mensagem*','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
             'anexo'=>['label'=>'Anexos','active'=>true,'placeholder'=>'Anexar arquivos','type'=>'file','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'info1'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
+            //'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar sua solicitação de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
         ];
     }
     public function index(User $user)
@@ -210,12 +212,29 @@ class sicController extends Controller
         $local = $this->ambiente;
         $validatedData = $request->validate([
             'mensagem' => ['required','string'],
+            'anexo' => ['mimes:pdf,jpg,jpeg,gif,mp4,png,rar,zip','max:10000'],
             [
                 'mensagem.required'=>'É necessário uma mensagem',
                 'mensagem.string'=>'Mensagem inválida',
                 ]
         ]);
         $dados = $request->all();
+        // if (isset($dados['anexo']) && $dados['anexo']!='undefined'){
+        //     //if($dados['anexo']->isValid()){
+        //         $verTipoArq = Qlib::verificaArquivo($dados['anexo'],'pdf,jpg,jpeg,gif,png,mp4,rar,zip');
+        //         if($verTipoArq['mens']){
+        //             $ret = [
+        //                 'mens'=>$verTipoArq['mens'],
+        //                 'color'=>'danger',
+        //                 'idCad'=>false,
+        //                 'exec'=>false,
+        //                 'dados'=>$dados
+        //             ];
+        //             //dd($ret);
+        //             return $ret;
+        //         }
+        //     //}
+        // }
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
         $salvar = Sic::create($dados);
@@ -224,21 +243,25 @@ class sicController extends Controller
             $data['protocolo'] = isset($data['protocolo'])?$data['protocolo']:date('YmdH').'-'.Qlib::zerofill($salvar->id,'4');
             $mens = 'Sua solicitação foi cadastrada com sucesso e gerou o número de protocolo <b>'.$data['protocolo'].'</b>. guarde este número pois será com ele que você consultará o andamento da sua solicitação. Foi enviado um e-mail para sua caixa postal contendo os dados da solicitação.';
             $salvAnexo = false;
-            if (isset($dados['anexo']) && $dados['anexo']->isValid()){
-                $nameFile = Str::of($data['protocolo'])->slug('-').'.'.$dados['anexo']->getClientOriginalExtension();
-                $anexo = $dados['anexo']->storeAs('sic/anexo',$nameFile);
-                $salvAnexo = $anexo;
+            if (isset($dados['anexo']) && $dados['anexo']!='undefined'){
+                if($dados['anexo']->isValid()){
+
+                    $nameFile = Str::of($data['protocolo'])->slug('-').'.'.$dados['anexo']->getClientOriginalExtension();
+                    $anexo = $dados['anexo']->storeAs('sic/anexo',$nameFile);
+                    $salvAnexo = $anexo;
+                    //dd($dados['anexo']->getSize());
+                }
             }
             if($salvAnexo){
                 $ret['upd_cad'] = Sic::where('id',$id)->update($data);
-                $ret['mens'] = $mens;
+                //$ret['mens'] = $mens;
             }
         }
-        Qlib::lib_print($salvar);
-        dd($ret);
+        //Qlib::lib_print($salvar);
+        //dd($ret);
         $route = $this->routa.'.index';
         $ret = [
-            'mens'=>$this->label.' cadastrada com sucesso!',
+            'mens'=>$mens,
             'color'=>'success',
             'idCad'=>$salvar->id,
             'exec'=>true,

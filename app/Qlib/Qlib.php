@@ -796,4 +796,18 @@ class Qlib
             return 'front';
         }
     }
+    static function verificaArquivo($file,$tipo_permitido='jpg,png'){
+        $ret['exec']=false;
+        $ret['mens']=false;
+        $extension = $file->getClientOriginalExtension();
+        if($tipo_permitido){
+            $arr_extension = explode(',',$tipo_permitido);
+        }
+        if(in_array($extension,$arr_extension)){
+            $ret['exec'] = true;
+        }else{
+            $ret['mens'] = 'O Arquivo tipo '.$extension.' não é permitido!';
+        }
+        return $ret;
+    }
 }
