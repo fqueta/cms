@@ -44,9 +44,25 @@ class AuthServiceProvider extends ServiceProvider
         });
         Gate::define('is_user_front', function ($user) {
             if(($user->id_permission==Qlib::qoption('id_permission_front')) && $user->ativo=='s'){
-                return Response::allow();
+                // if($user->verificado!='s'){
+                //     return Response::deny('Você deve ser um internauta com cadastro verificado entre em contato com o suporte.');
+                // }else{
+                    return Response::allow();
+                //}
             }else{
-                return Response::deny('Você deve ser um internauta.');
+                return Response::deny('Você deve ser um internauta com cadastro.');
+            }
+        });
+        Gate::define('is_user_front_v', function ($user) {
+            //para usuario front verificado
+            if(($user->id_permission==Qlib::qoption('id_permission_front')) && $user->ativo=='s'){
+                if($user->verificado!='s'){
+                    return Response::deny('Você deve ser um internauta com cadastro verificado entre em contato com o suporte.');
+                }else{
+                    return Response::allow();
+                }
+            }else{
+                return Response::deny('Você deve ser um internauta com cadastro.');
             }
         });
 
