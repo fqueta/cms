@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\admin;
 
-use stdClass;
 use App\Http\Controllers\Controller;
-use App\Models\_upload;
 use Illuminate\Http\Request;
-use App\Models\Permission;
+use stdClass;
+use App\Models\Tag;
 use App\Qlib\Qlib;
 use App\Models\User;
-use App\Models\Menu;
+use App\Models\_upload;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
-class UserPermissions extends Controller
+
+class TagsController extends Controller
 {
     protected $user;
     public $routa;
@@ -23,28 +24,28 @@ class UserPermissions extends Controller
     {
         $this->middleware('auth');
         $this->user = $user;
-        $this->url = 'permissions';
-        $this->routa = 'permissions';
-        $this->label = 'Permissões';
+        $this->routa = 'tags';
+        $this->label = 'Tag';
+        $this->url = 'tags';
         $this->view = 'padrao';
     }
-    public function queryPermissions($get=false,$config=false)
+    public function queryTag($get=false,$config=false)
     {
         $ret = false;
         $get = isset($_GET) ? $_GET:[];
         $ano = date('Y');
         $mes = date('m');
+        //$todasFamilias = Familia::where('excluido','=','n')->where('deletado','=','n');
         $config = [
             'limit'=>isset($get['limit']) ? $get['limit']: 50,
             'order'=>isset($get['order']) ? $get['order']: 'desc',
         ];
 
-        $logado = Auth::user();
-        $permission =  Permission::where('id','>=',$logado->id_permission)->orderBy('id',$config['order']);
-        //$permission =  DB::table('permissions')->where('active','s')->orderBy('id',$config['order']);
+        $tag =  Tag::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        //$tag =  DB::table('tags')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
-        $permissions = new stdClass;
-        $campos = isset($_SESSION['campos_permissions_exibe']) ? $_SESSION['campos_permissions_exibe'] : $this->campos();
+        $tag_totais = new stdClass;
+        $campos = isset($_SESSION['campos_tags_exibe']) ? $_SESSION['campos_tags_exibe'] : $this->campos();
         $tituloTabela = 'Lista de todos cadastros';
         $arr_titulo = false;
         if(isset($get['filter'])){
@@ -53,11 +54,11 @@ class UserPermissions extends Controller
                 foreach ($get['filter'] as $key => $value) {
                     if(!empty($value)){
                         if($key=='id'){
-                            $permission->where($key,'LIKE', $value);
+                            $tag->where($key,'LIKE', $value);
                             $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
                             $arr_titulo[$campos[$key]['label']] = $value;
                         }else{
-                            $permission->where($key,'LIKE','%'. $value. '%');
+                            $tag->where($key,'LIKE','%'. $value. '%');
                             if($campos[$key]['type']=='select'){
                                 $value = $campos[$key]['arr_opc'][$value];
                             }
@@ -69,96 +70,101 @@ class UserPermissions extends Controller
                 }
                 if($titulo_tab){
                     $tituloTabela = 'Lista de: &'.$titulo_tab;
+                                //$arr_titulo = explode('&',$tituloTabela);
                 }
-                $fm = $permission;
+                $fm = $tag;
                 if($config['limit']=='todos'){
-                    $permission = $permission->get();
+                    $tag = $tag->get();
                 }else{
-                    $permission = $permission->paginate($config['limit']);
+                    $tag = $tag->paginate($config['limit']);
                 }
         }else{
-            $fm = $permission;
+            $fm = $tag;
             if($config['limit']=='todos'){
-                $permission = $permission->get();
+                $tag = $tag->get();
             }else{
-                $permission = $permission->paginate($config['limit']);
+                $tag = $tag->paginate($config['limit']);
             }
         }
-        $permissions->todos = $fm->count();
-        $permissions->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->get()->count();
-        $permissions->ativos = $fm->where('active','=','s')->get()->count();
-        $permissions->inativos = $fm->where('active','=','n')->get()->count();
+        $tag_totais->todos = $fm->count();
+        $tag_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->get()->count();
+        $tag_totais->ativos = $fm->where('ativo','=','s')->get()->count();
+        $tag_totais->inativos = $fm->where('ativo','=','n')->get()->count();
 
-        $ret['permission'] = $permission;
-        $ret['etapa_totais'] = $permissions;
+        $ret['tag'] = $tag;
+        $ret['tag_totais'] = $tag_totais;
         $ret['arr_titulo'] = $arr_titulo;
         $ret['campos'] = $campos;
         $ret['config'] = $config;
         $ret['tituloTabela'] = $tituloTabela;
         $ret['config']['resumo'] = [
-            'todos_registro'=>['label'=>'Todos cadastros','value'=>$permissions->todos,'icon'=>'fas fa-calendar'],
-            'todos_mes'=>['label'=>'Cadastros recentes','value'=>$permissions->esteMes,'icon'=>'fas fa-calendar-times'],
-            'todos_ativos'=>['label'=>'Cadastros ativos','value'=>$permissions->ativos,'icon'=>'fas fa-check'],
-            'todos_inativos'=>['label'=>'Cadastros inativos','value'=>$permissions->inativos,'icon'=>'fas fa-archive'],
+            'todos_registro'=>['label'=>'Todos cadastros','value'=>$tag_totais->todos,'icon'=>'fas fa-calendar'],
+            'todos_mes'=>['label'=>'Cadastros recentes','value'=>$tag_totais->esteMes,'icon'=>'fas fa-calendar-times'],
+            'todos_ativos'=>['label'=>'Cadastros ativos','value'=>$tag_totais->ativos,'icon'=>'fas fa-check'],
+            'todos_inativos'=>['label'=>'Cadastros inativos','value'=>$tag_totais->inativos,'icon'=>'fas fa-archive'],
         ];
         return $ret;
     }
-    public function campos($dados=false){
+    public function campos(){
+        $user = Auth::user();
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'name'=>['label'=>'Nome da permissão','active'=>true,'placeholder'=>'Ex.: Cadastrados','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'active'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            'description'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            'id_menu'=>['label'=>'lista de Permissões','active'=>false,'type'=>'html_blade','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'permissions.check_permissao','dados'=>@$dados['id_menu']],
-
+            'pai'=>[
+                'label'=>'Pai',
+                'active'=>true,
+                'type'=>'select',
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai IS NULL ORDER BY ordem ASC",'nome','id'),'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'10',
+                'value'=>@$_GET['etapa'],
+                'option_select'=>true,
+            ],
+            'ordem'=>['label'=>'ordem','active'=>true,'type'=>'number','placeholder'=>'','exibe_busca'=>'d-block','event'=>'','tam'=>'2','class'=>''],
+            'nome'=>['label'=>'Nome da opção','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12','class'=>''],
+            'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
         ];
     }
+
     public function index(User $user)
     {
-        $this->authorize('ler', $this->url);
-        $title = 'Permissões Cadastradas';
+        $this->authorize('ler', $this->routa);
+        $title = 'Tags Cadastrados';
         $titulo = $title;
-        $queryPermissions = $this->queryPermissions($_GET);
-        $queryPermissions['config']['exibe'] = 'html';
+        $queryTag = $this->queryTag($_GET);
+        $queryTag['config']['exibe'] = 'html';
         $routa = $this->routa;
-        $view = $this->view;
-
-        return view($routa.'.index',[
-            'dados'=>$queryPermissions['permission'],
+        return view($this->view.'.index',[
+            'dados'=>$queryTag['tag'],
             'title'=>$title,
             'titulo'=>$titulo,
-            'campos_tabela'=>$queryPermissions['campos'],
-            'etapa_totais'=>$queryPermissions['etapa_totais'],
-            'titulo_tabela'=>$queryPermissions['tituloTabela'],
-            'arr_titulo'=>$queryPermissions['arr_titulo'],
-            'config'=>$queryPermissions['config'],
+            'campos_tabela'=>$queryTag['campos'],
+            'tag_totais'=>$queryTag['tag_totais'],
+            'titulo_tabela'=>$queryTag['tituloTabela'],
+            'arr_titulo'=>$queryTag['arr_titulo'],
+            'config'=>$queryTag['config'],
             'routa'=>$routa,
-            'view'=>$view,
+            'view'=>$this->view,
             'i'=>0,
         ]);
     }
     public function create(User $user)
     {
-        $this->authorize('is_admin', $user);
-        $title = __('Cadastrar permissão');
+        $this->authorize('create', $this->routa);
+        $title = 'Cadastrar tag';
         $titulo = $title;
         $config = [
             'ac'=>'cad',
-            'frm_id'=>'frm-permissions',
+            'frm_id'=>'frm-tags',
             'route'=>$this->routa,
             'url'=>$this->url,
         ];
         $value = [
             'token'=>uniqid(),
         ];
-
-        $arrMenus = $this->listMenusPermisson();
-
-        $campos = $this->campos([
-            'id_menu'=>@$arrMenus,
-        ]);
-        return view($this->routa.'.createedit',[
+        $campos = $this->campos();
+        return view($this->view.'.createedit',[
             'config'=>$config,
             'title'=>$title,
             'titulo'=>$titulo,
@@ -169,15 +175,16 @@ class UserPermissions extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => ['required','string','unique:permissions'],
+            'nome' => ['required','string','unique:tags'],
         ]);
+
+        //$valida
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
-        $dados['active'] = isset($dados['active'])?$dados['active']:'n';
-        $dados['id_menu'] = isset($dados['id_menu'])?$dados['id_menu']:[];
+        $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
 
         //dd($dados);
-        $salvar = Permission::create($dados);
+        $salvar = Tag::create($dados);
         $route = $this->routa.'.index';
         $ret = [
             'mens'=>$this->label.' cadastrada com sucesso!',
@@ -189,6 +196,7 @@ class UserPermissions extends Controller
 
         if($ajax=='s'){
             $ret['return'] = route($route).'?idCad='.$salvar->id;
+            $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
             return response()->json($ret);
         }else{
             return redirect()->route($route,$ret);
@@ -199,54 +207,34 @@ class UserPermissions extends Controller
     {
         //
     }
-    public function listMenusPermisson($var = null)
+
+    public function edit($tag,User $user)
     {
-        $arrMenus = [];
-        $dadosMenus = Menu::where('actived',true)->where('pai','')->get();
-        $roles = ['create'=>'Cadastrar','update'=>'Editar','delete'=>'Excluir'];
-        if(count($dadosMenus)){
-            foreach($dadosMenus as $k=>$v){
-                $arrMenus[$k] = $v;
-                $submen = Menu::where('actived',true)->where('pai',$v->url)->getQuery()->get();
-                if(count($dadosMenus)){
-                    $arrMenus[$k]['submenu'] = $submen->all();
-                    $arrMenus[$k]['roles'] = $roles;
-                }
-            }
-        }
-        return $arrMenus;
-    }
-    public function edit($permission,User $user)
-    {
-        $this->authorize('is_admin');
-        $this->authorize('update', $this->url);
-        $id = $permission;
-        $dados = Permission::where('id',$id)->get();
-        $routa = 'permissions';
+        $id = $tag;
+        $dados = Tag::where('id',$id)->get();
+        $routa = 'tags';
+        $this->authorize('ler', $this->routa);
 
         if(!empty($dados)){
-            $title = 'Editar Cadastro de permissions';
+            $title = 'Editar Cadastro de tags';
             $titulo = $title;
             $dados[0]['ac'] = 'alt';
             if(isset($dados[0]['config'])){
                 $dados[0]['config'] = Qlib::lib_json_array($dados[0]['config']);
             }
             $listFiles = false;
+            $campos = $this->campos();
             if(isset($dados[0]['token'])){
                 $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
             }
             $config = [
                 'ac'=>'alt',
-                'frm_id'=>'frm-permissions',
+                'frm_id'=>'frm-tags',
                 'route'=>$this->routa,
                 'url'=>$this->url,
                 'id'=>$id,
             ];
-            $arrMenus = $this->listMenusPermisson();
 
-            $campos = $this->campos([
-                'id_menu'=>$arrMenus,
-            ]);
             $ret = [
                 'value'=>$dados[0],
                 'config'=>$config,
@@ -254,23 +242,22 @@ class UserPermissions extends Controller
                 'titulo'=>$titulo,
                 'listFiles'=>$listFiles,
                 'campos'=>$campos,
-                'arrMenus'=>$arrMenus,
                 'exec'=>true,
             ];
 
-            return view($routa.'.createedit',$ret);
+            return view($this->view.'.createedit',$ret);
         }else{
             $ret = [
                 'exec'=>false,
             ];
-            return redirect()->route($routa.'.index',$ret);
+            return redirect()->route($this->view.'.index',$ret);
         }
     }
 
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'name' => ['required'],
+            'nome' => ['required'],
         ]);
         $data = [];
         $dados = $request->all();
@@ -291,15 +278,14 @@ class UserPermissions extends Controller
             }
         }
         $userLogadon = Auth::id();
-        $data['active'] = isset($data['active'])?$data['active']:'n';
-        $data['id_menu'] = isset($data['id_menu'])?$data['id_menu']:[];
+        $data['ativo'] = isset($data['ativo'])?$data['ativo']:'n';
         $data['autor'] = $userLogadon;
         if(isset($dados['config'])){
             $dados['config'] = Qlib::lib_array_json($dados['config']);
         }
         $atualizar=false;
         if(!empty($data)){
-            $atualizar=Permission::where('id',$id)->update($data);
+            $atualizar=Tag::where('id',$id)->update($data);
             $route = $this->routa.'.index';
             $ret = [
                 'exec'=>$atualizar,
@@ -328,19 +314,20 @@ class UserPermissions extends Controller
 
     public function destroy($id,Request $request)
     {
+        $this->authorize('delete', $this->routa);
         $config = $request->all();
         $ajax =  isset($config['ajax'])?$config['ajax']:'n';
-        $routa = 'permissions';
-        if (!$post = Permission::find($id)){
+        $routa = 'tags';
+        if (!$post = Tag::find($id)){
             if($ajax=='s'){
-                $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route($this->routa.'.index')]);
+                $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route($this->view.'.index')]);
             }else{
-                $ret = redirect()->route($routa.'.index',['mens'=>'Registro não encontrado!','color'=>'danger']);
+                $ret = redirect()->route($this->view.'.index',['mens'=>'Registro não encontrado!','color'=>'danger']);
             }
             return $ret;
         }
 
-        Permission::where('id',$id)->delete();
+        Tag::where('id',$id)->delete();
         if($ajax=='s'){
             $ret = response()->json(['mens'=>__('Registro '.$id.' deletado com sucesso!'),'color'=>'success','return'=>route($this->routa.'.index')]);
         }else{

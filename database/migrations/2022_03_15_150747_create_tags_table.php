@@ -16,11 +16,12 @@ class CreateTagsTable extends Migration
         Schema::create('tags', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('token','100')->nullable();
-            $table->string('value','100')->nullable();
+            $table->text('token')->nullable();
             $table->string('nome',300)->nullable();
+            $table->text('value')->nullable();
             $table->enum('ativo',['s','n']);
-            $table->integer('pai')->nullable();
+            $table->string('pai')->nullable();
+            $table->integer('ordem')->nullable();
             $table->integer('autor')->nullable();
             $table->longText('obs')->nullable();
             $table->json('config')->nullable();

@@ -22,6 +22,12 @@
                     @php
                         $nk = str_replace('[]','',$k);
                         $value[$k] = isset($value[$nk])?$value[$nk]:false;
+                        @endphp
+                @elseif ($v['type']=='file')
+                    @php
+                        $nk = str_replace('[]','',$k);
+                        $value[$k] = isset($value[$nk])?$value[$nk]:false;
+                        //dd($value[$k])
                     @endphp
                 @endif
 
@@ -49,7 +55,6 @@
             ])}}
             @endforeach
         @endif
-        @csrf
-
     </div>
+
     @include('qlib.btnedit')

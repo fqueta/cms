@@ -1,5 +1,7 @@
 <?php
 namespace App\Qlib;
+
+use App\Models\Documento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -54,6 +56,19 @@ class Qlib
 		}
 		return $ret;
 	}
+    static function documento($code,$select='conteudo'){
+        $ret = false;
+        $d = Documento::where('url','=',$code)->
+        where('ativo','=','s')->
+        where('excluido','=','n')->
+        where('deletado','=','n')->
+        select($select)->get();
+        if(isset($d[0]->$select)) {
+            $ret = $d[0]->$select;
+        }
+        return $ret;
+
+    }
   static function dtBanco($data) {
 			$data = trim($data);
 			if (strlen($data) != 10)
@@ -68,7 +83,7 @@ class Qlib
 			}
 			return $rs;
 	}
-  static function dataExibe($data) {
+    static function dataExibe($data) {
 			$val = trim(strlen($data));
 			$data = trim($data);$rs = false;
 			if($val == 10){

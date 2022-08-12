@@ -86,5 +86,4 @@
 
 @section('js')
     @include('qlib.jslib')
-    @include('mapas.jslib')
 @stop

@@ -37,7 +37,10 @@ class veriUser extends Mailable
         return $this->markdown('mail.veriUser',[
             'user'=>$this->user,
             'empresa'=>Qlib::qoption('empresa'),
-            'link_confirma_email'=>route('internautas.acao.get',['tipo'=>'veriuser','id'=>base64_encode($this->user['email'])]),
+            'link_confirma_email'=>route('internautas.acao.get',[
+                'tipo'=>'veriuser',
+                'id'=>base64_encode($this->user['email'])
+            ]),
         ]);
     }
 }

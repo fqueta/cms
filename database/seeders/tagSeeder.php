@@ -15,8 +15,8 @@ class tagSeeder extends Seeder
     public function run()
     {
         $arr = [
-            ['nome'=>'Tags Secretarias','obs'=>'Secretarias de uma prefeitura'],
-            ['nome'=>'Tags Categorias do E-sic','obs'=>'Todas a categorias de assuntos do E-sic de acordo com a secretaria.'],
+            ['nome'=>'SECRETARIAS NO SIC','obs'=>'Secretarias de uma prefeitura'],
+            ['nome'=>'CATEGORIA DO SIC','obs'=>'Todas a categorias de assuntos do E-sic de acordo com a secretaria.'],
             [
                 'nome'=>'Assessoria de Planejamento Urbanístico',
                 'pai'=>1,
@@ -160,6 +160,46 @@ class tagSeeder extends Seeder
                 'pai'=>2,
                 'obs'=>'',
                 'value'=>'outra_informcoes',
+            ],
+            [
+                'nome'=>'STATUS NO SIC',
+                'pai'=>0,
+                'obs'=>'Status do E-sic',
+                'value'=>'status_sic',
+            ],
+            [
+                'nome'=>'MOTIVOS NO SIC',
+                'pai'=>0,
+                'obs'=>'Motivos no E-sic',
+                'value'=>'motivos_sic',
+            ],
+            [
+                'nome'=>'Abertos',
+                'pai'=>'status_sic',
+                'obs'=>'Status no E-sic',
+                'ordem'=>1,
+                'value'=>'sic_abertos',
+            ],
+            [
+                'nome'=>'Respondidos',
+                'pai'=>'status_sic',
+                'obs'=>'Status no E-sic',
+                'ordem'=>2,
+                'value'=>'sic_respondidos',
+            ],
+            [
+                'nome'=>'Indeferidos',
+                'pai'=>'status_sic',
+                'obs'=>'Status no E-sic',
+                'ordem'=>3,
+                'value'=>'sic_indeferidos',
+            ],
+            [
+                'nome'=>'Resolvidos',
+                'pai'=>'status_sic',
+                'obs'=>'Status no E-sic',
+                'ordem'=>4,
+                'value'=>'sic_resolvidos',
             ],
         ];
 

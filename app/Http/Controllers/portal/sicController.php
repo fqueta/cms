@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\portal;
 
+use App\Http\Controllers\admin\sicController as AdminSicController;
 use App\Http\Controllers\Controller;
 
 use stdClass;
@@ -12,16 +13,20 @@ use App\Models\_upload;
 use App\Models\Sic;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 class sicController extends Controller
 {
     protected $user;
+    //public $sic_admin;
     public $routa;
     public $label;
     public $ambiente;
-    public function __construct(User $user)
+    public function __construct()
     {
+        $user = Auth::user();
         $this->middleware('auth');
+        //$this->sic_admin = new AdminSicController();
         $this->user = $user;
         $this->routa = 'sic';
         $this->label = 'Sic';
@@ -43,7 +48,8 @@ class sicController extends Controller
         //$sic =  DB::table('sics')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
         $sic_totais = new stdClass;
-        $campos = isset($_SESSION['campos_sics_exibe']) ? $_SESSION['campos_sics_exibe'] : $this->campos();
+        //$campos = isset($_SESSION['campos_sics_exibe']) ? $_SESSION['campos_sics_exibe'] : (new AdminSicController())->campos();
+        $campos = (new AdminSicController())->campos();
         $tituloTabela = 'Lista de todos cadastros';
         $arr_titulo = false;
         if(isset($get['filter'])){
@@ -56,12 +62,27 @@ class sicController extends Controller
                             $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
                             $arr_titulo[$campos[$key]['label']] = $value;
                         }else{
-                            $sic->where($key,'LIKE','%'. $value. '%');
-                            if($campos[$key]['type']=='select'){
-                                $value = $campos[$key]['arr_opc'][$value];
+                            if(is_array($value)){
+                                foreach ($value as $k1 => $v1) {
+                                    if(!empty($v1)){
+
+                                        $sic->where($key,'LIKE','%'. $v1. '%');
+                                        if($campos[$key]['type']=='select'){
+                                            $v1 = $campos[$key]['arr_opc'][$v1];
+                                        }
+                                        $arr_titulo[$campos[$key]['label']] = $v1;
+                                        $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$v1.'& ';
+                                    }
+                                }
+                            }else{
+                                $value = trim($value);
+                                $sic->where($key,'LIKE','%'. $value. '%');
+                                if($campos[$key]['type']=='select'){
+                                    $value = $campos[$key]['arr_opc'][$value];
+                                }
+                                $arr_titulo[$campos[$key]['label']] = $value;
+                                $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
                             }
-                            $arr_titulo[$campos[$key]['label']] = $value;
-                            $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
                         }
                         $i++;
                     }
@@ -105,14 +126,15 @@ class sicController extends Controller
     public function campos(){
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'type'=>['label'=>'type','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2','value'=>'solicitacao'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar sua solicitação de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
             'config[secretaria]'=>[
                 'label'=>'Secretaria*',
-                'active'=>false,
+                'active'=>true,
                 'id'=>'secretaria',
                 'type'=>'select',
-                'arr_opc'=>Qlib::sql_array("SELECT value,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','value'),
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id'),
                 'exibe_busca'=>'d-block',
                 'event'=>'required',
                 'tam'=>'12',
@@ -124,10 +146,10 @@ class sicController extends Controller
             ],
             'config[categoria]'=>[
                 'label'=>'Categoria*',
-                'active'=>false,
+                'active'=>true,
                 'id'=>'categoria',
                 'type'=>'select',
-                'arr_opc'=>Qlib::sql_array("SELECT value,nome FROM tags WHERE ativo='s' AND pai='2'",'nome','value'),
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='2'",'nome','id'),
                 'exibe_busca'=>'d-block',
                 'event'=>'required',
                 'tam'=>'12',
@@ -137,16 +159,16 @@ class sicController extends Controller
                 'option_select'=>true,
                 'cp_busca'=>'config][categoria',
             ],
-            'config[assunto]'=>['label'=>'Assunto*','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','cp_busca'=>'config][categoria','event'=>'required','tam'=>'12'],
+            'config[assunto]'=>['label'=>'Assunto*','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','cp_busca'=>'config][assunto','event'=>'required','tam'=>'12'],
             //'nome'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Ensino médio completo','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             //'ativo'=>['label'=>'Ativado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'mensagem'=>['label'=>'Mensagem*','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
-            'anexo'=>['label'=>'Anexos','active'=>true,'placeholder'=>'Anexar arquivos','type'=>'file','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'anexo'=>['label'=>'Anexos','active'=>false,'placeholder'=>'Anexar arquivos','type'=>'file','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'info1'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
-            //'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar sua solicitação de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
+            'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" value="s" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
         ];
     }
-    public function index(User $user)
+    public function index()
     {
         $this->authorize('ler', $this->routa);
         $title = 'Cadastro de sic';
@@ -210,34 +232,47 @@ class sicController extends Controller
             $this->authorize('create', $this->routa);
         }
         $local = $this->ambiente;
-        $validatedData = $request->validate([
-            'mensagem' => ['required','string'],
-            'anexo' => ['mimes:pdf,jpg,jpeg,gif,mp4,png,rar,zip','max:10000'],
-            [
-                'mensagem.required'=>'É necessário uma mensagem',
-                'mensagem.string'=>'Mensagem inválida',
-                ]
-        ]);
         $dados = $request->all();
-        // if (isset($dados['anexo']) && $dados['anexo']!='undefined'){
-        //     //if($dados['anexo']->isValid()){
-        //         $verTipoArq = Qlib::verificaArquivo($dados['anexo'],'pdf,jpg,jpeg,gif,png,mp4,rar,zip');
-        //         if($verTipoArq['mens']){
-        //             $ret = [
-        //                 'mens'=>$verTipoArq['mens'],
-        //                 'color'=>'danger',
-        //                 'idCad'=>false,
-        //                 'exec'=>false,
-        //                 'dados'=>$dados
-        //             ];
-        //             //dd($ret);
-        //             return $ret;
-        //         }
-        //     //}
-        // }
+        if (isset($dados['anexo']) && $dados['anexo']!='undefined'){
+            $validatedData = $request->validate([
+                'mensagem' => ['required','string'],
+                'anexo' => ['mimes:pdf,jpg,jpeg,gif,mp4,png,rar,zip','max:10000'],
+                [
+                    'mensagem.required'=>'É necessário uma mensagem',
+                    'mensagem.string'=>'Mensagem inválida',
+                ]
+            ]);
+            //if($dados['anexo']->isValid()){
+                // $verTipoArq = Qlib::verificaArquivo($dados['anexo'],'pdf,jpg,jpeg,gif,png,mp4,rar,zip');
+                // if($verTipoArq['mens']){
+                //     $ret = [
+                //         'mens'=>$verTipoArq['mens'],
+                //         'color'=>'danger',
+                //         'idCad'=>false,
+                //         'exec'=>false,
+                //         'dados'=>$dados
+                //     ];
+                //     //dd($ret);
+                //     return $ret;
+                // }
+            //}
+        }else{
+            $validatedData = $request->validate([
+                'mensagem' => ['required','string'],
+                [
+                    'mensagem.required'=>'É necessário uma mensagem',
+                    'mensagem.string'=>'Mensagem inválida',
+                ]
+            ]);
+        }
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
-        $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
+        $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'s';
+        $userLogadon = Auth::id();
+        $dados['autor'] = $userLogadon;
+        $dados['id_requerente'] = isset($dados['id_requerente'])?$dados['id_requerente']:$userLogadon;
+        //dd($dados);
         $salvar = Sic::create($dados);
+        $email = false;
         if(isset($salvar->id)){
             $id = $salvar->id;
             $data['protocolo'] = isset($data['protocolo'])?$data['protocolo']:date('YmdH').'-'.Qlib::zerofill($salvar->id,'4');
@@ -245,17 +280,39 @@ class sicController extends Controller
             $salvAnexo = false;
             if (isset($dados['anexo']) && $dados['anexo']!='undefined'){
                 if($dados['anexo']->isValid()){
-
                     $nameFile = Str::of($data['protocolo'])->slug('-').'.'.$dados['anexo']->getClientOriginalExtension();
                     $anexo = $dados['anexo']->storeAs('sic/anexo',$nameFile);
                     $salvAnexo = $anexo;
                     //dd($dados['anexo']->getSize());
                 }
             }
+            $arr_tags = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND (pai='1' OR pai='2')",'nome','id');
             if($salvAnexo){
-                $ret['upd_cad'] = Sic::where('id',$id)->update($data);
-                //$ret['mens'] = $mens;
+                $data['arquivo'] = $salvAnexo;
+            }else{
+                $data['arquivo'] = false;
             }
+            $ret['upd_cad'] = Sic::where('id',$id)->update($data);
+            $mensagem = $mens.'<br><br>';
+            $mensagem .= '<h2>Resumo da Solicitação</h2>';
+            $mensagem .= '<ul>';
+            if(isset($dados['config']['secretaria']))
+                $mensagem .= '<li>Secretaria: <b>'.$arr_tags[$dados['config']['secretaria']].'</b></li>';
+            if(isset($dados['config']['categoria']))
+                $mensagem .= '<li>Categoria: <b>'.$arr_tags[$dados['config']['categoria']].'</b></li>';
+            if(isset($dados['config']['assunto']))
+                $mensagem .= '<li>Assunto: <b>'.$dados['config']['assunto'].'</b></li>';
+            $mensagem .= '</ul>';
+            $mensagem .= '<h4>Mensagem:</h4>';
+            $mensagem .= $dados['mensagem'];
+            $mensagem = str_replace('Foi enviado um e-mail para sua caixa postal contendo os dados da solicitação.','',$mensagem);
+
+            $email = Mail::send(new \App\Mail\sic\infoSolicitacao([
+                'mensagem'=>$mensagem,
+                'arquivo'=>$data['arquivo'],
+                'nome_supervisor'=>'Responsável por E-sic',
+                'email_supervisor'=>'ger.maisaqui1@gmail.com',
+            ]));
         }
         //Qlib::lib_print($salvar);
         //dd($ret);
@@ -264,6 +321,7 @@ class sicController extends Controller
             'mens'=>$mens,
             'color'=>'success',
             'idCad'=>$salvar->id,
+            'email'=>$email,
             'exec'=>true,
             'dados'=>$dados
         ];
@@ -352,8 +410,8 @@ class sicController extends Controller
             }
         }
         $userLogadon = Auth::id();
-        $data['ativo'] = isset($data['ativo'])?$data['ativo']:'n';
         $data['autor'] = $userLogadon;
+        $data['ativo'] = isset($data['ativo'])?$data['ativo']:'n';
         if(isset($dados['config'])){
             $dados['config'] = Qlib::lib_array_json($dados['config']);
         }

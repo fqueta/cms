@@ -933,7 +933,7 @@ function qFormCampos(config){
         date : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         number : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         hidden : '<div class="form-group col-{col}-{tam} {class_div} d-none" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
-        textarea : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" ><textarea name="{campo}" class="form-control {class}" rows="{rows}" cols="{cols}">{value}</textarea></div>',
+        textarea : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<textarea name="{campo}" class="form-control {class}" rows="{rows}" cols="{cols}">{value}</textarea></div>',
         chave_checkbox : '<div class="form-group col-{col}-{tam}"><div class="custom-control custom-switch  {class}"><input type="checkbox" class="custom-control-input" {checked} value="{value}"  name="{campo}" id="{campo}"><label class="custom-control-label" for="{campo}">{label}</label></div></div>',
         select : {
             tm1 : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<select name="{campo}" {event} class="form-control custom-select {class}">{op}</select></div>',
@@ -987,12 +987,14 @@ function qFormCampos(config){
                         label.replaceAll('{label}',);
                         var value = v.value?v.value:'';
                         var classe = v.class?v.class:'';
+                        var class_div = v.class_div?v.class_div:'';
                         var placeholder = v.placeholder?v.placeholder:'';
                         r = r.replaceAll('{campo}',key);
                         r = r.replaceAll('{label}',v.label);
                         r = r.replaceAll('{value}',value);
                         r = r.replaceAll('{tam}',v.tam);
                         r = r.replaceAll('{event}',v.event);
+                        r = r.replaceAll('{class_div}',class_div);
                         r = r.replaceAll('{col}','md');
                         r = r.replaceAll('{class}',classe);
                         r = r.replaceAll('{checked}',checked);

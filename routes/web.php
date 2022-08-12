@@ -56,6 +56,16 @@ Route::prefix($prefixo_admin)->group(function(){
     Route::get('/',function(){
         return redirect()->route('login');
     });
+    //inicio Rotas módulo Sic
+    Route::resource('sic','\App\Http\Controllers\admin\sicController',['as'=>'admin','parameters' => ['sic' => 'id']]);
+    Route::get('/sic/relatorios', [App\Http\Controllers\admin\sicController::class, 'relatorios'])->name('admin.sic.relatorios');
+    Route::get('/sic/config', [App\Http\Controllers\admin\sicController::class, 'config'])->name('admin.sic.config');
+    Route::get('/sic/config/{url}', [App\Http\Controllers\admin\sicController::class, 'config'])->name('admin.sic.config.edit');
+    //Fim Rotas módulo Sic
+
+    Route::resource('tags','\App\Http\Controllers\admin\TagsController',['parameters' => [
+    'tags' => 'id'
+]]);
 });
 Route::get($prefixo_site,[App\Http\Controllers\portalController::class, 'index'])->name('portal');
 
@@ -184,9 +194,9 @@ Route::get('envio-mails',function(){
     $user = new stdClass();
     $user->name = 'Fernando Queta';
     $user->email = 'ferqueta@yahoo.com.br';
-    //return new \App\Mail\dataBrasil($user);
-    $enviar = Mail::send(new \App\Mail\dataBrasil($user));
-    return $enviar;
+    return new \App\Mail\sic\infoSolicitacao($user);
+    //$enviar = Mail::send(new \App\Mail\dataBrasil($user));
+    //return $enviar;
 });
 Route::get('envio-mails-veriuser',function(){
     $user = new stdClass();

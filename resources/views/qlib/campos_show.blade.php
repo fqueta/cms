@@ -274,6 +274,24 @@
         <label for="{{$config['campo']}}">{{$config['label']}}:</label>
         {{@$config['value']}}
     </div>
+    @elseif($config['type']=='file')
+    <div class="col-{{$config['tam']}}" div-id="{{$config['campo']}}">
+        <label for="{{$config['campo']}}">{{$config['label']}}:</label><br>
+        @if(is_array(@$config['value']))
+        @else
+            @if(!empty($config['value']))
+                @php
+                    $href = '/storage/'.$config['value'];
+                    $arquivo = explode('.',$href);
+                    $mime = false;
+                    if(isset($arquivo[1])){
+                        $mime = ' '.strtoupper($arquivo[1]);
+                    }
+                @endphp
+                <a href="{{$href}}" class="" style="text-decoration: underline" target="_blank">{{__('ARQUIVO').$mime}}</a>
+            @endif
+        @endif
+    </div>
     @else
     <div class="col-{{$config['tam']}}" div-id="{{$config['campo']}}">
         <label for="{{$config['campo']}}">{{$config['label']}}:</label>

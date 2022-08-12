@@ -20,7 +20,8 @@ class TesteController extends Controller
     {
 
        $ret = Qlib::redirectLogin();
-       dd($ret);
+
+       dd(base_path().'/');
        //$user = Auth::user();
         //$doc = new LotesController($user);
         $lote = isset($_GET['lote'])?$_GET['lote']:201;

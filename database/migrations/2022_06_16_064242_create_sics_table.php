@@ -20,10 +20,14 @@ class CreateSicsTable extends Migration
             $table->string('protocolo','60')->nullable();
             $table->string('nome')->nullable();
             $table->string('type')->nullable();
-            $table->string('status')->nullable();
+            $table->integer('status')->nullable();
+            $table->integer('situacao')->nullable();
+            $table->integer('motivo')->nullable();
             $table->enum('ativo',['s','n']);
             $table->longText('mensagem')->nullable();
+            $table->longText('resposta')->nullable();
             $table->longText('arquivo')->nullable();
+            $table->json('recurso')->nullable();
             $table->longText('obs')->nullable();
             $table->json('meta')->nullable();
             $table->json('config')->nullable();

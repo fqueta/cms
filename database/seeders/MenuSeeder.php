@@ -16,24 +16,14 @@ class MenuSeeder extends Seeder
     {
         DB::table('menus')->insert([
             [
-                'categoria'=>'',
-                'description'=>'Conteúdo do Site',
-                'icon'=>'fas fa-wold',
+                'categoria'=>'MÓDULOS',
+                'description'=>'Postagens do Site',
+                'icon'=>'fas fa-globe',
                 'actived'=>true,
                 'url'=>'cad-conteudo',
                 'route'=>'',
                 'pai'=>''
             ],
-            /*
-            [
-                'categoria'=>'',
-                'description'=>'Gerenciar cursos',
-                'icon'=>'fa fa-blog',
-                'actived'=>true,
-                'url'=>'cad-post',
-                'route'=>'',
-                'pai'=>''
-            ],*/
             [
                 'categoria'=>'',
                 'description'=>'Posts',
@@ -52,97 +42,42 @@ class MenuSeeder extends Seeder
                 'route'=>'pages.index',
                 'pai'=>'cad-conteudo'
             ],
-            /*
             [
                 'categoria'=>'',
-                'description'=>'Lotes',
-                'icon'=>'fas fa-list',
+                'description'=>'Sic',
+                'icon'=>'fas fa-info',
                 'actived'=>true,
-                'url'=>'lotes',
-                'route'=>'lotes.index',
-                'pai'=>'cad-topografico'
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Quadras',
-                'icon'=>'fas fa-list',
-                'actived'=>true,
-                'url'=>'quadras',
-                'route'=>'quadras.index',
-                'pai'=>'cad-topografico'
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Áreas',
-                'icon'=>'fas fa-list',
-                'actived'=>true,
-                'url'=>'bairros',
-                'route'=>'bairros.index',
-                'pai'=>'cad-topografico'
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Etapas',
-                'icon'=>'fas fa-list',
-                'actived'=>true,
-                'url'=>'etapas',
-                'route'=>'etapas.index',
-                'pai'=>'cad-conteudo'
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Escolaridade',
-                'icon'=>'fas fa-list',
-                'actived'=>true,
-                'url'=>'escolaridades',
-                'route'=>'escolaridades.index',
-                'pai'=>'cad-conteudo'
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Estado civil',
-                'icon'=>'fas fa-list',
-                'actived'=>true,
-                'url'=>'estado-civil',
-                'route'=>'estado-civil.index',
-                'pai'=>'cad-conteudo'
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Relatórios',
-                'icon'=>'fas fa-file',
-                'actived'=>true,
-                'url'=>'relatorios',
-                'route'=>'relatorios.index',
+                'url'=>'admin.sic',
+                'route'=>'',
                 'pai'=>''
             ],
             [
                 'categoria'=>'',
-                'description'=>'Realidade Social',
-                'icon'=>'fas fa-file',
+                'description'=>'Solicitações',
+                'icon'=>'fas fa-list',
                 'actived'=>true,
-                'url'=>'relatorios_social',
-                'route'=>'relatorios.social',
-                'pai'=>'relatorios'
+                'url'=>'sic',
+                'route'=>'admin.sic.index',
+                'pai'=>'admin.sic'
             ],
             [
                 'categoria'=>'',
-                'description'=>'Evolução',
-                'icon'=>'fa fa-chart-bar',
+                'description'=>'Relatórios',
+                'icon'=>'fas fa-chart-line',
                 'actived'=>true,
-                'url'=>'relatorios_evolucao',
-                'route'=>'relatorios.evolucao',
-                'pai'=>'relatorios'
+                'url'=>'sic',
+                'route'=>'admin.sic.relatorios',
+                'pai'=>'admin.sic'
             ],
-            /*[
+            [
                 'categoria'=>'',
-                'description'=>'Listagem de Ocupantes',
-                'icon'=>'fa fa-chart-bar',
+                'description'=>'Configurações',
+                'icon'=>'fas fa-cog',
                 'actived'=>true,
-                'url'=>'relatorios_evolucao',
-                'route'=>'relatorios.evolucao',
-                'pai'=>'relatorios'
-            ],*/
+                'url'=>'sic',
+                'route'=>'admin.sic.config',
+                'pai'=>'admin.sic'
+            ],
             [
                 'categoria'=>'SISTEMA',
                 'description'=>'Configurações',
@@ -186,6 +121,15 @@ class MenuSeeder extends Seeder
                 'actived'=>true,
                 'url'=>'permissions',
                 'route'=>'permissions.index',
+                'pai'=>'config'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Listas do sistema (Tags)',
+                'icon'=>'fas fa-list',
+                'actived'=>true,
+                'url'=>'tags',
+                'route'=>'tags.index',
                 'pai'=>'config'
             ],
             [
