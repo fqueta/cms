@@ -160,6 +160,7 @@ class sicController extends Controller
                 'cp_busca'=>'config][categoria',
             ],
             'config[assunto]'=>['label'=>'Assunto*','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','cp_busca'=>'config][assunto','event'=>'required','tam'=>'12'],
+            'config[origem]'=>['label'=>'origem','active'=>false,'placeholder'=>'','type'=>'hidden','exibe_busca'=>'d-block','cp_busca'=>'config][origem','event'=>'','value'=>'sistema','tam'=>'12'],
             //'nome'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Ensino médio completo','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             //'ativo'=>['label'=>'Ativado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'mensagem'=>['label'=>'Mensagem*','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],

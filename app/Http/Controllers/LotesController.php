@@ -301,7 +301,7 @@ class LotesController extends Controller
             ]);
         }
         $salvar = Lote::create($dados);
-        $dados['id'] = $salvar->id;
+        $dados['id'] = $salvar->id; //Caso seja necessário incluir um vinculo automaticamente
 
         $sql = "SELECT l.*,q.nome quadra_valor FROM lotes as l
             JOIN quadras as q ON q.id=l.quadra

@@ -56,18 +56,21 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href=" {{url('/')}}/css/lib.css">
+    @include('qlib.csslib')
 @stop
 
 @section('js')
     @include('qlib.jslib')
     <script type="text/javascript">
-          $(function(){
+        $(function(){
             $('a.print-card').on('click',function(e){
                 openPageLink(e,$(this).attr('href'),"{{date('Y')}}");
             });
-            $('#inp-password').val('');
-          });
+            $('[mask-cpf]').inputmask('999.999.999-99');
+            $('[mask-data]').inputmask('99/99/9999');
+            $('[mask-cep]').inputmask('99.999-999');
+        });
+
     </script>
     @include('qlib.js_submit')
 @stop

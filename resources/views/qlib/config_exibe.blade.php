@@ -35,7 +35,7 @@
                     'option_select'=>false,
                     'class_div'=>'pt-4 text-right',
                 ])}}
-                @can('create',$routa)
+                @can('create',$url)
 
                 <div class="col-md-2 text-right mt-4">
                     <a href="{{ route($routa.'.create') }}" class="btn btn-success btn-block">

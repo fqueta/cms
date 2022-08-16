@@ -46,6 +46,7 @@
                     'tab'=>$config['route'],
                     'listFiles'=>@$listFiles,
                     'routa'=>@$config['route'],
+                    'url'=>@$config['url'],
                     'arquivos'=>@$config['arquivos'],
                     'typeN'=>@$config['typeN'],
                 ])}}

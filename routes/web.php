@@ -2,12 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\admin\UserPermissions;
-use App\Http\Controllers\GerenciarGrupo;
-use App\Http\Controllers\GerenciarUsuarios;
-use App\Http\Controllers\FamiliaController;
-use App\Http\Controllers\BairroController;
-use App\Http\Controllers\TesteController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\EtapaController;
 use App\Http\Controllers\EscolaridadeController;

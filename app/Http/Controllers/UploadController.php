@@ -14,10 +14,12 @@ class UploadController extends Controller
 {
     public $i_wp;//integração com wp
     public $wp_api;//integração com wp
+    public $url;
     public function __construct()
     {
         $this->i_wp = Qlib::qoption('i_wp');//indegração com Wp s para sim
         $this->wp_api = new ApiWpController();
+        $this->url = 'uploads';
     }
     public function index(Request $request)
     {

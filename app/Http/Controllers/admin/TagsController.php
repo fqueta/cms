@@ -146,6 +146,7 @@ class TagsController extends Controller
             'config'=>$queryTag['config'],
             'routa'=>$routa,
             'view'=>$this->view,
+            'url'=>$this->url,
             'i'=>0,
         ]);
     }
@@ -244,7 +245,6 @@ class TagsController extends Controller
                 'campos'=>$campos,
                 'exec'=>true,
             ];
-
             return view($this->view.'.createedit',$ret);
         }else{
             $ret = [

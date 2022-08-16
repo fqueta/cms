@@ -22,11 +22,13 @@ class UserController extends Controller
     public $routa;
     public $label;
     public $view;
+    public $url;
     public function __construct(User $user)
     {
         $this->middleware('auth');
         $this->user = $user;
         $this->routa = 'users';
+        $this->url = 'users';
         $this->label = 'Usuários';
         $this->view = 'padrao';
     }
@@ -41,9 +43,35 @@ class UserController extends Controller
             'order'=>isset($get['order']) ? $get['order']: 'desc',
         ];
         $logado = Auth::user();
-        $user =  User::where('id_permission','>=',$logado->id_permission)->orderBy('id',$config['order']);
-        //$user =  DB::table('users')->where('ativo','s')->orderBy('id',$config['order']);
+        if(isset($get['term'])){
+            //Autocomplete
+            if(isset($get['bairro']) && !empty($get['bairro']) && isset($get['quadra']) && !empty($get['quadra'])){
+               $sql = "SELECT * FROM users WHERE (nome LIKE '%".$get['term']."%') AND bairro=".$get['bairro']." AND quadra=".$get['quadra']." AND ".Qlib::compleDelete();
+            }elseif(isset($get['id_permission']) && !empty($get['id_permission'])){
+                $sql = "SELECT * FROM users WHERE (nome LIKE '%".$get['term']."%') AND id_permission=".$get['id_permission']." AND ".Qlib::compleDelete();
+            }else{
+                // $sql = "SELECT l.*,q.nome quadra_valor FROM users as l
+                // JOIN quadras as q ON q.id=l.quadra
+                // WHERE (l.nome LIKE '%".$get['term']."%' OR q.nome LIKE '%".$get['term']."%' ) AND ".Qlib::compleDelete('l');
+                $sql = "SELECT * FROM users WHERE nome LIKE '%".$get['term']."%' AND ".Qlib::compleDelete();
 
+            }
+            $user = DB::select($sql);
+            // if(isset($get['familias'])&&$get['familias']=='s' && is_array($user)){
+            //     foreach ($user as $k => $v) {
+            //         $sqlF = "SELECT f.*,b.nome,b.cpf FROM familias As f
+            //         JOIN beneficiarios As b ON b.id=f.id_beneficiario
+            //         WHERE f.useramento LIKE '%\"".$v->id."\"%' AND ".Qlib::compleDelete('f')." AND ".Qlib::compleDelete('b');
+            //         $user[$k]->familias = DB::select($sqlF);
+            //     }
+            // }
+            $ret['user'] = $user;
+            //dd($ret);
+            return $ret;
+        }else{
+            $user =  User::where('id_permission','>=',$logado->id_permission)->orderBy('id',$config['order']);
+            //$user =  DB::table('users')->where('ativo','s')->orderBy('id',$config['order']);
+        }
         $users = new stdClass;
         $campos = isset($_SESSION['campos_users_exibe']) ? $_SESSION['campos_users_exibe'] : $this->campos();
         $tituloTabela = 'Lista de todos cadastros';
@@ -125,6 +153,7 @@ class UserController extends Controller
                 ],'arr_opc'=>Qlib::sql_array("SELECT id,name FROM permissions WHERE active='s' AND id >='".$user->id_permission."'",'name','id'),'exibe_busca'=>'d-block',
                 'event'=>'',
                 'tam'=>'6',
+                'value'=>@$_GET['id_permission'],
             ],
             'nome'=>['label'=>'Nome completo','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
@@ -138,26 +167,83 @@ class UserController extends Controller
     public function index(User $user)
     {
         $this->authorize('is_admin', $user);
+        $ajax = isset($_GET['ajax'])?$_GET['ajax']:'n';
         $title = 'Usuários Cadastrados';
         $titulo = $title;
         $queryUsers = $this->queryUsers($_GET);
         $queryUsers['config']['exibe'] = 'html';
         $routa = $this->routa;
         $view = $this->view;
+        if(isset($_GET['term'])){
+            $ret = false;
+            $ajax = 's';
+            $campos = $this->campos();
+            if($queryUsers['user']){
+               //$ret = $queryUsers['user'];
+                if(isset($_GET['id_permission']) && empty($_GET['id_permission'])){
+                    $ret[0]['value'] = 'Por favor selecione a Permissão! ';
+                    $ret[0]['id'] = '';
+                }elseif(isset($_GET['quadra']) && empty($_GET['quadra'])){
+                    $ret[0]['value'] = 'Por favor selecione a Quadra! ';
+                    $ret[0]['id'] = 'cad';
+                }else{
+                    foreach ($queryUsers['user'] as $key => $v) {
+                        $bairro = false;
+                        if(isset($v->config)){
+                            $v->config = Qlib::lib_json_array($v->config);
+                            if(isset($v->config['celular'])){
+                                $v->celular = $v->config['celular'];
+                            }
+                        }
+                        if($id_permission = $v->id_permission){
+                            $permission = Qlib::buscaValorDb([
+                                'tab'=>'permissions',
+                                'campo_bus'=>'id',
+                                'valor'=>$id_permission,
+                                'select'=>'name',
+                            ]);
+                            $ret[$key]['dados'] = $v;
+                        }
+                        $nome_quadra = false;
+                        // if($id_quadra = $v->quadra){
 
-        return view($routa.'.index',[
-            'dados'=>$queryUsers['user'],
-            'title'=>$title,
-            'titulo'=>$titulo,
-            'campos_tabela'=>$queryUsers['campos'],
-            'user_totais'=>$queryUsers['user_totais'],
-            'titulo_tabela'=>$queryUsers['tituloTabela'],
-            'arr_titulo'=>$queryUsers['arr_titulo'],
-            'config'=>$queryUsers['config'],
-            'routa'=>$routa,
-            'view'=>$view,
-            'i'=>0,
-        ]);
+                        //     $nome_quadra = Qlib::buscaValorDb([
+                        //         'tab'=>'quadras',
+                        //         'campo_bus'=>'id',
+                        //         'valor'=>$id_quadra,
+                        //         'select'=>'nome',
+                        //     ]);
+                        //     $ret[$key]['dados'] = $v;
+                        //     $ret[$key]['dados']->quadra_valor = $nome_quadra;
+                        // }
+                        $ret[$key]['value'] = ' Usuario: '.$v->nome.' | E-mail: '.$v->email;
+                    }
+                }
+            }else{
+                $ret[0]['value'] = 'Usuario não encontrado. Cadastrar agora?';
+                $ret[0]['id'] = 'cad';
+            }
+        }else{
+            $ret = [
+                'dados'=>$queryUsers['user'],
+                'title'=>$title,
+                'titulo'=>$titulo,
+                'campos_tabela'=>$queryUsers['campos'],
+                'user_totais'=>$queryUsers['user_totais'],
+                'titulo_tabela'=>$queryUsers['tituloTabela'],
+                'arr_titulo'=>$queryUsers['arr_titulo'],
+                'config'=>$queryUsers['config'],
+                'routa'=>$routa,
+                'view'=>$view,
+                'url'=>$this->url,
+                'i'=>0,
+            ];
+        }
+        if($ajax=='s'){
+            return response()->json($ret);
+        }else{
+            return view($this->view.'.index',$ret);
+        }
     }
     public function create(User $user)
     {
@@ -168,6 +254,7 @@ class UserController extends Controller
             'ac'=>'cad',
             'frm_id'=>'frm-users',
             'route'=>$this->routa,
+            'url'=>$this->url,
         ];
         $value = [
             'token'=>uniqid(),
@@ -184,8 +271,13 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'nome' => ['required','string','unique:users'],
-        ]);
+            'nome' => ['required','string'],
+            'email' => ['required','string','unique:users'],
+            ],[
+                'nome.required'=>__('O nome é obrigatório'),
+                'nome.string'=>__('É necessário conter letras no nome'),
+                'email.unique'=>__('E-mail já cadastrado'),
+            ]);
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
@@ -198,6 +290,7 @@ class UserController extends Controller
         }
         //dd($dados);
         $salvar = User::create($dados);
+        $dados['id'] = $salvar->id;
         $route = $this->routa.'.index';
         $ret = [
             'mens'=>$this->label.' cadastrada com sucesso!',
@@ -242,6 +335,7 @@ class UserController extends Controller
                 'ac'=>'alt',
                 'frm_id'=>'frm-users',
                 'route'=>$this->routa,
+                'url'=>$this->url,
                 'id'=>$id,
             ];
             $campos = $this->campos();

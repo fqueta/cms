@@ -4,12 +4,15 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\portal\sicController as PortalSicController;
+use App\Http\Controllers\portalController;
+use App\Http\Controllers\UserController;
 use App\Models\_upload;
 use App\Models\Sic;
 use App\Models\User;
 use App\Qlib\Qlib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class sicController extends Controller
 {
@@ -47,7 +50,7 @@ class sicController extends Controller
             'dados'=>$querySic['sic'],
             'title'=>$title,
             'titulo'=>$titulo,
-            'campos_tabela'=>$this->campos(),
+            'campos_tabela'=>$this->campos_resposta(),
             'sic_totais'=>$querySic['sic_totais'],
             'titulo_tabela'=>$querySic['tituloTabela'],
             'arr_titulo'=>$querySic['arr_titulo'],
@@ -59,11 +62,73 @@ class sicController extends Controller
         ]);
     }
     public function campos(){
+        $user = Auth::user();
+        $internauta = new UserController($user);
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar sua solicitação de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
-            //'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'protocolo'=>['label'=>'Protocolo','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'id_permission'=>['label'=>'id_permission','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2','value'=>Qlib::qoption('id_permission_front')],
+            //'protocolo'=>['label'=>'Protocolo','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'id_requerente'=>[
+                'label'=>'Dados do solicitante',
+                'active'=>false,
+                'type'=>'html_vinculo',
+                'exibe_busca'=>'d-none',
+                'event'=>'',
+                'tam'=>'12',
+                'script'=>'',
+                'data_selector'=>[
+                    'campos'=>$internauta->campos(),
+                    'route_index'=>route('users.index'),
+                    'id_form'=>'frm-id_requerente',
+                    'tipo'=>'int', // int para somente um ou array para vários
+                    'action'=>route('users.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'nome',
+                    'campo'=>'id_requerente',
+                    'value'=>[],
+                    'label'=>'Informações do lote',
+                    'table'=>[
+                        //'id'=>['label'=>'Id','type'=>'text'],
+                        // 'nome'=>['label'=>'Nome','type'=>'arr_tab',
+                        //     'conf_sql'=>[
+                        //         'tab'=>'users',
+                        //         'campo_bus'=>'id',
+                        //         'select'=>'nome',
+                        //         'param'=>['id_permission'],
+                        //     ]
+                        // ],
+                        'nome'=>['label'=>'Nome','type'=>'text'],
+                        'email'=>['label'=>'E-mail','type'=>'text'],
+                        //'celular'=>['label'=>'Celular','type'=>'text'],
+                    ],
+                    'tab' =>'lotes',
+                    'placeholder' =>__('Digite somente o nome do usuário').'...',
+                    'janela'=>[
+                        'url'=>route('users.create').'',
+                        'param'=>['id_permission'],
+                        'form-param'=>'',
+                    ],
+                    'salvar_primeiro' =>false,//exigir cadastro do vinculo antes de cadastrar este
+                ],
+                //'script' =>'familias.loteamento',
+            ],
+            'config[origem]'=>[
+                'label'=>'origem*',
+                'active'=>true,
+                'id'=>'origem',
+                'type'=>'select',
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='origem_sic'",'nome','id'),
+                'exibe_busca'=>'d-block',
+                'event'=>'required',
+                'tam'=>'6',
+                'class'=>'',
+                'title'=>'',
+                'exibe_busca'=>true,
+                'option_select'=>true,
+                'cp_busca'=>'config][origem',
+            ],
             'config[secretaria]'=>[
                 'label'=>'Secretaria',
                 'active'=>true,
@@ -72,7 +137,7 @@ class sicController extends Controller
                 'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id'),
                 'exibe_busca'=>'d-block',
                 'event'=>'',
-                'tam'=>'12',
+                'tam'=>'6',
                 'class'=>'',
                 'title'=>'',
                 'exibe_busca'=>true,
@@ -100,7 +165,7 @@ class sicController extends Controller
             'mensagem'=>['label'=>'Mensagem*','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
             'arquivo'=>['label'=>'Anexos','active'=>false,'placeholder'=>'Anexar arquivos','type'=>'file','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'info1'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
-            'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
+            //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
         ];
     }
     public function campos_status($pai=false){
@@ -134,9 +199,9 @@ class sicController extends Controller
                     'campo_bus'=>'nome',
                     'label'=>'Tag',
                 ],
-                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$this->pai_status'",'nome','id'),
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$this->pai_status' AND ".Qlib::compleDelete(),'nome','id'),
                 'exibe_busca'=>'d-block',
-                'event'=>'required',
+                'event'=>'',
                 'tam'=>'6',
                 'class'=>'',
                 'title'=>'',
@@ -144,7 +209,7 @@ class sicController extends Controller
                 'option_select'=>true,
             ],
             'motivo'=>[
-                'label'=>'Motivo',
+                'label'=>'Motivos de Negativa de Respostas',
                 'active'=>true,
                 'id'=>'motivo',
                 'type'=>'selector',
@@ -169,17 +234,151 @@ class sicController extends Controller
             //'config[assunto]'=>['label'=>'Assunto*','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-none','cp_busca'=>'config][assunto','event'=>'','tam'=>'12'],
             //'nome'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Ensino médio completo','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'resposta'=>['label'=>'Resposta*','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12','class'=>'summernote'],
-            'meta[enviar_email]'=>['label'=>'Enviar resposta por e-mail','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não'],'cp_busca'=>'meta][enviar_email'],
+            'meta[enviar_email]'=>['label'=>'Enviar resposta por e-mail','active'=>false,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não'],'cp_busca'=>'meta][enviar_email'],
 
             //'info1'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
             //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
         ];
     }
+    public function create(User $user)
+    {
+        $this->authorize('create', $this->url);
+        $title = __('Cadastrar Solicitação');
+        $titulo = $title;
+        //$Users = Users::all();
+        //$roles = DB::select("SELECT * FROM roles ORDER BY id ASC");
+        $sic = ['ac'=>'cad','token'=>uniqid()];
+        $arr_escolaridade = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
+        $arr_estadocivil = Qlib::sql_array("SELECT id,nome FROM estadocivils ORDER BY nome ", 'nome', 'id');
+        $config = [
+            'ac'=>'cad',
+            'frm_id'=>'frm-sics',
+            'route'=>$this->routa,
+            'url'=>$this->url,
+            'arquivos'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg,zip,rar',
+        ];
+        $value = [
+            'token'=>uniqid(),
+            'matricula'=>false,
+        ];
+        if(!$value['matricula'])
+            $config['display_matricula'] = 'd-none';
+        $campos = $this->campos();
+        return view($this->routa.'.create',[
+            'config'=>$config,
+            'title'=>$title,
+            'titulo'=>$titulo,
+            'arr_escolaridade'=>$arr_escolaridade,
+            'arr_estadocivil'=>$arr_estadocivil,
+            'campos'=>$campos,
+            'value'=>$value,
+            'routa'=>$this->routa,
+        ]);
+    }
+    public function store(Request $request){
+        if(auth()->user()->id_permission==Qlib::qoption('id_permission_front')){
+            $this->authorize('is_user_front');
+        }else{
+            $this->authorize('create', $this->url);
+        }
+        $local = $this->ambiente;
+        $dados = $request->all();
+        //dd($dados);
+        if (isset($dados['anexo']) && $dados['anexo']!='undefined'){
+            $validatedData = $request->validate([
+                'id_requerente' => ['required'],
+                'mensagem' => ['required','string'],
+                'anexo' => ['mimes:pdf,jpg,jpeg,gif,mp4,png,rar,zip','max:10000'],
+                ],[
+                    'id_requerente.required'=>'É necessário informar o solicitante',
+                    'mensagem.required'=>'É necessário uma mensagem',
+                    'mensagem.string'=>'Mensagem inválida',
+                ]);
+            }else{
+                $validatedData = $request->validate([
+                    'id_requerente' => ['required'],
+                    'mensagem' => ['required','string'],
+                    ],[
+                        'id_requerente.required'=>'É necessário informar o solicitante',
+                        'mensagem.required'=>'É necessário uma mensagem',
+                        'mensagem.string'=>'Mensagem inválida',
+                ]);
+        }
+        $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
+        $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'s';
+        $userLogadon = Auth::id();
+        $dados['autor'] = $userLogadon;
+        $dados['id_requerente'] = isset($dados['id_requerente'])?$dados['id_requerente']:$userLogadon;
+        //dd($dados);
+        $salvar = Sic::create($dados);
+        $email = false;
+        if(isset($salvar->id)){
+            $id = $salvar->id;
+            $data['protocolo'] = isset($data['protocolo'])?$data['protocolo']:date('YmdH').'-'.Qlib::zerofill($salvar->id,'4');
+            $mens = 'Sua solicitação foi cadastrada com sucesso e gerou o número de protocolo <b>'.$data['protocolo'].'</b>. guarde este número pois será com ele que você consultará o andamento da sua solicitação. Foi enviado um e-mail para sua caixa postal contendo os dados da solicitação.';
+            $salvAnexo = false;
+            if (isset($dados['anexo']) && $dados['anexo']!='undefined'){
+                if($dados['anexo']->isValid()){
+                    $nameFile = Str::of($data['protocolo'])->slug('-').'.'.$dados['anexo']->getClientOriginalExtension();
+                    $anexo = $dados['anexo']->storeAs('sic/anexo',$nameFile);
+                    $salvAnexo = $anexo;
+                    //dd($dados['anexo']->getSize());
+                }
+            }
+            $arr_tags = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND (pai='1' OR pai='2')",'nome','id');
+            if($salvAnexo){
+                $data['arquivo'] = $salvAnexo;
+            }else{
+                $data['arquivo'] = false;
+            }
+            $ret['upd_cad'] = Sic::where('id',$id)->update($data);
+            $mensagem = $mens.'<br><br>';
+            $mensagem .= '<h2>Resumo da Solicitação</h2>';
+            $mensagem .= '<ul>';
+            if(isset($dados['config']['secretaria']))
+                $mensagem .= '<li>Secretaria: <b>'.$arr_tags[$dados['config']['secretaria']].'</b></li>';
+            if(isset($dados['config']['categoria']))
+                $mensagem .= '<li>Categoria: <b>'.$arr_tags[$dados['config']['categoria']].'</b></li>';
+            if(isset($dados['config']['assunto']))
+                $mensagem .= '<li>Assunto: <b>'.$dados['config']['assunto'].'</b></li>';
+            $mensagem .= '</ul>';
+            $mensagem .= '<h4>Mensagem:</h4>';
+            $mensagem .= $dados['mensagem'];
+            //$mensagem .= '<p>Observação: A confirmação do seu e-mail é obrigatória.</p>';
+            $mensagem = str_replace('Foi enviado um e-mail para sua caixa postal contendo os dados da solicitação.','',$mensagem);
+
+            // $email = (new portalController)->enviarEmail([
+            //     'mensagem'=>$mensagem,
+            //     'arquivos'=>$data['arquivo'],
+            //     'nome_supervisor'=>'Responsável por E-sic',
+            //     'email_supervisor'=>'ger.maisaqui1@gmail.com',
+            // ]);
+        }
+        //Qlib::lib_print($salvar);
+        //dd($ret);
+        $route = $this->routa.'.index';
+        $ret = [
+            'mens'=>$mens,
+            'color'=>'success',
+            'idCad'=>$salvar->id,
+            'email'=>$email,
+            'exec'=>true,
+            'dados'=>$dados
+        ];
+
+        if($ajax=='s'){
+            $ret['return'] = route($route).'?idCad='.$salvar->id;
+            $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
+            return response()->json($ret);
+        }else{
+            return redirect()->route($route,$ret);
+        }
+    }
     public function show($id){
         $dados = Sic::findOrFail($id);
         $this->authorize('ler', $this->routa);
         if(!empty($dados)){
-            $title = 'Cadastro da família';
+            $title = __('Cadastro da família');
             $titulo = $title;
             $dados['ac'] = 'alt';
             if(isset($dados['config'])){
@@ -200,10 +399,6 @@ class sicController extends Controller
                 'url'=>$this->url,
                 'id'=>$id,
             ];
-            // if($dados['loteamento']>0){
-            //     $bairro = Bairro::find($dados['bairro']);
-            //     $dados['matricula'] = isset($bairro['matricula'])?$bairro['matricula']:false;
-            // }
             if(!$dados['matricula'])
                 $config['display_matricula'] = 'd-none';
             if(isset($dados['config']) && is_array($dados['config'])){
@@ -416,6 +611,9 @@ class sicController extends Controller
             return redirect()->route($route,$ret);
         }
     }
+    public function mensagem(){
+
+    }
     public function destroy($id,Request $request)
     {
         $this->authorize('delete', $this->url);
@@ -440,6 +638,92 @@ class sicController extends Controller
         return $ret;
     }
     public function relatorios(){
-        echo 'rela';
+        $title = __('RELATÓRIOS DE INFORMAÇÕES');
+        $titulo = $title;
+        $titulo2 = __('Relatório Estatístico dos Solicitantes');
+        $total_users = User::where('id_permission','=',Qlib::qoption('id_permission_front'))->count();
+        $campos_form_consulta = [
+            'dataI'=>['label'=>'Data inicial','active'=>false,'value'=>@$_GET['dataI'],'placeholder'=>'Data inicial','type'=>'date','exibe_busca'=>'d-block','event'=>'required','tam'=>'3'],
+            'dataF'=>['label'=>'Data final','active'=>false,'value'=>@$_GET['dataF'],'placeholder'=>'Data final','type'=>'date','exibe_busca'=>'d-block','event'=>'required','tam'=>'3'],
+            'origem'=>[
+                'label'=>'Origem',
+                'active'=>true,
+                'id'=>'origem',
+                'type'=>'select',
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='origem_sic'",'nome','id'),
+                'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'3',
+                'class'=>'',
+                'title'=>'',
+                'exibe_busca'=>true,
+                'option_select'=>true,
+                //'cp_busca'=>'config][secretaria',
+            ],
+            'btn'=>['label'=>'btn_buscar','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'3','class'=>'','script'=>'<button type="submit" class="btn btn-secondary btn-block  mt-4">Buscar</button>'],
+
+        ];
+        $totalSolicitantes = Sic::where('sics.excluido','=','n')
+        ->where('sics.deletado','=','n')
+        ->distinct('id_requerente')
+        //->where('sics.id_permission','=',Qlib::qoption('id_permission_front'))
+        ->join('users', 'users.id', '=', 'sics.id_requerente')
+        ->count();
+        $totalPedidos = Sic::where('sics.excluido','=','n')
+        ->where('sics.deletado','=','n')
+        ->count();
+
+        $arr_status = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$this->pai_status' AND ".Qlib::compleDelete(),'nome','id','','','data');
+
+        $totalPedidosAbertos = Sic::where('sics.excluido','=','n')
+                                    ->where('sics.deletado','=','n')
+                                    ->whereNull('status')
+                                    ->count();
+        $totalPedidosRespondidos = Sic::where('sics.excluido','=','n')
+                                        ->where('sics.deletado','=','n')
+                                        ->whereNotNull('status')
+                                        ->count();
+        $res = false;
+        $d_rel = [
+            'total_users'=>$total_users,
+            //'grafico'=>$res,
+        ];
+        if($totalPedidos){
+            $arr_color=['rgba(250, 174, 0, 1)','#0571ec','#ad2503','#03973c'];
+            $res = [
+                ['name'=>'Abertos','y'=>$totalPedidosAbertos,'color'=>$arr_color[0]],
+                ['name'=>'Respondidos','y'=>$totalPedidosRespondidos,'color'=>$arr_color[1]],
+            ];
+            if(is_array($arr_status)){
+                $i=2;
+                foreach ($arr_status as $k => $v) {
+                    $status_totalPedidos = Sic::where('sics.excluido','=','n')
+                                                ->where('sics.deletado','=','n')
+                                                ->where('status','=',$k)
+                                                ->count();
+                    $res0 = ['name'=>$v.'s','y'=>$status_totalPedidos,'color'=>$arr_color[$i]];
+                    array_push($res,$res0);
+                    $i++;
+                }
+            }
+            $d_rel['grafico'] = $res;
+        }
+        $totais_gerais = [
+            ['label'=>__('Total de Solicitantes'),'value'=>$totalSolicitantes],
+            ['label'=>__('Total de Pedidos'),'value'=>$totalPedidos],
+            ['label'=>__('Pedidos em Aberto'),'value'=>$res[0]['y']],
+            ['label'=>__('Pedidos Respondidos'),'value'=>$res[1]['y']],
+            ['label'=>__('Pedidos Ideferidos'),'value'=>$res[2]['y']],
+            ['label'=>__('Pedidos Resolvidos'),'value'=>$res[3]['y']],
+        ];
+        $ret = [
+            'title'=>$title,
+            'titulo'=>$titulo,
+            'titulo2'=>$titulo2,
+            'd_rel' =>$d_rel,
+            'campos_form_consulta' =>$campos_form_consulta,
+            'totais_gerais' =>$totais_gerais,
+        ];
+        return view($this->routa.'.relatorios',$ret);
     }
 }
