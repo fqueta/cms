@@ -58,7 +58,7 @@
             .highcharts-figure,
             .highcharts-data-table table {
                 min-width: 320px;
-                max-width: 800px;
+                max-width: 100%;
                 margin: 1em auto;
             }
 
@@ -156,3 +156,113 @@
         </script>
     </div>
 @endisset
+<!-- ASSUNTO DOS PEDIDOS -->
+<div id="conteudo_grafico_assuntos" class="conteudo_grafico col-md-12">
+    <figure class="highcharts-figure">
+        <div id="container_grafico_assuntos" class="container_grafico"></div>
+    </figure>
+
+    <script>
+        Highcharts.chart('container_grafico_assuntos', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Assunto dos Pedidos'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <strong>{point.percentage:.1f}%</strong>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: "Percentual",
+                colorByPoint: true,
+                data: [
+                                                    {
+                            name: 'Documentos',
+                            y: 14.29,
+                        },
+
+                                                    {
+                            name: 'Saúde',
+                            y: 3.57,
+                        },
+
+                                                    {
+                            name: 'Educação',
+                            y: 7.14,
+                        },
+
+                                                    {
+                            name: 'Esporte',
+                            y: 0.00,
+                        },
+
+                                                    {
+                            name: 'Finanças',
+                            y: 0.00,
+                        },
+
+                                                    {
+                            name: 'Cultura',
+                            y: 3.57,
+                        },
+
+                                                    {
+                            name: 'Legislação',
+                            y: 7.14,
+                        },
+
+                                                    {
+                            name: 'Iluminação Pública',
+                            y: 10.71,
+                        },
+
+                                                    {
+                            name: 'Saneamento Básico',
+                            y: 0.00,
+                        },
+
+                                                    {
+                            name: 'Licitações',
+                            y: 7.14,
+                        },
+
+                                                    {
+                            name: 'Concursos Públicos',
+                            y: 0.00,
+                        },
+
+                                                    {
+                            name: 'Obras',
+                            y: 0.00,
+                        },
+
+                                                    {
+                            name: 'Outras Informações',
+                            y: 46.43,
+                        },
+
+                                                    {
+                            name: 'Social',
+                            y: 0.00,
+                        },
+
+                                            ]
+            }]
+        });
+    </script>
+</div>
+   <!-- FIM ASSUNTO DOS PEDIDOS -->
