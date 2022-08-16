@@ -19,6 +19,8 @@ class sicController extends Controller
     public $label;
     public $url;
     public $ambiente;
+    public $pai_motivo;
+    public $pai_status;
 
     public function __construct()
     {
@@ -30,6 +32,9 @@ class sicController extends Controller
         $this->label = 'Sic';
         $this->url = 'sic';
         $this->view = 'admin.sic';
+        $this->pai_status = 'status_sic';
+        $this->pai_motivo = 'motivos_sic';
+
     }
     public function index(){
         $this->authorize('ler', $this->routa);
@@ -108,8 +113,8 @@ class sicController extends Controller
         ];
     }
     public function campos_resposta(){
-        $pai_status = 'status_sic';
-        $pai_motivo = 'motivos_sic';
+        $pai_status = $this->pai_status;
+        $pai_motivo = $this->pai_motivo;
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar uma resposta a solicitação acima de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
@@ -129,9 +134,9 @@ class sicController extends Controller
                     'campo_bus'=>'nome',
                     'label'=>'Tag',
                 ],
-                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$pai_status'",'nome','id'),
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$this->pai_status'",'nome','id'),
                 'exibe_busca'=>'d-block',
-                'event'=>'',
+                'event'=>'required',
                 'tam'=>'6',
                 'class'=>'',
                 'title'=>'',
@@ -152,7 +157,7 @@ class sicController extends Controller
                     'campo_bus'=>'nome',
                     'label'=>'Tag',
                 ],
-                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$pai_motivo'",'nome','id'),
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$this->pai_motivo'",'nome','id'),
                 'exibe_busca'=>'d-block',
                 'event'=>'',
                 'tam'=>'6',
@@ -163,9 +168,9 @@ class sicController extends Controller
             ],
             //'config[assunto]'=>['label'=>'Assunto*','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-none','cp_busca'=>'config][assunto','event'=>'','tam'=>'12'],
             //'nome'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Ensino médio completo','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            //'ativo'=>['label'=>'Ativado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            'resposta'=>['label'=>'Resposta*','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
-            //'arquivo'=>['label'=>'Anexos','active'=>false,'placeholder'=>'Anexar arquivos','type'=>'file','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'resposta'=>['label'=>'Resposta*','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12','class'=>'summernote'],
+            'meta[enviar_email]'=>['label'=>'Enviar resposta por e-mail','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não'],'cp_busca'=>'meta][enviar_email'],
+
             //'info1'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
             //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
         ];
@@ -281,8 +286,9 @@ class sicController extends Controller
                 'url'=>$this->url,
                 'id'=>$id,
                 'info_solicitante'=>$info_solicitante,
+                'arquivos'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg,zip,rar',
+                'local'=>'sic_admin',
             ];
-
             $ret = [
                 'value'=>$dados[0],
                 'config'=>$config,
@@ -293,7 +299,6 @@ class sicController extends Controller
                 'campos_solicitacao'=>$campos_solicitacao,
                 'exec'=>true,
             ];
-
             return view($this->view.'.edit',$ret);
         }else{
             $ret = [
@@ -330,13 +335,67 @@ class sicController extends Controller
             $dados['config'] = Qlib::lib_array_json($dados['config']);
         }
         $atualizar=false;
+        $email = false;
+        $mens = false;
         if(!empty($data)){
             $atualizar=Sic::where('id',$id)->update($data);
+            if($atualizar){
+                $mens = 'Salvo com sucesso!';
+            }
+            if($atualizar && isset($data['meta']['enviar_email']) && $data['meta']['enviar_email']=='s'){
+                $d_sic = Sic::Find($id);
+                $d_requerente = false;
+                if($d_sic){
+                    $d_requerente = User::Find($d_sic['id_requerente']);
+                }
+                if($d_requerente){
+                    $arr_tags = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND (pai='".$this->pai_motivo."' OR pai='".$this->pai_status."')",'nome','id');
+
+                    //if(isset($dados['secretaria']))
+                    $assunto = 'Resposta SIC '.$d_sic['protocolo'];
+                    $mensagem = '<h2>Resumo da Resposta</h2>';
+                    $mensagem .= '<ul>';
+                    if(!empty($d_sic['motivo']))
+                        $mensagem .= '<li>Motivo: <b>'.$arr_tags[$d_sic['motivo']].'</b></li>';
+                    if(!empty($d_sic['status']))
+                        $mensagem .= '<li>Status: <b>'.$arr_tags[$d_sic['status']].'</b></li>';
+                    // if(isset($dados['config']['categoria']))
+                    //     $mensagem .= '<li>Categoria: <b>'.$arr_tags[$dados['config']['categoria']].'</b></li>';
+                    // if(isset($dados['config']['assunto']))
+                    //     $mensagem .= '<li>Assunto: <b>'.$dados['config']['assunto'].'</b></li>';
+                    $mensagem .= '</ul>';
+                    $mensagem .= '<h2>Mensagem da resposta:</h2>';
+                    $mensagem .= $d_sic['resposta'];
+                    //$mensagem = str_replace('Foi enviado um e-mail para sua caixa postal contendo os dados da solicitação.','',$mensagem);
+                    $arquivos = false;
+                    if(isset($d_sic['token'])){
+                        $d_arq = _upload::where('token_produto','=',$d_sic['token'])->get();
+                        if($d_arq){
+                            foreach ($d_arq as $ka => $va) {
+                                $arquivos[] = $va['pasta'];
+                            }
+                        }
+                    }
+
+                    $email = (new PortalSicController)->enviarEmail([
+                        'para_email'=>$d_requerente['email'],
+                        'para_nome'=>$d_requerente['nome'],
+                        'assunto'=>$assunto,
+                        'mensagem'=>$mensagem,
+                        'arquivos'=>$arquivos,
+                        'nome_supervisor'=>'Responsável por E-sic',
+                        'email_supervisor'=>'ger.maisaqui1@gmail.com',
+                    ]);
+                    if($email){
+                        $mens .= ' O E-mail com a resposta foi enviado com sucesso para '.$d_requerente['email'];
+                    }
+                }
+            }
             $route = $this->routa.'.index';
             $ret = [
                 'exec'=>$atualizar,
                 'id'=>$id,
-                'mens'=>'Salvo com sucesso!',
+                'mens'=>$mens,
                 'color'=>'success',
                 'idCad'=>$id,
                 'return'=>$route,
@@ -379,5 +438,8 @@ class sicController extends Controller
             $ret = redirect()->route($routa.'.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
         }
         return $ret;
+    }
+    public function relatorios(){
+        echo 'rela';
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\portal\sicController;
 use App\Models\Familia;
 use App\Models\User;
 use App\Qlib\Qlib;
@@ -19,9 +20,27 @@ class TesteController extends Controller
     public function index()
     {
 
-       $ret = Qlib::redirectLogin();
 
-       dd(base_path().'/');
+        $email = (new sicController)->enviarEmail([
+            'mensagem'=>'Ola seja bem vindo',
+            // 'arquivos'=>[
+            //     'sic/anexo/2022081008-0008.pdf',
+            //     'admin.sic/2022/08/Designações Agosto_1659993647.pdf',
+            //     'admin.sic/2022/08/Designações Reunião meio de semana_1659993647.pdf',
+            // ],
+            'arquivos'=>'',
+            'assunto'=>'Teste de Sistema de emails',
+            'nome_supervisor'=>'Responsável por E-sic',
+            'email_supervisor'=>'ferqueta@yahoo.com.br',
+            'assunto_supervisor'=>'Enviado para cliente',
+            'mensagem_supervisor'=>'Foi enviado um email para o supervisor contendo esta informação',
+            'para_nome'=>'Patrícia Lima Queta',
+            'para_email'=>'ger.maisaqui1@gmail.com',
+        ]);
+        return $email;
+        //$ret = Qlib::redirectLogin();
+
+       //dd(base_path().'/');
        //$user = Auth::user();
         //$doc = new LotesController($user);
         $lote = isset($_GET['lote'])?$_GET['lote']:201;
@@ -44,8 +63,8 @@ class TesteController extends Controller
 
         //$arquivo = $this->carregaArquivo($link_html);
         //$temaHTML = explode('<!--separa--->',$arquivo);
-        $api = file_get_contents($link);
-        $arr_api = Qlib::lib_json_array($api);
+        //$api = file_get_contents($link);
+        //$arr_api = Qlib::lib_json_array($api);
         /*
         $tema1 = '<ul id="conteudo" class="list-group">{tr}</ul>';
         $tema2 = '<li class="list-group-item" itemprop="headline"><a href="{link_file}" target="_blank">{file_file_name} – {date}</a></li>';

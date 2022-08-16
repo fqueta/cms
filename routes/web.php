@@ -58,9 +58,9 @@ Route::prefix($prefixo_admin)->group(function(){
     });
     //inicio Rotas módulo Sic
     Route::resource('sic','\App\Http\Controllers\admin\sicController',['as'=>'admin','parameters' => ['sic' => 'id']]);
-    Route::get('/sic/relatorios', [App\Http\Controllers\admin\sicController::class, 'relatorios'])->name('admin.sic.relatorios');
-    Route::get('/sic/config', [App\Http\Controllers\admin\sicController::class, 'config'])->name('admin.sic.config');
-    Route::get('/sic/config/{url}', [App\Http\Controllers\admin\sicController::class, 'config'])->name('admin.sic.config.edit');
+    Route::get('sics/relatorios', ['\App\Http\Controllers\admin\sicController', 'relatorios'])->name('admin.sic.relatorios');
+    Route::get('sics/config', ['\App\Http\Controllers\admin\sicController', 'config'])->name('admin.sic.config');
+    Route::get('sics/config/{url}', ['\App\Http\Controllers\admin\sicController', 'config'])->name('admin.sic.config.edit');
     //Fim Rotas módulo Sic
 
     Route::resource('tags','\App\Http\Controllers\admin\TagsController',['parameters' => [

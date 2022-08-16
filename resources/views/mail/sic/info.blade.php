@@ -1,9 +1,8 @@
 @component('mail::message')
 
 {!!$mens!!}
-<p>
-    Observação: A confirmação do seu e-mail é obrigatória.
-</p>
+<p>&nbsp;</p>
+
 <p>
     * Este é um e-mail automático do sistema, não responda a este e-mail pois ele não será lido.
 </p>

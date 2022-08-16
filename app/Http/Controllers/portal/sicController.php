@@ -305,14 +305,15 @@ class sicController extends Controller
             $mensagem .= '</ul>';
             $mensagem .= '<h4>Mensagem:</h4>';
             $mensagem .= $dados['mensagem'];
+            //$mensagem .= '<p>Observação: A confirmação do seu e-mail é obrigatória.</p>';
             $mensagem = str_replace('Foi enviado um e-mail para sua caixa postal contendo os dados da solicitação.','',$mensagem);
 
-            $email = Mail::send(new \App\Mail\sic\infoSolicitacao([
+            $email = $this->enviarEmail([
                 'mensagem'=>$mensagem,
-                'arquivo'=>$data['arquivo'],
+                'arquivos'=>$data['arquivo'],
                 'nome_supervisor'=>'Responsável por E-sic',
                 'email_supervisor'=>'ger.maisaqui1@gmail.com',
-            ]));
+            ]);
         }
         //Qlib::lib_print($salvar);
         //dd($ret);
@@ -335,6 +336,39 @@ class sicController extends Controller
         }
     }
 
+    public function enviarEmail($config=false)
+    {
+        $ret = false;
+        if($config){
+            $para_email = isset($config['para_email'])?$config['para_email']:'';
+            $para_nome = isset($config['para_nome'])?$config['para_nome']:'';
+            $assunto = isset($config['assunto'])?$config['assunto']:'';
+            $mensagem = isset($config['mensagem'])?$config['mensagem']:'';
+            $assunto_supervisor = isset($config['assunto_supervisor'])?$config['assunto_supervisor']:'';
+            $mensagem_supervisor = isset($config['mensagem_supervisor'])?$config['mensagem_supervisor']:'';
+            $arquivos = isset($config['arquivos'])?$config['arquivos']:'';
+            $nome_supervisor = isset($config['nome_supervisor'])?$config['nome_supervisor']:Qlib::qoption('nome_responsavel_sic');
+            $email_supervisor = isset($config['email_supervisor'])?$config['email_supervisor']:Qlib::qoption('email_responsavel_sic');
+
+            $info = new \App\Mail\sic\infoSolicitacao([
+                'para_email'=>$para_email,
+                'para_nome'=>$para_nome,
+                'assunto'=>$assunto,
+                'mensagem'=>$mensagem,
+                'arquivos'=>$arquivos,
+                'nome_supervisor'=>$nome_supervisor,
+                'email_supervisor'=>$email_supervisor,
+                'assunto_supervisor'=>$assunto_supervisor,
+                'mensagem_supervisor'=>$mensagem_supervisor,
+            ]);
+
+            Mail::send($info);
+            if(count(Mail::failures())==0){
+                $ret = true;
+            }
+        }
+        return $ret;
+    }
     public function show($id)
     {
         //

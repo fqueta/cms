@@ -11,13 +11,14 @@
                         'tipo'=>'list',
                         'listFiles'=>@$config['listFiles'],
                         'routa'=>@$config['routa'],
+                        'url'=>@$config['url'],
                         'arquivos'=>@$config['arquivos'],
                         ])}}
 
                 </span>
             </div>
             <div class="col-md-12">
-                @can('create',$config['routa'])
+                @can('create',$config['url'])
                     @if (isset($config['arquivos']) && $config['arquivos'])
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-upload"></i>
                             {{ __('Enviar arquivos') }}
@@ -47,6 +48,7 @@
                                 <input type="hidden" name="pasta" value="{{$config['pasta']}}" />
                                 <input type="hidden" name="arquivos" value="{{$config['arquivos']}}" />
                                 <input type="hidden" name="typeN" value="{{@$config['typeN']}}" />
+                                <input type="hidden" name="local" value="{{@$config['local']}}" />
                                 <div class="fallback">
                                     <input name="file" type="file" multiple />
                                 </div>
@@ -79,7 +81,7 @@
             <a href="{{url('/storage')}}/{{$vl['pasta']}}" target="_blank" rel="noopener noreferrer">
               <span class="pull-left"><i class="fas fa-file-{{$vl['tipo_icon']}} fa-2x"></i></span> {{$vl['nome']}}
             </a>
-            @can('delete',$config['routa'])
+            @can('delete',$config['url'])
                 <button type="button" onclick="excluirArquivo('{{$vl['id']}}','{{route('uploads.destroy',['id'=>$vl['id']])}}')" class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button type="button">
             @endcan
         </li>

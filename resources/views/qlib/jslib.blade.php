@@ -5,12 +5,13 @@
     'botao'=>false,
     'botao_fechar'=>true,
     'tam'=>'modal-lg',
-]])
+    ]])
+{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script> --}}
 <script src="{{url('/')}}/js/jquery.maskMoney.min.js"></script>
 <script src="{{url('/')}}/js/jquery.validate.min.js"></script>
-<script src="{{url('/')}}/js/jquery-ui.min.js"></script>
 <script src="{{url('/')}}/js/jquery.inputmask.bundle.min.js"></script>
 <script src="{{url('/')}}/summernote/summernote.min.js"></script>
+{{-- <script src="{{url('/')}}/js/jquery-ui.min.js"></script> --}}
 <script src=" {{url('/')}}/js/lib.js"></script>
 <script>
     $(function(){
@@ -35,15 +36,23 @@
             document.querySelector('.select2-search__field').focus();
         });
         var urlAuto = $('.autocomplete').attr('url');
-        $( ".autocomplete" ).autocomplete({
-            source: urlAuto,
-            select: function (event, ui) {
-                //var sec = $(this).attr('sec');
-                lib_listarCadastro(ui.item,$(this));
-            },
-        });
+        // $( ".autocomplete" ).autocomplete({
+        //     source: urlAuto,
+        //     select: function (event, ui) {
+        //         //var sec = $(this).attr('sec');
+        //         lib_listarCadastro(ui.item,$(this));
+        //     },
+        // });
+        // var path = urlAuto;
+        // $('input.autocomplete').typeahead({
+        //     source:  function (query, process) {
+        //     return $.get(path, { query: query }, function (data) {
+        //             return process(data);
+        //         });
+        //     }
+        // });
         $('.summernote').summernote({
-            height: 400,
+            height: 300,
             placeholder: 'Digite o conteudo',
         });
         $('[type_slug="true"]').on('keyup',function(e){

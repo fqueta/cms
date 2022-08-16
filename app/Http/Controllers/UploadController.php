@@ -25,8 +25,8 @@ class UploadController extends Controller
         $arquivos = false;
         if($request->has('token_produto')){
             $id=$request->get('token_produto');
-            if($this->i_wp=='s'){
-                $dados = Post::where('id',$id)->get();
+            $dados = Post::where('id',$id)->get();
+            if($this->i_wp=='s' && $dados->count()>0){
                 $dadosApi = $this->wp_api->list([
                     'params'=>'/'.$dados[0]['post_name'].'?_type='.$dados[0]['post_type'],
                 ]);
@@ -84,6 +84,7 @@ class UploadController extends Controller
             $nomeArquivoSavo = $file->storeAs($pasta,$fileNameToStore);
             $exec = false;
             $salvar = false;
+            $local = isset($dados['local'])?$dados['local']:false;
             if($nomeArquivoSavo){
                 $exec = true;
                 $salvar = _upload::create([
@@ -91,7 +92,7 @@ class UploadController extends Controller
                     'pasta'=>$nomeArquivoSavo,
                     'ordem'=>$ordem,
                     'nome'=>$filenameWithExt,
-                    'config'=>json_encode(['extenssao'=>$extension])
+                    'config'=>json_encode(['extenssao'=>$extension,'local'=>$local]),
                 ]);
             }
             //$lista = _upload::where('token_produto','=',$token_produto)->get();
@@ -160,25 +161,26 @@ class UploadController extends Controller
 
     public function destroy($id)
     {
-        if($this->i_wp=='s'){
-            $ret = $this->wp_api->delete([
-                'params'=>'/'.$id,
-            ]);
-            $ret['dele_file'] = false;
-            if(isset($ret['exec'])){
-                $ret['dele_file'] = true;
-            }
-            return $ret;
+        // if($this->i_wp=='s'){
+        //     $ret = $this->wp_api->delete([
+        //         'params'=>'/'.$id,
+        //     ]);
+        //     $ret['dele_file'] = false;
+        //     if(isset($ret['exec'])){
+        //         $ret['dele_file'] = true;
+        //     }
+        //     return $ret;
 
-        }else{
+        // }else{
 
             $dados = _upload::find($id);
             $dele_file = false;
+            //dd($dados->pasta);
             if (Storage::exists($dados->pasta))
-            $dele_file = Storage::delete($dados->pasta);
+                $dele_file = Storage::delete($dados->pasta);
 
             $delete = _upload::where('id',$id)->delete();
             return response()->json(['exec'=>$delete,'dele_file'=>$dele_file]);
-        }
+        // }
     }
 }
