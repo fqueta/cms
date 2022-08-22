@@ -59,9 +59,9 @@
         </div>
         <div class="card-footer d-print-none">
             <div class="table-responsive">
-                @if ($config['limit']!='todos')
+                {{-- @if ($config['limit']!='todos') --}}
                 {{ $dados->appends($_GET)->links() }}
-                @endif
+                {{-- @endif --}}
             </div>
         </div>
       </div>

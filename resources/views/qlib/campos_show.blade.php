@@ -28,7 +28,7 @@
             @if ($config['label'])
                 <label for="{{$config['campo']}}">{{$config['label']}}</label>
             @endif
-            {{@$config['arr_opc'][$config['value']]}}
+            {!!@$config['arr_opc'][$config['value']]!!}
         </div>
         @endif
     @elseif ($config['type']=='radio')
@@ -52,7 +52,7 @@
         <!--config['checked'] é o gravado no bando do dedos e o value é o valor para ficar checado-->
         <div class="col-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
             <label for="{{$config['campo']}}">{{$config['label']}}</label><br>
-            @if(isset($config['value'])){{$config['value']}}@endif
+            @if(isset($config['value'])){!!$config['value']!!}@endif
         </div>
     @elseif ($config['type']=='html')
         @php
@@ -272,7 +272,7 @@
     @elseif($config['type']=='text')
     <div class="col-{{$config['tam']}}" div-id="{{$config['campo']}}">
         <label for="{{$config['campo']}}">{{$config['label']}}:</label>
-        {{@$config['value']}}
+        {!!@$config['value']!!}
     </div>
     @elseif($config['type']=='file')
     <div class="col-{{$config['tam']}}" div-id="{{$config['campo']}}">
@@ -295,7 +295,7 @@
     @else
     <div class="col-{{$config['tam']}}" div-id="{{$config['campo']}}">
         <label for="{{$config['campo']}}">{{$config['label']}}:</label>
-        {{@$config['value']}}
+        {!!@$config['value']!!}
     </div>
     @endif
 @endif

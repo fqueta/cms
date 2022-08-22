@@ -162,6 +162,54 @@ class tagSeeder extends Seeder
                 'value'=>'outra_informcoes',
             ],
             [
+                'nome'=>'Educação',
+                'pai'=>2,
+                'obs'=>'',
+                'value'=>'educacao',
+            ],
+            [
+                'nome'=>'Esporte',
+                'pai'=>2,
+                'obs'=>'',
+                'value'=>'esporte',
+            ],
+            [
+                'nome'=>'Finanças',
+                'pai'=>2,
+                'obs'=>'',
+                'value'=>'financas',
+            ],
+            [
+                'nome'=>'Cultura',
+                'pai'=>2,
+                'obs'=>'',
+                'value'=>'cultura',
+            ],
+            [
+                'nome'=>'Iluminação Pública',
+                'pai'=>2,
+                'obs'=>'',
+                'value'=>'iluminacao_publica',
+            ],
+            [
+                'nome'=>'Saneamento Básico',
+                'pai'=>2,
+                'obs'=>'',
+                'value'=>'saneamento_basico',
+            ],
+            [
+                'nome'=>'Concursos Públicos',
+                'pai'=>2,
+                'obs'=>'',
+                'value'=>'concursos_publicos',
+            ],
+            [
+                'nome'=>'Social',
+                'pai'=>2,
+                'obs'=>'',
+                'value'=>'social',
+            ],
+            [
                 'nome'=>'ORIGEM SIC',
                 'pai'=>0,
                 'obs'=>'Listagem de Origem do E-sic',
@@ -293,6 +341,35 @@ class tagSeeder extends Seeder
                 'ordem'=>8,
                 'value'=>'outro',
             ],
+            [
+                'nome'=>'TIPO PJ',
+                'pai'=>0,
+                'obs'=>'Tipo de pessoa jurídica',
+                'ordem'=>10,
+                'value'=>'tipo_pj',
+            ],
+            [
+                "nome"=>"EMPRESA - PME",
+                "pai"=>"tipo_pj",
+                "obs"=>"",
+                "ordem"=>1,
+                "value"=>"pme",
+            ],
+            [
+                "nome"=>"INSTITUIÇÃO DE ENSINO E/OU PESQUISA",
+                "pai"=>"tipo_pj",
+                "obs"=>"",
+                "ordem"=>2,
+                "value"=>"iep",
+            ],
+            [
+                "nome"=>"VEÍCULO DE COMUNICAÇÃO",
+                "pai"=>"tipo_pj",
+                "obs"=>"",
+                "ordem"=>3,
+                "value"=>"vc",
+            ],
+
         ];
 
         foreach ($arr as $key => $value) {

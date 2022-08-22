@@ -9,6 +9,7 @@ use App\Http\Controllers\EstadocivilController;
 use App\Http\Controllers\LotesController;
 use App\Http\Controllers\RelatoriosController;
 use App\Http\Controllers\MapasController;
+use App\Http\Controllers\portal\sicController;
 use App\Http\Controllers\portalController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -72,7 +73,8 @@ Route::prefix($prefixo_site.'internautas')->group(function(){
     Route::get('/logout',[portalController::class,'logoutInternautas'])->name('internautas.logout');
     Route::resource('sic','\App\Http\Controllers\portal\sicController',['parameters' => [
         'sic' => 'id'
-    ]]);
+    ]])->middleware('auth');;
+    Route::get('sics',[sicController::class,'relatorios'])->name('sic.internautas.relatorios');
 
 });
 Route::prefix($prefixo_admin.'/users')->group(function(){
@@ -159,30 +161,11 @@ Route::prefix('teste')->group(function(){
 
 Auth::routes();
 
-
 Route::post('/tinymce', function (Request $request) {
     $content = $request->content;
     return view('testes.show')->with(compact('content'));
 })->name('tinymce.store');
-/*
-Route::prefix('admin')->group(function(){
-    Route::get('/home', [App\Http\Controllers\admin\homeController::class, 'index'])->name('home.admin');
-    Route::resource('cursos','\App\Http\Controllers\admin\CursosController',['parameters' => [
-        'cursos' => 'id'
-    ]]);
-    Route::resource('categorias','\App\Http\Controllers\admin\CategoriasController',['parameters' => [
-        'categorias' => 'id'
-    ]]);
-    Route::resource('modulos','\App\Http\Controllers\admin\ModulosController',['parameters' => [
-        'modulos' => 'id'
-    ]]);
-    Route::resource('provas','\App\Http\Controllers\admin\ProvasController',['parameters' => [
-        'questoes' => 'id'
-    ]]);
-    Route::resource('questoes','\App\Http\Controllers\admin\QuestoesController',['parameters' => [
-        'questoes' => 'id'
-    ]]);
-});*/
+
 
 Route::get('envio-mails',function(){
     $user = new stdClass();

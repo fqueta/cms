@@ -10,7 +10,7 @@
           <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item active">
-          <a class="nav-link" href="{{route('sic.create')}}">E-Sic<span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="{{route('sic.internautas.relatorios')}}">E-Sic<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{route('cad.internautas',['tipo'=>'pf'])}}">Cadastrar P.F</a>

@@ -1,7 +1,7 @@
 <!-- Modal -->
 
 <div class="col-md-12">
-    <div class="card">
+    <div class="card card-primary card-outline">
         <div class="card-header">
             <h5 class="card-title">{{__('Pesquisar cadastros')}}</h5>
             <div class="card-tools">
@@ -18,6 +18,9 @@
                             @if ($vbu['active'])
                                 @php
                                     if($vbu['type']!='text' && $kbu=='id'){
+                                        $vbu['type'] = 'text';
+                                    }
+                                    if($vbu['type']=='hidden_text'){
                                         $vbu['type'] = 'text';
                                     }
                                     if($kbu!='obs')

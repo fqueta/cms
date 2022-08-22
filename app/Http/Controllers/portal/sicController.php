@@ -25,7 +25,7 @@ class sicController extends Controller
     public function __construct()
     {
         $user = Auth::user();
-        $this->middleware('auth');
+        //$this->middleware('auth');
         //$this->sic_admin = new AdminSicController();
         $this->user = $user;
         $this->routa = 'sic';
@@ -33,7 +33,7 @@ class sicController extends Controller
         $this->ambiente = Qlib::ambiente(); //Verifica se estamos no backend ou no frontend
         $this->view = 'padrao';
     }
-    public function querySic($get=false,$config=false)
+    public function querySic($get=false,$campos=false)
     {
         $ret = false;
         $get = isset($_GET) ? $_GET:[];
@@ -48,8 +48,7 @@ class sicController extends Controller
         //$sic =  DB::table('sics')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
         $sic_totais = new stdClass;
-        //$campos = isset($_SESSION['campos_sics_exibe']) ? $_SESSION['campos_sics_exibe'] : (new AdminSicController())->campos();
-        $campos = (new AdminSicController())->campos();
+        $campos = $campos?$campos: (new AdminSicController())->campos_resposta();
         $tituloTabela = 'Lista de todos cadastros';
         $arr_titulo = false;
         if(isset($get['filter'])){
@@ -67,15 +66,16 @@ class sicController extends Controller
                                     if(!empty($v1)){
 
                                         $sic->where($key,'LIKE','%'. $v1. '%');
-                                        if($campos[$key]['type']=='select'){
+                                        if(@$campos[$key]['type']=='select'){
                                             $v1 = $campos[$key]['arr_opc'][$v1];
                                         }
-                                        $arr_titulo[$campos[$key]['label']] = $v1;
-                                        $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$v1.'& ';
+                                        @$arr_titulo[$campos[$key]['label']] = $v1;
+                                        $titulo_tab .= 'Todos com *'. @$campos[$key]['label'] .'% = '.$v1.'& ';
                                     }
                                 }
                             }else{
                                 $value = trim($value);
+                                //dd($campos);
                                 $sic->where($key,'LIKE','%'. $value. '%');
                                 if($campos[$key]['type']=='select'){
                                     $value = $campos[$key]['arr_opc'][$value];
@@ -169,15 +169,134 @@ class sicController extends Controller
             'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" value="s" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
         ];
     }
+    /**ARRAY CONTENDO INFORMAÇÕES PARA MOTAR A TELA DE REPOSTA DO SIC PARO O INTERNAUTA
+     * @retun array
+     */
+    public function campos_resposta(){
+        $sicControllerAdmin = new AdminSicController;
+        $pai_status = $sicControllerAdmin->pai_status;
+        $pai_motivo = $sicControllerAdmin->pai_motivo;
+        return [
+            'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar uma resposta a solicitação acima de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
+            'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'id_requerente'=>['label'=>'id_requerente','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            //'protocolo'=>['label'=>'Protocolo','active'=>true,'placeholder'=>'','type'=>'hidden_text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'config[assunto]'=>['label'=>'Assunto','active'=>false,'placeholder'=>'','type'=>'hidden','exibe_busca'=>'d-block','cp_busca'=>'config][assunto','event'=>'required','tam'=>'12'],
+            'config[secretaria]'=>[
+                'label'=>'Secretaria',
+                'active'=>true,
+                'id'=>'secretaria',
+                'type'=>'select',
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id'),
+                'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'6',
+                'class'=>'',
+                'title'=>'',
+                'exibe_busca'=>true,
+                'option_select'=>true,
+                'cp_busca'=>'config][secretaria',
+            ],
+            'config[categoria]'=>[
+                'label'=>'Categoria',
+                'active'=>false,
+                'id'=>'categoria',
+                'type'=>'select',
+                'arr_opc'=>$sicControllerAdmin->arr_tags(2),
+                'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'3',
+                'class'=>'',
+                'title'=>'',
+                'exibe_busca'=>true,
+                'option_select'=>true,
+                'cp_busca'=>'config][categoria',
+            ],
+            'config[origem]'=>[
+                'label'=>'Origem*',
+                'active'=>true,
+                'id'=>'origem',
+                'type'=>'select',
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='origem_sic'",'nome','id'),
+                'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'3',
+                'class'=>'',
+                'title'=>'',
+                'exibe_busca'=>true,
+                'option_select'=>true,
+                'cp_busca'=>'config][origem',
+            ],
+            'status'=>[
+                'label'=>'Status',
+                'active'=>true,
+                'id'=>'status',
+                'type'=>'select',
+                'data_selector'=>[
+                    'campos'=>$sicControllerAdmin->campos_status($pai_status),
+                    'route_index'=>route('tags.index'),
+                    'id_form'=>'frm-tags',
+                    'action'=>route('tags.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'nome',
+                    'label'=>'Tag',
+                ],
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$pai_status' AND ".Qlib::compleDelete(),'nome','id'),
+                'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'6',
+                'class'=>'',
+                'title'=>'',
+                'exibe_busca'=>true,
+                'option_select'=>true,
+            ],
+            'motivo'=>[
+                'label'=>'Motivos de Negativa de Respostas',
+                'active'=>true,
+                'id'=>'motivo',
+                'type'=>'selector',
+                'data_selector'=>[
+                    'campos'=>$sicControllerAdmin->campos_status($pai_motivo),
+                    'route_index'=>route('tags.index'),
+                    'id_form'=>'frm-tags',
+                    'action'=>route('tags.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'nome',
+                    'label'=>'Tag',
+                ],
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$pai_motivo'",'nome','id'),
+                'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'12',
+                'class'=>'',
+                'title'=>'',
+                'exibe_busca'=>true,
+                'option_select'=>true,
+            ],
+            'mensagem'=>['label'=>'Mensagem Inicial','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
+            'resposta'=>['label'=>'Resposta','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12','class'=>'summernote'],
+            //'meta[enviar_email]'=>['label'=>'Enviar resposta por e-mail','active'=>false,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não'],'cp_busca'=>'meta][enviar_email'],
+
+            //'info1'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
+            //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
+        ];
+    }
     public function index()
     {
-        $this->authorize('ler', $this->routa);
+        //$this->authorize('ler', $this->routa);
         $title = 'Cadastro de sic';
         $titulo = $title;
+        $_GET['filter']['id_requerente'] = Auth::id();
         $querySic = $this->querySic($_GET);
         $querySic['config']['exibe'] = 'html';
         $routa = $this->routa;
-        return view($this->view.'.index',[
+        $local = $this->ambiente;
+        if($local=='front'){
+            $view = 'portal.sic_front';
+        }
+        $sicControllerAdmin = new AdminSicController;
+        $ret = [
             'dados'=>$querySic['sic'],
             'title'=>$title,
             'titulo'=>$titulo,
@@ -187,12 +306,21 @@ class sicController extends Controller
             'arr_titulo'=>$querySic['arr_titulo'],
             'config'=>$querySic['config'],
             'routa'=>$routa,
+            'arr_categorias'=>$sicControllerAdmin->arr_tags(2),
+            'arr_motivos'=>$sicControllerAdmin->arr_tags($sicControllerAdmin->pai_motivo),
+            'arr_status'=>$sicControllerAdmin->arr_tags($sicControllerAdmin->pai_status),
             'view'=>$this->view,
             'i'=>0,
-        ]);
+        ];
+        return view($view.'.index',$ret);
     }
     public function create(User $user)
     {
+        // $this->middleware('auth');
+        // if(!Auth::check()){
+        //     //return redirect()->route('login');
+        //     return false;
+        // }
         if(auth()->user()->id_permission==Qlib::qoption('id_permission_front')){
             $this->authorize('is_user_front');
         }else{
@@ -205,6 +333,7 @@ class sicController extends Controller
             'ac'=>'cad',
             'frm_id'=>'frm-sics',
             'route'=>$this->routa,
+            'url'=>$this->routa,
             'ambiente'=>$local,
             'event'=>'enctype=multipart/form-data',
         ];
@@ -370,9 +499,67 @@ class sicController extends Controller
         }
         return $ret;
     }
-    public function show($id)
-    {
-        //
+    public function show($id){
+        $dados = Sic::findOrFail($id);
+        //$this->authorize('ler', $this->routa);
+        if(!empty($dados)){
+            $title = __('Solicitação').' '.$dados['protocolo'];
+            $titulo = $title;
+            $dados['ac'] = 'alt';
+            if(isset($dados['config'])){
+                $dados['config'] = Qlib::lib_json_array($dados['config']);
+            }
+            $arr_escolaridade = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
+            $arr_estadocivil = Qlib::sql_array("SELECT id,nome FROM estadocivils ORDER BY nome ", 'nome', 'id');
+            $listFiles = false;
+            //$dados['renda_familiar'] = number_format($dados['renda_familiar'],2,',','.');
+            $campos = $this->campos_resposta();
+            if(isset($dados['token'])){
+                $listFiles = _upload::where('token_produto','=',$dados['token'])->get();
+            }
+            $view = $this->view;
+            $local = $this->ambiente;
+            if($local=='front'){
+                $view = 'portal.sic_front';
+            }
+
+            $config = [
+                'ac'=>'alt',
+                'frm_id'=>'frm-sic',
+                'route'=>$this->routa,
+                'url'=>$this->routa,
+                'ambiente'=>$local,
+                'id'=>$id,
+            ];
+            if(isset($dados['config']) && is_array($dados['config'])){
+                foreach ($dados['config'] as $key => $value) {
+                    if(is_array($value)){
+
+                    }else{
+                        $dados['config['.$key.']'] = $value;
+                    }
+                }
+            }
+            $ret = [
+                'value'=>$dados,
+                'config'=>$config,
+                'title'=>$title,
+                'titulo'=>$titulo,
+                'arr_escolaridade'=>$arr_escolaridade,
+                'arr_estadocivil'=>$arr_estadocivil,
+                'listFiles'=>$listFiles,
+                'campos'=>$campos,
+                'routa'=>$this->routa,
+                'url'=>$this->routa,
+                'exec'=>true,
+            ];
+            return view($view.'.show',$ret);
+        }else{
+            $ret = [
+                'exec'=>false,
+            ];
+            return redirect()->route($this->routa.'.index',$ret);
+        }
     }
 
     public function edit($sic,User $user)
@@ -501,5 +688,15 @@ class sicController extends Controller
             $ret = redirect()->route($routa.'.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
         }
         return $ret;
+    }
+    public function relatorios(Request $request){
+        $ret = (new AdminSicController)->dadosRelatorio($request);
+        $view = $this->view;
+        $local = $this->ambiente;
+        if($local=='front'){
+            $view = 'portal.sic_front';
+        }
+
+        return view($view.'.relatorios',$ret);
     }
 }

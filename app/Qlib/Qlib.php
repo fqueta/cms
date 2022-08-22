@@ -825,4 +825,46 @@ class Qlib
         }
         return $ret;
     }
+    /**
+     * MONTA UM ARRAY COM OPÇÕES DE SEXO
+     * @retun array ou string se $var não for nulo
+     */
+    static function lib_sexo($var = null)
+    {
+        $arr_tipo_genero = [
+            'm'=>__('Masculino'),'f'=>__('Feminino'),'ni'=>__('Não informar')
+        ];
+        if(!$var){
+            return $arr_tipo_genero;
+        }else{
+            return $arr_tipo_genero[$var];
+        }
+    }
+    /**
+     * MONTA UM ARRAY COM OPÇÕES DE ESCOLARIDADE ORIGEM TABELA ESCOLARIDADES
+     * @retun array ou string se $var não for nulo
+     */
+    static function lib_escolaridades($var = null)
+    {
+        $arr_tipo_escolaridade = Qlib::sql_array("SELECT id,nome FROM escolaridades WHERE ativo='s' ORDER BY nome ASC",'nome','id');
+        if(!$var){
+            return $arr_tipo_escolaridade;
+        }else{
+            return $arr_tipo_escolaridade[$var];
+        }
+    }
+    /**
+     * MONTA UM ARRAY COM OPÇÕES DE PROFISSÃO ORIGEM TABELA profissaos
+     * @retun array ou string se $var não for nulo
+     */
+    static function lib_profissao($var = null)
+    {
+        $arr_tipo_profissao = Qlib::sql_array("SELECT id,nome FROM profissaos WHERE ativo='s' ORDER BY nome ASC",'nome','id');
+        if(!$var){
+            return $arr_tipo_profissao;
+        }else{
+            return $arr_tipo_profissao[$var];
+        }
+    }
+
 }

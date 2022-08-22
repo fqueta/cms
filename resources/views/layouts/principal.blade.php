@@ -22,7 +22,9 @@
       @yield('nav')
     </header>
     <main role="main">
-        @yield('content')
+        <div class="container">
+            @yield('content')
+        </div>
     </main>
 
     <footer class="text-muted">

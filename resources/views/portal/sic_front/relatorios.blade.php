@@ -5,7 +5,11 @@
 @endsection
 
 @section('content')
-  <h3>Layout site em construção</h3>
+@include('portal.sic_front.painel')
+<div class="row">
+    @include('admin.sic.exibe_relatorios')
+</div>
+
 @endsection
 
 @section('css')

@@ -184,12 +184,59 @@ class sicController extends Controller
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar uma resposta a solicitação acima de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'protocolo'=>['label'=>'Protocolo','active'=>true,'placeholder'=>'','type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'id_requerente'=>['label'=>'id_requerente','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'protocolo'=>['label'=>'Protocolo','active'=>true,'placeholder'=>'','type'=>'hidden_text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'config[assunto]'=>['label'=>'Assunto','active'=>false,'placeholder'=>'','type'=>'hidden','exibe_busca'=>'d-block','cp_busca'=>'config][assunto','event'=>'required','tam'=>'12'],
+            'config[secretaria]'=>[
+                'label'=>'Secretaria',
+                'active'=>true,
+                'id'=>'secretaria',
+                'type'=>'select',
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id'),
+                'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'6',
+                'class'=>'',
+                'title'=>'',
+                'exibe_busca'=>true,
+                'option_select'=>true,
+                'cp_busca'=>'config][secretaria',
+            ],
+            'config[categoria]'=>[
+                'label'=>'Categoria*',
+                'active'=>false,
+                'id'=>'categoria',
+                'type'=>'select',
+                'arr_opc'=>$this->arr_tags(2),
+                'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'3',
+                'class'=>'',
+                'title'=>'',
+                'exibe_busca'=>true,
+                'option_select'=>true,
+                'cp_busca'=>'config][categoria',
+            ],
+            'config[origem]'=>[
+                'label'=>'Origem*',
+                'active'=>true,
+                'id'=>'origem',
+                'type'=>'select',
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='origem_sic'",'nome','id'),
+                'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'3',
+                'class'=>'',
+                'title'=>'',
+                'exibe_busca'=>true,
+                'option_select'=>true,
+                'cp_busca'=>'config][origem',
+            ],
             'status'=>[
                 'label'=>'Status',
                 'active'=>true,
                 'id'=>'status',
-                'type'=>'selector',
+                'type'=>'select',
                 'data_selector'=>[
                     'campos'=>$this->campos_status($pai_status),
                     'route_index'=>route('tags.index'),
@@ -240,6 +287,14 @@ class sicController extends Controller
             //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
         ];
     }
+    /** MONTA UM ARRAY BASEADO NA TABELA TAG
+     * @var pai ordenacao
+     * @return array()
+     */
+    public function arr_tags($pai=2){
+        $arr_tag = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$pai'",'nome','id');
+        return $arr_tag;
+    }
     public function create(User $user)
     {
         $this->authorize('create', $this->url);
@@ -248,7 +303,7 @@ class sicController extends Controller
         //$Users = Users::all();
         //$roles = DB::select("SELECT * FROM roles ORDER BY id ASC");
         $sic = ['ac'=>'cad','token'=>uniqid()];
-        $arr_escolaridade = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
+        $arr_escolaridade = Qlib::lib_escolaridades();
         $arr_estadocivil = Qlib::sql_array("SELECT id,nome FROM estadocivils ORDER BY nome ", 'nome', 'id');
         $config = [
             'ac'=>'cad',
@@ -637,10 +692,28 @@ class sicController extends Controller
         }
         return $ret;
     }
-    public function relatorios(){
+    public function dadosRelatorio($request = null)
+    {
+        //DECLARAÇÕES DE VARIAVEIS
         $title = __('RELATÓRIOS DE INFORMAÇÕES');
         $titulo = $title;
         $titulo2 = __('Relatório Estatístico dos Solicitantes');
+        $dataI = false;
+        $dataF = false;
+        $origem = false;
+        $arr_status = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$this->pai_status' AND ".Qlib::compleDelete(),'nome','id','','','data');
+        $arr_assuntos = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='2' AND ".Qlib::compleDelete()." ORDER BY nome ASC",'nome','id','','','data');
+        $arr_motivos = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$this->pai_motivo' AND ".Qlib::compleDelete()." ORDER BY nome ASC",'nome','id','','','data');
+        $arr_escolaridade = Qlib::lib_escolaridades();
+        $arr_profissao = Qlib::lib_profissao();
+        $arr_tipo_pj = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='tipo_pj'",'nome','id');
+        //FIM DECLARAÇÃO DE VAIRAVEIS
+
+        if($request->isMethod('get') && $request->has(['dataI','dataF','origem'])){
+            $dataI = $request->input('dataI');
+            $dataF = $request->input('dataF');
+            $origem = $request->input('origem');
+        }
         $total_users = User::where('id_permission','=',Qlib::qoption('id_permission_front'))->count();
         $campos_form_consulta = [
             'dataI'=>['label'=>'Data inicial','active'=>false,'value'=>@$_GET['dataI'],'placeholder'=>'Data inicial','type'=>'date','exibe_busca'=>'d-block','event'=>'required','tam'=>'3'],
@@ -658,36 +731,51 @@ class sicController extends Controller
                 'title'=>'',
                 'exibe_busca'=>true,
                 'option_select'=>true,
+                'value'=>@$_GET['origem'],
                 //'cp_busca'=>'config][secretaria',
             ],
             'btn'=>['label'=>'btn_buscar','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'3','class'=>'','script'=>'<button type="submit" class="btn btn-secondary btn-block  mt-4">Buscar</button>'],
 
         ];
-        $totalSolicitantes = Sic::where('sics.excluido','=','n')
+        $solicitantes = Sic::where('sics.excluido','=','n')
         ->where('sics.deletado','=','n')
         ->distinct('id_requerente')
-        //->where('sics.id_permission','=',Qlib::qoption('id_permission_front'))
-        ->join('users', 'users.id', '=', 'sics.id_requerente')
-        ->count();
-        $totalPedidos = Sic::where('sics.excluido','=','n')
-        ->where('sics.deletado','=','n')
-        ->count();
+        ->join('users', 'users.id', '=', 'sics.id_requerente');
 
-        $arr_status = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$this->pai_status' AND ".Qlib::compleDelete(),'nome','id','','','data');
+        $totalPedidos = Sic::where('sics.excluido','=','n')
+        ->where('sics.deletado','=','n');
 
         $totalPedidosAbertos = Sic::where('sics.excluido','=','n')
                                     ->where('sics.deletado','=','n')
-                                    ->whereNull('status')
-                                    ->count();
+                                    ->whereNull('status');
         $totalPedidosRespondidos = Sic::where('sics.excluido','=','n')
                                         ->where('sics.deletado','=','n')
-                                        ->whereNotNull('status')
-                                        ->count();
+                                        ->whereNotNull('status');
+
+        if($dataI && $dataF){
+            $solicitantes->whereBetween('sics.created_at',[$dataI,$dataF]);
+            $totalPedidos->whereBetween('sics.created_at',[$dataI,$dataF]);
+            $totalPedidosAbertos->whereBetween('sics.created_at',[$dataI,$dataF]);
+            $totalPedidosRespondidos->whereBetween('sics.created_at',[$dataI,$dataF]);
+        }
+        if($origem){
+            $solicitantes->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+            $totalPedidos->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+            $totalPedidosAbertos->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+            $totalPedidosRespondidos->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+        }
+
+        $totalSolicitantes = $solicitantes->count();
+        $totalPedidos = $totalPedidos->count();
+        $totalPedidosAbertos = $totalPedidosAbertos->count();
+        $totalPedidosRespondidos = $totalPedidosRespondidos->count();
+
         $res = false;
         $d_rel = [
             'total_users'=>$total_users,
             //'grafico'=>$res,
         ];
+        //MONTAGEM DO ARRAY DE STATUS
         if($totalPedidos){
             $arr_color=['rgba(250, 174, 0, 1)','#0571ec','#ad2503','#03973c'];
             $res = [
@@ -699,8 +787,15 @@ class sicController extends Controller
                 foreach ($arr_status as $k => $v) {
                     $status_totalPedidos = Sic::where('sics.excluido','=','n')
                                                 ->where('sics.deletado','=','n')
-                                                ->where('status','=',$k)
-                                                ->count();
+                                                ->where('status','=',$k);
+                    if($dataI && $dataF){
+                        $status_totalPedidos->whereBetween('sics.created_at',[$dataI,$dataF]);
+                    }
+                    if($origem){
+                        $status_totalPedidos->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+                    }
+                    $status_totalPedidos = $status_totalPedidos->count();
+                                                //->count();
                     $res0 = ['name'=>$v.'s','y'=>$status_totalPedidos,'color'=>$arr_color[$i]];
                     array_push($res,$res0);
                     $i++;
@@ -708,6 +803,183 @@ class sicController extends Controller
             }
             $d_rel['grafico'] = $res;
         }
+
+        //MONTAGEM DO ARRAY DE ASSUNTOS
+
+        $res_assunto=[];
+        if(is_array($arr_assuntos)){
+            $i=2;
+            foreach ($arr_assuntos as $k => $v) {
+                $assunto_totalPedidos = Sic::where('sics.excluido','=','n')
+                                            ->where('sics.deletado','=','n')
+                                            ->where('config','LIKE','%"'.$k.'"%');
+                if($dataI && $dataF){
+                    $assunto_totalPedidos->whereBetween('sics.created_at',[$dataI,$dataF]);
+                }
+                if($origem){
+                    $assunto_totalPedidos->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+                }
+                $assunto_totalPedidos = $assunto_totalPedidos->count();
+
+                $res_assunto0 = ['name'=>$v,'y'=>$assunto_totalPedidos];
+                array_push($res_assunto,$res_assunto0);
+                $i++;
+            }
+        }
+        $d_rel['grafico_assunto'] = $res_assunto;
+
+        //MONTAGEM DO ARRAY DE MOTIVOS
+
+        $res_motivo=[];
+        if(is_array($arr_motivos)){
+            $i=2;
+            foreach ($arr_motivos as $k => $v) {
+                $motivo_totalPedidos = Sic::where('sics.excluido','=','n')
+                                            ->where('sics.deletado','=','n')
+                                            ->where('motivo','=',$k);
+                                            //->count();
+                if($dataI && $dataF){
+                    $motivo_totalPedidos->whereBetween('sics.created_at',[$dataI,$dataF]);
+                }
+                if($origem){
+                    $motivo_totalPedidos->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+                }
+                $motivo_totalPedidos = $motivo_totalPedidos->count();
+
+                $res_motivo0 = ['name'=>$v,'y'=>$motivo_totalPedidos];
+                array_push($res_motivo,$res_motivo0);
+                $i++;
+            }
+        }
+        $d_rel['grafico_motivo'] = $res_motivo;
+
+        //MONTAGEM DO ARRAY DE SOLICITANTE
+        $arr_tipo_solicitante = [
+            'pf'=>__('Pessoa Física'),'pj'=>__('Pessoa Jurídica')
+        ];
+
+        $res_solicitante=[];
+        if(is_array($arr_tipo_solicitante)){
+            foreach ($arr_tipo_solicitante as $k => $v) {
+                $solicitante_totalPedidos = Sic::where('sics.excluido','=','n')
+                                                ->where('sics.deletado','=','n')
+                                                ->distinct('id_requerente')
+                                                ->join('users', 'users.id', '=', 'sics.id_requerente')
+                                                ->where('users.tipo_pessoa','=',$k);
+                if($dataI && $dataF){
+                    $solicitante_totalPedidos->whereBetween('sics.created_at',[$dataI,$dataF]);
+                }
+                if($origem){
+                    $solicitante_totalPedidos->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+                }
+                $solicitante_totalPedidos = $solicitante_totalPedidos->count();
+                $res_solicitante0 = ['name'=>$v,'y'=>$solicitante_totalPedidos];
+                array_push($res_solicitante,$res_solicitante0);
+            }
+        }
+        $d_rel['grafico_solicitante'] = $res_solicitante;
+
+        //MONTAGEM DO ARRAY DE GÊNERO
+
+        $arr_tipo_genero = Qlib::lib_sexo();
+
+        $res_genero=[];
+        if(is_array($arr_tipo_genero)){
+            foreach ($arr_tipo_genero as $k => $v) {
+                $genero_totalPedidos = Sic::where('sics.excluido','=','n')
+                                            ->where('sics.deletado','=','n')
+                                            ->distinct('id_requerente')
+                                            ->join('users', 'users.id', '=', 'sics.id_requerente')
+                                            ->where('users.genero','=',$k);
+                                            //->count();
+                if($dataI && $dataF){
+                    $genero_totalPedidos->whereBetween('sics.created_at',[$dataI,$dataF]);
+                }
+                if($origem){
+                    $genero_totalPedidos->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+                }
+                $genero_totalPedidos = $genero_totalPedidos->count();
+                $res_genero0 = ['name'=>$v,'y'=>$genero_totalPedidos];
+                array_push($res_genero,$res_genero0);
+            }
+        }
+        $d_rel['grafico_genero'] = $res_genero;
+
+        //MONTAGEM DO ARRAY DE ESCOLARIDADE
+
+        $res_escolaridade=[];
+        if(is_array($arr_escolaridade)){
+            foreach ($arr_escolaridade as $k => $v) {
+                $escolaridade_totalPedidos = Sic::where('sics.excluido','=','n')
+                                                ->where('sics.deletado','=','n')
+                                                ->distinct('id_requerente')
+                                                ->join('users', 'users.id', '=', 'sics.id_requerente')
+                                                ->where('users.config','LIKE','%"escolaridade":"'.$k.'"%');
+                                                //->count();
+                if($dataI && $dataF){
+                    $escolaridade_totalPedidos->whereBetween('sics.created_at',[$dataI,$dataF]);
+                }
+                if($origem){
+                    $escolaridade_totalPedidos->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+                }
+                $escolaridade_totalPedidos = $escolaridade_totalPedidos->count();
+                $res_escolaridade0 = ['name'=>$v,'y'=>$escolaridade_totalPedidos];
+                array_push($res_escolaridade,$res_escolaridade0);
+            }
+        }
+        $d_rel['grafico_escolaridade'] = $res_escolaridade;
+
+
+        //MONTAGEM DO ARRAY DE PROFISSÃO
+
+        $res_profissao=[];
+        if(is_array($arr_profissao)){
+            foreach ($arr_profissao as $k => $v) {
+                $profissao_totalPedidos = Sic::where('sics.excluido','=','n')
+                                                ->where('sics.deletado','=','n')
+                                                ->distinct('id_requerente')
+                                                ->join('users', 'users.id', '=', 'sics.id_requerente')
+                                                ->where('users.config','LIKE','%"profissao":"'.$k.'"%');
+                if($dataI && $dataF){
+                    $profissao_totalPedidos->whereBetween('sics.created_at',[$dataI,$dataF]);
+                }
+                if($origem){
+                    $profissao_totalPedidos->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+                }
+                $profissao_totalPedidos = $profissao_totalPedidos->count();
+                $res_profissao0 = ['name'=>$v,'y'=>$profissao_totalPedidos];
+                array_push($res_profissao,$res_profissao0);
+            }
+        }
+        $d_rel['grafico_profissao'] = $res_profissao;
+
+
+
+        //MONTAGEM DO ARRAY DE TIPO PJ
+
+        $res_tipo_pj=[];
+        if(is_array($arr_tipo_pj)){
+            foreach ($arr_tipo_pj as $k => $v) {
+                $tipo_pj_totalPedidos = Sic::where('sics.excluido','=','n')
+                                                ->where('sics.deletado','=','n')
+                                                ->distinct('id_requerente')
+                                                ->join('users', 'users.id', '=', 'sics.id_requerente')
+                                                ->where('users.config','LIKE','%"tipo_pj":"'.$k.'"%');
+                if($dataI && $dataF){
+                    $tipo_pj_totalPedidos->whereBetween('sics.created_at',[$dataI,$dataF]);
+                }
+                if($origem){
+                    $tipo_pj_totalPedidos->where('sics.config','LIKE','%"origem":"'.$origem.'"%');
+                }
+                $tipo_pj_totalPedidos = $tipo_pj_totalPedidos->count();
+                $res_tipo_pj0 = ['name'=>$v,'y'=>$tipo_pj_totalPedidos];
+                array_push($res_tipo_pj,$res_tipo_pj0);
+            }
+        }
+        $d_rel['grafico_tipo_pj'] = $res_tipo_pj;
+
+
+        //dd($d_rel);
         $totais_gerais = [
             ['label'=>__('Total de Solicitantes'),'value'=>$totalSolicitantes],
             ['label'=>__('Total de Pedidos'),'value'=>$totalPedidos],
@@ -724,6 +996,10 @@ class sicController extends Controller
             'campos_form_consulta' =>$campos_form_consulta,
             'totais_gerais' =>$totais_gerais,
         ];
+        return $ret;
+    }
+    public function relatorios(Request $request){
+        $ret = $this->dadosRelatorio($request);
         return view($this->routa.'.relatorios',$ret);
     }
 }
