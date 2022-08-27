@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Str;
 
+// if(isset($_GET['teste'])){
+//     echo  $_SERVER['SERVER_NAME'];exit;
+// }
 return [
 
     /*

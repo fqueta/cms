@@ -11,21 +11,26 @@
         </div>
     </div>
     @can('is_user_front_v')
-        <div class = "page-header">
+    <div class="card card-primary card-outline">
+        <div class = "card-header">
             <h1 class="text-center">
                 {{$titulo}}
             </h1>
         </div>
-        @php
+        <div class="card-body">
+
+            @php
             $_GET['redirect'] = route('internautas.index');
             //$config['event'] = 'enctype="multipart/form-data"';
-        @endphp
+            @endphp
 
-        {{App\Qlib\Qlib::show([
-            'campos'=>$campos,
-            'config'=>$config,
-            'value'=>$value,
-        ])}}
+            {{App\Qlib\Qlib::show([
+                'campos'=>$campos,
+                'config'=>$config,
+                'value'=>$value,
+            ])}}
+        </div>
+    </div>
     @elsecannot('is_user_front_v')
         <h6 class="text-center">{{__('Somente internautas com cadastro verificados podem usar este serviço')}}</h6>
     @endcan

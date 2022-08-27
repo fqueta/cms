@@ -172,10 +172,11 @@ class sicController extends Controller
     /**ARRAY CONTENDO INFORMAÇÕES PARA MOTAR A TELA DE REPOSTA DO SIC PARO O INTERNAUTA
      * @retun array
      */
-    public function campos_resposta(){
+    public function campos_resposta($config=false){
         $sicControllerAdmin = new AdminSicController;
         $pai_status = $sicControllerAdmin->pai_status;
         $pai_motivo = $sicControllerAdmin->pai_motivo;
+        $dados = isset($config['dados'])?$config['dados']:false;
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar uma resposta a solicitação acima de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
@@ -276,9 +277,7 @@ class sicController extends Controller
             ],
             'mensagem'=>['label'=>'Mensagem Inicial','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
             'resposta'=>['label'=>'Resposta','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12','class'=>'summernote'],
-            //'meta[enviar_email]'=>['label'=>'Enviar resposta por e-mail','active'=>false,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não'],'cp_busca'=>'meta][enviar_email'],
-
-            //'info1'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
+            'anexo'=>['label'=>'Anexos','active'=>false,'placeholder'=>'Anexar arquivos','type'=>'file','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],            'show_file_front'=>['label'=>'Info1','active'=>false,'type'=>'show_file_front','script'=>'portal.sic_front.show_files','tam'=>'12','value'=>$dados],
             //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
         ];
     }
@@ -540,6 +539,8 @@ class sicController extends Controller
                     }
                 }
             }
+            $campos = $this->campos_resposta(['dados'=>$dados]);
+
             $ret = [
                 'value'=>$dados,
                 'config'=>$config,

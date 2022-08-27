@@ -122,6 +122,7 @@ class UserPermissions extends Controller
         $queryPermissions = $this->queryPermissions($_GET);
         $queryPermissions['config']['exibe'] = 'html';
         $routa = $this->routa;
+        $url = $this->routa;
         $view = $this->view;
 
         return view($routa.'.index',[
@@ -134,6 +135,7 @@ class UserPermissions extends Controller
             'arr_titulo'=>$queryPermissions['arr_titulo'],
             'config'=>$queryPermissions['config'],
             'routa'=>$routa,
+            'url'=>$url,
             'view'=>$view,
             'i'=>0,
         ]);
@@ -203,7 +205,7 @@ class UserPermissions extends Controller
     {
         $arrMenus = [];
         $dadosMenus = Menu::where('actived',true)->where('pai','')->get();
-        $roles = ['create'=>'Cadastrar','update'=>'Editar','delete'=>'Excluir'];
+        $roles = ['create'=>'Cadastrar','update'=>'Editar','delete'=>'Excluir','ler_arquivos'=>'Ver Arquivos',];
         if(count($dadosMenus)){
             foreach($dadosMenus as $k=>$v){
                 $arrMenus[$k] = $v;

@@ -11,6 +11,7 @@
 <script src="{{url('/')}}/js/jquery.validate.min.js"></script>
 <script src="{{url('/')}}/js/jquery.inputmask.bundle.min.js"></script>
 <script src="{{url('/')}}/summernote/summernote.min.js"></script>
+<script src="{{url('/')}}/vendor/venobox/venobox.min.js"></script>
 <script src="{{url('/')}}/js/jquery-ui.min.js"></script>
 <script src=" {{url('/')}}/js/lib.js"></script>
 <script>
@@ -59,6 +60,14 @@
             let text = lib_urlAmigavel($(this).val());
             $(this).val(text);
         });
+        new VenoBox({
+            selector: ".venobox",
+            numeration: true,
+            infinigall: true,
+            share: false,
+            spinner: 'rotating-plane'
+        });
+        $('[data-toggle="tooltip"]').tooltip();
     });
 </script>
 @if (App\Qlib\Qlib::qoption('editor_padrao')=='tinymce')

@@ -134,6 +134,7 @@ class QoptionsController extends Controller
             'arr_titulo'=>$queryQoption['arr_titulo'],
             'config'=>$queryQoption['config'],
             'routa'=>$routa,
+            'url'=>$routa,
             'view'=>$this->view,
             'i'=>0,
         ]);
@@ -147,6 +148,7 @@ class QoptionsController extends Controller
             'ac'=>'cad',
             'frm_id'=>'frm-qoptions',
             'route'=>$this->routa,
+            'url'=>$this->routa,
         ];
         $value = [
             'token'=>uniqid(),
@@ -219,6 +221,7 @@ class QoptionsController extends Controller
                 'ac'=>'alt',
                 'frm_id'=>'frm-qoptions',
                 'route'=>$this->routa,
+                'url'=>$this->routa,
                 'id'=>$id,
             ];
 

@@ -274,6 +274,16 @@
         <label for="{{$config['campo']}}">{{$config['label']}}:</label>
         {!!@$config['value']!!}
     </div>
+    @elseif($config['type']=='show_file')
+        @include('qlib.show_files')
+    @elseif($config['type']=='show_file_front')
+    <div class="col-{{$config['tam']}}" div-id="{{$config['campo']}}">
+
+        @php
+            $value = isset($config['value'])?$config['value']:false;
+        @endphp
+        @include('portal.sic_front.show_files')
+    </div>
     @elseif($config['type']=='file')
     <div class="col-{{$config['tam']}}" div-id="{{$config['campo']}}">
         <label for="{{$config['campo']}}">{{$config['label']}}:</label><br>

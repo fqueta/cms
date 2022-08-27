@@ -103,7 +103,7 @@ class sicController extends Controller
                         'email'=>['label'=>'E-mail','type'=>'text'],
                         //'celular'=>['label'=>'Celular','type'=>'text'],
                     ],
-                    'tab' =>'lotes',
+                    'tab' =>'users',
                     'placeholder' =>__('Digite somente o nome do usuário').'...',
                     'janela'=>[
                         'url'=>route('users.create').'',
@@ -453,6 +453,8 @@ class sicController extends Controller
                 'route'=>$this->routa,
                 'url'=>$this->url,
                 'id'=>$id,
+                'url'=>$this->url,
+                'arquivos'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg,zip,rar',
             ];
             if(!$dados['matricula'])
                 $config['display_matricula'] = 'd-none';

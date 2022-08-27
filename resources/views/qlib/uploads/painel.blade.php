@@ -18,6 +18,7 @@
                 </span>
             </div>
             <div class="col-md-12">
+                {{$config['url']}}
                 @can('create',$config['url'])
                     @if (isset($config['arquivos']) && $config['arquivos'])
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-upload"></i>
