@@ -135,9 +135,71 @@ class UserController extends Controller
     public function campos($dados=false){
         $user = Auth::user();
         $permission = new admin\UserPermissions($user);
-
+        if(isset($dados['tipo_pessoa']) && $dados['tipo_pessoa']){
+            $_GET['tipo'] = $dados['tipo_pessoa'];
+        }
+        // $ret = [
+        //     'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+        //     'id_permission'=>[
+        //         'label'=>'Permissão*',
+        //         'active'=>true,
+        //         'type'=>'select',
+        //         'data_selector'=>[
+        //             'campos'=>$permission->campos(),
+        //             'route_index'=>route('permissions.index'),
+        //             'id_form'=>'frm-permission',
+        //             'action'=>route('permissions.store'),
+        //             'campo_id'=>'id',
+        //             'campo_bus'=>'nome',
+        //             'label'=>'Permissão',
+        //         ],'arr_opc'=>Qlib::sql_array("SELECT id,name FROM permissions WHERE active='s' AND id >='".$user->id_permission."'",'name','id'),'exibe_busca'=>'d-block',
+        //         'event'=>'',
+        //         'tam'=>'6',
+        //         'value'=>@$_GET['id_permission'],
+        //     ],
+        //     'nome'=>['label'=>'Nome completo','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+        //     'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+        //     'email'=>['label'=>'Email','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
+        //     'password'=>['label'=>'Senha','active'=>false,'type'=>'password','value'=>'','exibe_busca'=>'d-none','event'=>'','tam'=>'6'],
+        //     'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'2','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+        //     //'email'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+        // ];
+        //$sec = $sec?$sec:request()->segment(3);
+        $sec = isset($_GET['tipo'])?$_GET['tipo']:'pf';
+        if($sec=='pf'){
+            $lab_nome = 'Nome completo *';
+            $lab_cpf = 'CPF *';
+            $displayPf = '';
+            $displayPj = 'd-none';
+        }elseif($sec=='pj'){
+            $lab_nome = 'Nome do responsável *';
+            $lab_cpf = 'CPF do responsável*';
+            $displayPf = 'd-none';
+            $displayPj = '';
+        }else{
+            $lab_nome = 'Nome completo *';
+            $lab_cpf = 'CPF *';
+            $displayPf = '';
+            $displayPj = 'd-none';
+        }
+        $hidden_editor = '';
+        $info_obs = '<div class="alert alert-info alert-dismissable" role="alert"><button class="close" type="button" data-dismiss="alert" aria-hidden="true">×</button><i class="fa fa-info-circle"></i>&nbsp;<span class="sw_lato_black">Obs</span>: campos com asterisco (<i class="swfa fas fa-asterisk cad_asterisco" aria-hidden="true"></i>) são obrigatórios.</div>';
         $ret = [
+            'sep0'=>['label'=>'informações','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Informe seus dados').'</h4><hr>','script_show'=>''],
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'tipo_pessoa'=>[
+                'label'=>'',
+                'active'=>true,
+                'type'=>'radio_btn',
+                'arr_opc'=>['pf'=>'Pessoa Física','pj'=>'Pessoa Jurídica'],
+                'exibe_busca'=>'d-block',
+                'event'=>'onclick=selectTipoUser(this.value)',
+                'tam'=>'12',
+                'value'=>$sec,
+                'class'=>'btn btn-outline-primary',
+            ],
+            'info_obs'=>['label'=>'Informações obs','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>$info_obs,'script_show'=>''],
+            'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'id_permission'=>[
                 'label'=>'Permissão*',
                 'active'=>true,
@@ -150,17 +212,79 @@ class UserController extends Controller
                     'campo_id'=>'id',
                     'campo_bus'=>'nome',
                     'label'=>'Permissão',
-                ],'arr_opc'=>Qlib::sql_array("SELECT id,name FROM permissions WHERE active='s' AND id >='".$user->id_permission."'",'name','id'),'exibe_busca'=>'d-block',
+                   ],
+                'arr_opc'=>Qlib::sql_array("SELECT id,name FROM permissions WHERE active='s' AND id >='".$user->id_permission."'",'name','id'),'exibe_busca'=>'d-block',
                 'event'=>'',
-                'tam'=>'6',
+                'tam'=>'3',
                 'value'=>@$_GET['id_permission'],
             ],
-            'nome'=>['label'=>'Nome completo','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
-            'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'email'=>['label'=>'Email','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
-            'password'=>['label'=>'Senha','active'=>false,'type'=>'password','value'=>'','exibe_busca'=>'d-none','event'=>'','tam'=>'6'],
-            'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'2','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            //'email'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'email'=>['label'=>'E-mail *','active'=>true,'type'=>'email','exibe_busca'=>'d-none','event'=>'required','tam'=>'6','placeholder'=>''],
+            'password'=>['label'=>'Senha','active'=>false,'type'=>'password','exibe_busca'=>'d-none','event'=>'','tam'=>'3','placeholder'=>'','value'=>''],
+            //'password_confirmation'=>['label'=>'Confirmar Senha *','active'=>false,'type'=>'password','exibe_busca'=>'d-none','event'=>'required','tam'=>'3','placeholder'=>''],
+            'nome'=>['label'=>$lab_nome,'active'=>true,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'9','placeholder'=>''],
+            'cpf'=>['label'=>$lab_cpf,'active'=>false,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cpf','tam'=>'3'],
+            'cnpj'=>['label'=>'CNPJ *','active'=>false,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cnpj required','tam'=>'4','class_div'=>'div-pj '.$displayPj],
+            'razao'=>['label'=>'Razão social *','active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'4','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
+            'config[nome_fantasia]'=>['label'=>'Nome fantasia','active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'4','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
+            'config[celular]'=>['label'=>'Telefone celular','active'=>true,'type'=>'tel','tam'=>'4','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','cp_busca'=>'config][celular'],
+            'config[telefone_residencial]'=>['label'=>'Telefone residencial','active'=>false,'type'=>'tel','tam'=>'4','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','class_div'=>'div-pf '.$displayPf,'cp_busca'=>'config][telefone_residencial'],
+            'config[telefone_comercial]'=>['label'=>'Telefone comercial','active'=>false,'type'=>'tel','tam'=>'4','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','cp_busca'=>'config][telefone_comercial'],
+            'config[rg]'=>['label'=>'RG','active'=>false,'type'=>'tel','tam'=>'4','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','cp_busca'=>'config][rg','class_div'=>'div-pf '.$displayPf],
+            'config[nascimento]'=>['label'=>'Data de nascimento','active'=>false,'type'=>'date','tam'=>'4','exibe_busca'=>'d-block','event'=>'','cp_busca'=>'config][nascimento','class_div'=>'div-pf '.$displayPf],
+            'genero'=>[
+                'label'=>'Sexo',
+                'active'=>false,
+                'type'=>'select',
+                'arr_opc'=>Qlib::lib_sexo(),
+                'event'=>'',
+                'tam'=>'4',
+                'exibe_busca'=>true,
+                'option_select'=>false,
+                'class'=>'select2',
+                'class_div'=>'div-pf '.$displayPf,
+            ],
+            'config[escolaridade]'=>[
+                'label'=>'Escolaridade',
+                'active'=>false,
+                'type'=>'select',
+                'arr_opc'=>Qlib::lib_escolaridades(),'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'6',
+                'class'=>'select2',
+                'cp_busca'=>'config][escolaridade','class_div'=>'div-pf '.$displayPf,
+            ],
+            'config[profissao]'=>[
+                'label'=>'Profissão',
+                'active'=>false,
+                'type'=>'select',
+                'arr_opc'=>Qlib::lib_profissao(),'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'6',
+                'class'=>'select2',
+                'cp_busca'=>'config][profissao','class_div'=>'div-pf '.$displayPf,
+            ],
+            'config[tipo_pj]'=>[
+                'label'=>'Tipo de Pessoa Jurídica',
+                'active'=>false,
+                'type'=>'select',
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='tipo_pj'",'nome','id'),'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'4',
+                'class'=>'select2',
+                'cp_busca'=>'config][tipo_pj','class_div'=>'div-pj '.$displayPj,
+            ],
+            'sep1'=>['label'=>'Endereço','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Endereço').'</h4><hr>','script_show'=>''],
+            'config[cep]'=>['label'=>'CEP','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'mask-cep onchange=buscaCep1_0(this.value)','tam'=>'3'],
+            'config[endereco]'=>['label'=>'Endereço','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'endereco=cep','tam'=>'7','cp_busca'=>'config][endereco'],
+            'config[numero]'=>['label'=>'Numero','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'numero=cep','tam'=>'2','cp_busca'=>'config][numero'],
+            'config[complemento]'=>['label'=>'Complemento','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4','cp_busca'=>'config][complemento'],
+            'config[cidade]'=>['label'=>'Cidade','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'cidade=cep','tam'=>'6','cp_busca'=>'config][cidade'],
+            'config[uf]'=>['label'=>'UF','active'=>false,'js'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'2','cp_busca'=>'config][uf'],
+            //'foto_perfil'=>['label'=>'Foto','active'=>false,'js'=>false,'placeholder'=>'','type'=>'file','exibe_busca'=>'d-none','event'=>'','tam'=>'12'],
+            'sep2'=>['label'=>'Preferencias','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>','script_show'=>''],
+            'preferecias[newslatter]'=>['label'=>'Desejo receber e-mails com as novidades','active'=>false,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+
+
         ];
         return $ret;
     }
@@ -302,6 +426,7 @@ class UserController extends Controller
 
         if($ajax=='s'){
             $ret['return'] = route($route).'?idCad='.$salvar->id;
+            $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
             return response()->json($ret);
         }else{
             return redirect()->route($route,$ret);
@@ -338,7 +463,8 @@ class UserController extends Controller
                 'url'=>$this->url,
                 'id'=>$id,
             ];
-            $campos = $this->campos();
+            $dcampo = $dados[0];
+            $campos = $this->campos($dcampo);
             $ret = [
                 'value'=>$dados[0],
                 'config'=>$config,

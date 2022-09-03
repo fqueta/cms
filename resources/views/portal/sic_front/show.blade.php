@@ -18,10 +18,10 @@
             </h1>
         </div>
         <div class="card-body">
-
             @php
             $_GET['redirect'] = route('internautas.index');
             //$config['event'] = 'enctype="multipart/form-data"';
+            //dd($config);
             @endphp
 
             {{App\Qlib\Qlib::show([

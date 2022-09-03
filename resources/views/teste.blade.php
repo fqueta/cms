@@ -18,6 +18,7 @@
         <br/>
         <button type="submit">Save</button>
     </form>
+
 </div>
 @stop
 
@@ -65,39 +66,5 @@
 
 @section('js')
     <script src=" {{url('/')}}/js/lib.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.9.5/tinymce.min.js"></script>
-    <script>
-        /*
-        var editor_config = {
-            selector: '#description-textarea',
-            directionality: document.dir,
-            path_absolute: "/",
-            menubar: 'edit insert view format table',
-            plugins: [
-                "advlist autolink lists link image charmap preview hr anchor pagebreak",
-                "searchreplace wordcount visualblocks visualchars code fullscreen",
-                "insertdatetime media save table contextmenu directionality",
-                "paste textcolor colorpicker textpattern"
-            ],
-            toolbar: "insertfile undo redo | formatselect styleselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | fullscreen code",
-            relative_urls: false,
-            language: document.documentElement.lang,
-            height: 300,
-        }
-        tinymce.init(editor_config);*/
-
-        tinymce.init({
-            selector: '.editor-padrao',
-            language: 'pt_BR',
-            plugins: 'image code a11ychecker advcode casechange formatpainter linkchecker lists checklist media mediaembed pageembed permanentpen powerpaste table advtable tinymcespellchecker',
-            toolbar: ' link image casechange checklist code formatpainter pageembed permanentpen table',
-            image_title: true,
-            automatic_uploads: true,
-            file_picker_types: 'image',
-            external_filemanager_path:"{{url('tinymce/filemanager')}}/",
-                    filemanager_title:"Uploads de Arquivos" ,
-                    external_plugins: { "filemanager" : "{{url('tinymce')}}/filemanager/plugin.min.js"},
-
-        });
-    </script>
+    
 @stop

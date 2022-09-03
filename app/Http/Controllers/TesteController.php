@@ -21,23 +21,23 @@ class TesteController extends Controller
     {
 
 
-        $email = (new sicController)->enviarEmail([
-            'mensagem'=>'Ola seja bem vindo',
-            // 'arquivos'=>[
-            //     'sic/anexo/2022081008-0008.pdf',
-            //     'admin.sic/2022/08/Designações Agosto_1659993647.pdf',
-            //     'admin.sic/2022/08/Designações Reunião meio de semana_1659993647.pdf',
-            // ],
-            'arquivos'=>'',
-            'assunto'=>'Teste de Sistema de emails',
-            'nome_supervisor'=>'Responsável por E-sic',
-            'email_supervisor'=>'ferqueta@yahoo.com.br',
-            'assunto_supervisor'=>'Enviado para cliente',
-            'mensagem_supervisor'=>'Foi enviado um email para o supervisor contendo esta informação',
-            'para_nome'=>'Patrícia Lima Queta',
-            'para_email'=>'ger.maisaqui1@gmail.com',
-        ]);
-        return $email;
+        // $email = (new sicController)->enviarEmail([
+        //     'mensagem'=>'Ola seja bem vindo',
+        //     // 'arquivos'=>[
+        //     //     'sic/anexo/2022081008-0008.pdf',
+        //     //     'admin.sic/2022/08/Designações Agosto_1659993647.pdf',
+        //     //     'admin.sic/2022/08/Designações Reunião meio de semana_1659993647.pdf',
+        //     // ],
+        //     'arquivos'=>'',
+        //     'assunto'=>'Teste de Sistema de emails',
+        //     'nome_supervisor'=>'Responsável por E-sic',
+        //     'email_supervisor'=>'ferqueta@yahoo.com.br',
+        //     'assunto_supervisor'=>'Enviado para cliente',
+        //     'mensagem_supervisor'=>'Foi enviado um email para o supervisor contendo esta informação',
+        //     'para_nome'=>'Patrícia Lima Queta',
+        //     'para_email'=>'ger.maisaqui1@gmail.com',
+        // ]);
+        // return $email;
         //$ret = Qlib::redirectLogin();
 
        //dd(base_path().'/');
@@ -104,6 +104,7 @@ class TesteController extends Controller
         //$ret = str_replace('{id_sec}',$id_sec,$ret);
         $ret = str_replace('{link_veja_mais}',$link_veja_mais,$ret);
         */
+        $arr_api=false;
         return response()->json($arr_api);
     }
     /**

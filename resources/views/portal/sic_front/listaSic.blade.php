@@ -28,6 +28,10 @@
                 $assunto = isset($cofg['categoria'])?$cofg['categoria']:false;
                 $motivo = false;
                 $status = false;
+                $tr_class=false;
+                if(isset($_GET['idCad'])&&$_GET['idCad']==$v['id']){
+                    $tr_class='table-info';
+                }
                 if($assunto){
                     $assunto = @$arr_categorias[$assunto];
                 }
@@ -38,7 +42,7 @@
                     $status = @$arr_status[$v['status']];
                 }
                 @endphp
-            <tr>
+            <tr class="{{$tr_class}}">
                 <td>
                     {{$v['protocolo']}}
                 </td>
