@@ -66,7 +66,7 @@
                                 <i class="fa fa-map-marker" aria-hidden="true"></i>
                             </a>
                         @endif
-                        @if ($routa=='familias')
+                        @if ($routa=='familias' || $routa=='users')
                             <a href=" {{ route($routa.'.show',['id'=>$val->id]) }}?redirect={{$redirect.'idCad='.$val->id}} " title="visualizar" class="btn btn-sm btn-outline-secondary mr-2">
                                 <i class="fas fa-eye"></i>
                             </a>

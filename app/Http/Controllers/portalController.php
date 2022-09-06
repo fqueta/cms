@@ -191,7 +191,7 @@ class portalController extends Controller
             'config[uf]'=>['label'=>'UF','active'=>false,'js'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'2','cp_busca'=>'config][uf'],
             //'foto_perfil'=>['label'=>'Foto','active'=>false,'js'=>true,'placeholder'=>'','type'=>'file','exibe_busca'=>'d-none','event'=>'','tam'=>'12'],
             'sep2'=>['label'=>'Preferencias','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>','script_show'=>''],
-            'preferecias[newslatter]'=>['label'=>'Desejo receber e-mails com as novidades','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'preferencias[newslatter]'=>['label'=>'Desejo receber e-mails com as novidades','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
 
 
         ];
@@ -271,7 +271,7 @@ class portalController extends Controller
         $user = User::find($id);
         Auth::login($user);
         if(Auth::check()){
-            return 'usuario '.$user->nome.'Locado com sucesso';
+            return 'usuario '.$user->nome.'Logado com sucesso';
         }
         return redirect('/');
     }

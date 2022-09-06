@@ -54,7 +54,6 @@
         </div>
     </div>
 </div>
-
 @stop
 
 @section('css')
@@ -69,6 +68,7 @@
                 openPageLink(e,$(this).attr('href'),"{{date('Y')}}");
             });
             $('[mask-cpf]').inputmask('999.999.999-99');
+            $('[mask-cnpj]').inputmask('99.999.999/9999-99');
             $('[mask-data]').inputmask('99/99/9999');
             $('[mask-cep]').inputmask('99.999-999');
         });

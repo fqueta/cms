@@ -6,6 +6,8 @@ use App\Models\_upload;
 use App\Models\User;
 use stdClass;
 use App\Qlib\Qlib;
+use App\Rules\FullName;
+use App\Rules\RightCpf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -117,7 +119,6 @@ class UserController extends Controller
         $users->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->get()->count();
         $users->ativos = $fm->where('ativo','=','s')->get()->count();
         $users->inativos = $fm->where('ativo','=','n')->get()->count();
-        //dd($user);
         $ret['user'] = $user;
         $ret['user_totais'] = $users;
         $ret['arr_titulo'] = $arr_titulo;
@@ -132,39 +133,12 @@ class UserController extends Controller
         ];
         return $ret;
     }
-    public function campos($dados=false){
+    public function campos($dados=false,$local='index'){
         $user = Auth::user();
         $permission = new admin\UserPermissions($user);
         if(isset($dados['tipo_pessoa']) && $dados['tipo_pessoa']){
             $_GET['tipo'] = $dados['tipo_pessoa'];
         }
-        // $ret = [
-        //     'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-        //     'id_permission'=>[
-        //         'label'=>'Permissão*',
-        //         'active'=>true,
-        //         'type'=>'select',
-        //         'data_selector'=>[
-        //             'campos'=>$permission->campos(),
-        //             'route_index'=>route('permissions.index'),
-        //             'id_form'=>'frm-permission',
-        //             'action'=>route('permissions.store'),
-        //             'campo_id'=>'id',
-        //             'campo_bus'=>'nome',
-        //             'label'=>'Permissão',
-        //         ],'arr_opc'=>Qlib::sql_array("SELECT id,name FROM permissions WHERE active='s' AND id >='".$user->id_permission."'",'name','id'),'exibe_busca'=>'d-block',
-        //         'event'=>'',
-        //         'tam'=>'6',
-        //         'value'=>@$_GET['id_permission'],
-        //     ],
-        //     'nome'=>['label'=>'Nome completo','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
-        //     'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-        //     'email'=>['label'=>'Email','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
-        //     'password'=>['label'=>'Senha','active'=>false,'type'=>'password','value'=>'','exibe_busca'=>'d-none','event'=>'','tam'=>'6'],
-        //     'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'2','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-        //     //'email'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-        // ];
-        //$sec = $sec?$sec:request()->segment(3);
         $sec = isset($_GET['tipo'])?$_GET['tipo']:'pf';
         if($sec=='pf'){
             $lab_nome = 'Nome completo *';
@@ -185,10 +159,9 @@ class UserController extends Controller
         $hidden_editor = '';
         $info_obs = '<div class="alert alert-info alert-dismissable" role="alert"><button class="close" type="button" data-dismiss="alert" aria-hidden="true">×</button><i class="fa fa-info-circle"></i>&nbsp;<span class="sw_lato_black">Obs</span>: campos com asterisco (<i class="swfa fas fa-asterisk cad_asterisco" aria-hidden="true"></i>) são obrigatórios.</div>';
         $ret = [
-            'sep0'=>['label'=>'informações','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Informe seus dados').'</h4><hr>','script_show'=>''],
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'tipo_pessoa'=>[
-                'label'=>'',
+                'label'=>'Tipo de Pessoa',
                 'active'=>true,
                 'type'=>'radio_btn',
                 'arr_opc'=>['pf'=>'Pessoa Física','pj'=>'Pessoa Jurídica'],
@@ -196,9 +169,9 @@ class UserController extends Controller
                 'event'=>'onclick=selectTipoUser(this.value)',
                 'tam'=>'12',
                 'value'=>$sec,
-                'class'=>'btn btn-outline-primary',
+                'class'=>'btn btn-outline-secondary',
             ],
-            'info_obs'=>['label'=>'Informações obs','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>$info_obs,'script_show'=>''],
+            'sep0'=>['label'=>'informações','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Informe os dados').'</h4><hr>','script_show'=>''],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'id_permission'=>[
                 'label'=>'Permissão*',
@@ -214,7 +187,7 @@ class UserController extends Controller
                     'label'=>'Permissão',
                    ],
                 'arr_opc'=>Qlib::sql_array("SELECT id,name FROM permissions WHERE active='s' AND id >='".$user->id_permission."'",'name','id'),'exibe_busca'=>'d-block',
-                'event'=>'',
+                'event'=>'required',
                 'tam'=>'3',
                 'value'=>@$_GET['id_permission'],
             ],
@@ -273,7 +246,7 @@ class UserController extends Controller
                 'class'=>'select2',
                 'cp_busca'=>'config][tipo_pj','class_div'=>'div-pj '.$displayPj,
             ],
-            'sep1'=>['label'=>'Endereço','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Endereço').'</h4><hr>','script_show'=>''],
+            'sep1'=>['label'=>'Endereço','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Endereço').'</h4><hr>','script_show'=>'<h4 class="text-center">'.__('Endereço').'</h4><hr>'],
             'config[cep]'=>['label'=>'CEP','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'mask-cep onchange=buscaCep1_0(this.value)','tam'=>'3'],
             'config[endereco]'=>['label'=>'Endereço','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'endereco=cep','tam'=>'7','cp_busca'=>'config][endereco'],
             'config[numero]'=>['label'=>'Numero','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'numero=cep','tam'=>'2','cp_busca'=>'config][numero'],
@@ -281,10 +254,81 @@ class UserController extends Controller
             'config[cidade]'=>['label'=>'Cidade','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'cidade=cep','tam'=>'6','cp_busca'=>'config][cidade'],
             'config[uf]'=>['label'=>'UF','active'=>false,'js'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'2','cp_busca'=>'config][uf'],
             //'foto_perfil'=>['label'=>'Foto','active'=>false,'js'=>false,'placeholder'=>'','type'=>'file','exibe_busca'=>'d-none','event'=>'','tam'=>'12'],
-            'sep2'=>['label'=>'Preferencias','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>','script_show'=>''],
-            'preferecias[newslatter]'=>['label'=>'Desejo receber e-mails com as novidades','active'=>false,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'sep2'=>['label'=>'Preferencias','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>','script_show'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>'],
+            'ativo'=>['label'=>'Liberado para uso','active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'preferencias[newslatter]'=>['label'=>'Deseja receber e-mails com as novidades','active'=>false,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não'],'cp_busca'=>'preferencias][newslatter'],
 
-
+        ];
+        if($local=='create' || $local=='show' || $local=='edit'){
+            //Importante para exibição das preferencias.
+            if(isset($dados['preferencias'])){
+                foreach ($dados['preferencias'] as $k => $v) {
+                   // $ret['preferencias['.$k.']']['value'] = $v;
+                    if($v=='s'){
+                        $ret['preferencias['.$k.']']['checked'] = $v;
+                    }
+                }
+            }
+            if($local=='show'){
+                unset($ret['password']);
+            }elseif($local=='create' || $local=='edit'){
+                $ret['tipo_pessoa']['label'] = '';
+            }
+        }
+        //dd($ret);
+        return $ret;
+    }
+    public function campos_show($dados=false){
+        $user = Auth::user();
+        $permission = new admin\UserPermissions($user);
+        if(isset($dados['tipo_pessoa']) && $dados['tipo_pessoa']){
+            $_GET['tipo'] = $dados['tipo_pessoa'];
+        }
+        $sec = isset($sec)?$sec:request()->segment(3);
+        $sec = isset($_GET['tipo'])?$_GET['tipo']:'pf';
+        if($sec=='pf'){
+            $lab_nome = 'Nome completo *';
+            $lab_cpf = 'CPF *';
+            $displayPf = '';
+            $displayPj = 'd-none';
+        }elseif($sec=='pj'){
+            $lab_nome = 'Nome do responsável *';
+            $lab_cpf = 'CPF do responsável*';
+            $displayPf = 'd-none';
+            $displayPj = '';
+        }else{
+            $lab_nome = 'Nome completo *';
+            $lab_cpf = 'CPF *';
+            $displayPf = '';
+            $displayPj = 'd-none';
+        }
+        $hidden_editor = '';
+        $info_obs = '<div class="alert alert-info alert-dismissable" role="alert"><button class="close" type="button" data-dismiss="alert" aria-hidden="true">×</button><i class="fa fa-info-circle"></i>&nbsp;<span class="sw_lato_black">Obs</span>: campos com asterisco (<i class="swfa fas fa-asterisk cad_asterisco" aria-hidden="true"></i>) são obrigatórios.</div>';
+        $ret = [
+            'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'id_permission'=>[
+                'label'=>'Permissão*',
+                'active'=>true,
+                'type'=>'select',
+                'data_selector'=>[
+                    'campos'=>$permission->campos(),
+                    'route_index'=>route('permissions.index'),
+                    'id_form'=>'frm-permission',
+                    'action'=>route('permissions.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'nome',
+                    'label'=>'Permissão',
+                ],'arr_opc'=>Qlib::sql_array("SELECT id,name FROM permissions WHERE active='s' AND id >='".$user->id_permission."'",'name','id'),'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'6',
+                'value'=>@$_GET['id_permission'],
+            ],
+            'nome'=>['label'=>'Nome completo','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+            'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'email'=>['label'=>'Email','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
+            'password'=>['label'=>'Senha','active'=>false,'type'=>'password','value'=>'','exibe_busca'=>'d-none','event'=>'','tam'=>'6'],
+            'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'2','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            //'email'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
         ];
         return $ret;
     }
@@ -383,7 +427,7 @@ class UserController extends Controller
         $value = [
             'token'=>uniqid(),
         ];
-        $campos = $this->campos();
+        $campos = $this->campos(false,'create');
         return view($this->routa.'.createedit',[
             'config'=>$config,
             'title'=>$title,
@@ -395,8 +439,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'nome' => ['required','string'],
+            'nome' => ['required','string',new FullName],
             'email' => ['required','string','unique:users'],
+            'cpf'   =>[new RightCpf]
             ],[
                 'nome.required'=>__('O nome é obrigatório'),
                 'nome.string'=>__('É necessário conter letras no nome'),
@@ -405,6 +450,7 @@ class UserController extends Controller
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
+        //$dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
         if(isset($dados['password']) && !empty($dados['password'])){
             $dados['password'] = Hash::make($dados['password']);
         }else{
@@ -435,14 +481,102 @@ class UserController extends Controller
 
     public function show($id)
     {
-        //
+        //$id = $this->user;
+        $dados = User::where('id',$id)->get();
+        $routa = 'users';
+        $this->authorize('ler', $this->url);
+
+        if(!empty($dados)){
+            $title = 'Editar Cadastro de users';
+            $titulo = $title;
+            $dados[0]['ac'] = 'alt';
+            if(isset($dados[0]['config'])){
+                $dados[0]['config'] = Qlib::lib_json_array($dados[0]['config']);
+            }
+            $listFiles = false;
+            if(isset($dados[0]['token'])){
+                $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
+            }
+            $config = [
+                'ac'=>'alt',
+                'frm_id'=>'frm-users',
+                'route'=>$this->routa,
+                'url'=>$this->url,
+                'id'=>$id,
+            ];
+            $dcampo = $dados[0];
+            $campos = $this->campos($dcampo,'show');
+            $ret = [
+                'value'=>$dados[0],
+                'config'=>$config,
+                'title'=>$title,
+                'titulo'=>$titulo,
+                'listFiles'=>$listFiles,
+                'campos'=>$campos,
+                'exec'=>true,
+            ];
+
+            return view($routa.'.show',$ret);
+        }else{
+            $ret = [
+                'exec'=>false,
+            ];
+            return redirect()->route($routa.'.index',$ret);
+        }
+    }
+    public function perfilShow()
+    {
+        $d = Auth::user();
+        $id = $d['id'];
+        $dados[0] = $d;
+        $routa = 'users';
+        $this->url = 'sistema';
+        $this->authorize('ler', $this->url);
+
+        if(!empty($dados)){
+            $title = 'Perfil';
+            $titulo = $title;
+            $dados[0]['ac'] = 'alt';
+            if(isset($dados[0]['config'])){
+                $dados[0]['config'] = Qlib::lib_json_array($dados[0]['config']);
+            }
+            $listFiles = false;
+            if(isset($dados[0]['token'])){
+                $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
+            }
+            $config = [
+                'ac'=>'alt',
+                'frm_id'=>'frm-users',
+                'route'=>$this->routa,
+                'url'=>$this->url,
+                'id'=>$id,
+            ];
+            $dcampo = $dados[0];
+            $campos = $this->campos($dcampo,'show');
+            $ret = [
+                'value'=>$dados[0],
+                'config'=>$config,
+                'title'=>$title,
+                'titulo'=>$titulo,
+                'listFiles'=>$listFiles,
+                'campos'=>$campos,
+                'exec'=>true,
+            ];
+
+            return view($routa.'.show',$ret);
+        }else{
+            $ret = [
+                'exec'=>false,
+            ];
+            return redirect()->route($routa.'.index',$ret);
+        }
     }
 
     public function edit($user)
     {
         $id = $user;
         $dados = User::where('id',$id)->get();
-        $routa = 'users';
+        $routa = $this->routa;//'users';
         $this->authorize('is_admin', $user);
 
         if(!empty($dados)){
@@ -464,7 +598,7 @@ class UserController extends Controller
                 'id'=>$id,
             ];
             $dcampo = $dados[0];
-            $campos = $this->campos($dcampo);
+            $campos = $this->campos($dcampo,'edit');
             $ret = [
                 'value'=>$dados[0],
                 'config'=>$config,
@@ -487,7 +621,8 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'nome' => ['required'],
+            'nome' => ['required',new FullName],
+            'cpf'   =>[new RightCpf]
         ]);
         $data = [];
         $dados = $request->all();
@@ -508,6 +643,7 @@ class UserController extends Controller
         }
         $userLogadon = Auth::id();
         $data['ativo'] = isset($data['ativo'])?$data['ativo']:'n';
+        $data['preferencias']['newslatter'] = isset($data['preferencias']['newslatter'])?$data['preferencias']['newslatter']:'n';
         $data['autor'] = $userLogadon;
         if(isset($dados['config'])){
             $dados['config'] = Qlib::lib_array_json($dados['config']);

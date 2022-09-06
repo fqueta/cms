@@ -102,7 +102,7 @@ class MenuSeeder extends Seeder
                 'icon'=>'fas fa-user',
                 'actived'=>true,
                 'url'=>'sistema',
-                'route'=>'sistema.perfil',
+                'route'=>'perfil.show',
                 'pai'=>'config'
             ],
             [

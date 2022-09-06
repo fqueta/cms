@@ -40,22 +40,44 @@
         @endif
     @elseif ($config['type']=='chave_checkbox')
         <div class="col-{{$config['tam']}}" div-id="{{$config['campo']}}">
-            <label class="" for="{{$config['campo']}}">
-                @if(isset($config['checked']) && $config['checked'] == $config['value'])
-                    <i class="fas fa-check-square"></i>
-                @endif
-                {{$config['label']}}
-            </label>
-
+            @if(isset($config['arr_opc'][$config['checked']]))
+                <label for="{{$config['campo']}}">{{$config['label']}}:&nbsp;</label>
+                    {{$config['arr_opc'][$config['checked']]}}
+            @else
+                <label class="" for="{{$config['campo']}}">
+                    @if(isset($config['checked']) && $config['checked'] == $config['value'])
+                        <i class="fas fa-check-square"></i>
+                    @endif
+                    {{$config['label']}}
+                </label>
+            @endif
+        </div>
+    @elseif ($config['type']=='radio_btn')
+        <div class="col-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
+            <label for="{{$config['campo']}}">{{$config['label']}}</label>:
+            @if(isset($config['arr_opc'][$config['value']]))
+                {!!$config['arr_opc'][$config['value']]!!}
+            @else
+                @if(isset($config['value'])){!!$config['value']!!}@endif
+            @endif
         </div>
     @elseif ($config['type']=='textarea')
-        <!--config['checked'] é o gravado no bando do dedos e o value é o valor para ficar checado-->
         <div class="col-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
             <label for="{{$config['campo']}}">{{$config['label']}}</label><br>
             @if(isset($config['value'])){!!$config['value']!!}@endif
         </div>
     @elseif ($config['type']=='html')
         @php
+           $config['script'] = isset($config['script'])?$config['script']:false;
+        @endphp
+        <div class="col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
+            @if ($config['script'])
+                {!!$config['script']!!}
+            @endif
+        </div>
+    @elseif ($config['type']=='html_blade')
+        @php
+        dd($config);
            $config['script'] = isset($config['script'])?$config['script']:false;
         @endphp
         <div class="col-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">

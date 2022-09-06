@@ -359,257 +359,257 @@ class FamiliaController extends Controller
         return Excel::download(new FamiliasExportView, 'Familias_'.date('d_m_Y').'.xlsx');
     }
     public function campos($dados=false){
-        $user = Auth::user();
-        $etapa = new EtapaController($user);
-        $bairro = new BairroController($user);
-        $beneficiario = new BeneficiariosController($user);
-        $escolaridade = new EscolaridadeController($user);
-        $quadra = new QuadrasController($user);
-        $lote = new LotesController($user);
-        $data = $dados?$dados:false;
-        if(isset($data['bairro'])){
-            $arr_opc_quadras = Qlib::sql_array("SELECT id,nome FROM quadras WHERE ativo='s' AND bairro='".$data['bairro']."' AND ".Qlib::compleDelete(),'nome','id');
-        }else{
-            $arr_opc_quadras = Qlib::sql_array("SELECT id,nome FROM quadras WHERE ativo='s'",'nome','id');
-        }
-        return [
-            'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>''],
-            'etapa'=>[
-                'label'=>'Etapa',
-                'active'=>true,
-                'type'=>'select',
-                'data_selector'=>[
-                    'campos'=>$etapa->campos(),
-                    'route_index'=>route('etapas.index'),
-                    'id_form'=>'frm-etapas',
-                    'action'=>route('etapas.store'),
-                    'campo_id'=>'id',
-                    'campo_bus'=>'nome',
-                    'label'=>'Etapa',
-                ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM etapas WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
-                'event'=>'',
-                'tam'=>'6',
-                'value'=>@$_GET['etapa'],
-            ],
-            'tipo_residencia'=>[
-                'label'=>'Tipo de residência*',
-                'active'=>true,
-                'type'=>'select',
-                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='2'",'nome','id'),'exibe_busca'=>'d-block',
-                'event'=>'',
-                'tam'=>'6',
-                'class'=>'',
-                'exibe_busca'=>true,
-                'option_select'=>false,
-            ],
-            'tags[]'=>[
-                'label'=>'Situação',
-                'active'=>true,
-                'type'=>'select_multiple',
-                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id'),'exibe_busca'=>'d-block',
-                'event'=>'',
-                'class'=>'',
-                'option_select'=>false,
-                'tam'=>'12',
-                'cp_busca'=>'tags]['
-            ],
-            'bairro'=>[
-                'label'=>'Área',
-                'active'=>true,
-                'type'=>'select',
-                'data_selector'=>[
-                    'campos'=>$bairro->campos(),
-                    'route_index'=>route('bairros.index'),
-                    'id_form'=>'frm-bairros',
-                    'action'=>route('bairros.store'),
-                    'campo_id'=>'id',
-                    'campo_bus'=>'nome',
-                    'label'=>'Etapa',
-                ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM bairros WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
-                'event'=>'onchange=carregaMatricula($(this).val(),\'familias\')',
-                //'event'=>'onchange=carregaMatricula($(this).val())',
-                'tam'=>'6',
-                'value'=>@$_GET['bairro'],
-            ],
-            'quadra'=>[
-                'label'=>'Quadra',
-                'active'=>true,
-                'type'=>'selector',
-                'data_selector'=>[
-                    'campos'=>$quadra->campos(),
-                    'route_index'=>route('quadras.index'),
-                    'id_form'=>'frm-quadras',
-                    'action'=>route('quadras.store'),
-                    'campo_id'=>'id',
-                    'campo_bus'=>'nome',
-                    'label'=>'Quadra',
-                    'value_transport'=>'bairro',//valor a transportar
-                ],
-                'arr_opc'=>$arr_opc_quadras,
-                'exibe_busca'=>'d-block',
-                'event'=>'onchange=lib_abrirModalConsultaVinculo(\'loteamento\',\'fechar\');',
-                'tam'=>'3',
-                //'class'=>'select2'
-                'value'=>@$_GET['quadra'],
-            ],
-            'matricula'=>['label'=>'Matricula','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>''],
-            //'area_alvo'=>['label'=>'Área Alvo','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'2','placeholder'=>''],
-            //'endereco'=>['label'=>'Rua','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'10'],
-            //'numero'=>['label'=>'Número','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+        // $user = Auth::user();
+        // $etapa = new EtapaController($user);
+        // $bairro = new BairroController($user);
+        // $beneficiario = new BeneficiariosController($user);
+        // $escolaridade = new EscolaridadeController($user);
+        // $quadra = new QuadrasController($user);
+        // $lote = new LotesController($user);
+        // $data = $dados?$dados:false;
+        // if(isset($data['bairro'])){
+        //     $arr_opc_quadras = Qlib::sql_array("SELECT id,nome FROM quadras WHERE ativo='s' AND bairro='".$data['bairro']."' AND ".Qlib::compleDelete(),'nome','id');
+        // }else{
+        //     $arr_opc_quadras = Qlib::sql_array("SELECT id,nome FROM quadras WHERE ativo='s'",'nome','id');
+        // }
+        // return [
+        //     'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>''],
+        //     'etapa'=>[
+        //         'label'=>'Etapa',
+        //         'active'=>true,
+        //         'type'=>'select',
+        //         'data_selector'=>[
+        //             'campos'=>$etapa->campos(),
+        //             'route_index'=>route('etapas.index'),
+        //             'id_form'=>'frm-etapas',
+        //             'action'=>route('etapas.store'),
+        //             'campo_id'=>'id',
+        //             'campo_bus'=>'nome',
+        //             'label'=>'Etapa',
+        //         ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM etapas WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
+        //         'event'=>'',
+        //         'tam'=>'6',
+        //         'value'=>@$_GET['etapa'],
+        //     ],
+        //     'tipo_residencia'=>[
+        //         'label'=>'Tipo de residência*',
+        //         'active'=>true,
+        //         'type'=>'select',
+        //         'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='2'",'nome','id'),'exibe_busca'=>'d-block',
+        //         'event'=>'',
+        //         'tam'=>'6',
+        //         'class'=>'',
+        //         'exibe_busca'=>true,
+        //         'option_select'=>false,
+        //     ],
+        //     'tags[]'=>[
+        //         'label'=>'Situação',
+        //         'active'=>true,
+        //         'type'=>'select_multiple',
+        //         'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id'),'exibe_busca'=>'d-block',
+        //         'event'=>'',
+        //         'class'=>'',
+        //         'option_select'=>false,
+        //         'tam'=>'12',
+        //         'cp_busca'=>'tags]['
+        //     ],
+        //     'bairro'=>[
+        //         'label'=>'Área',
+        //         'active'=>true,
+        //         'type'=>'select',
+        //         'data_selector'=>[
+        //             'campos'=>$bairro->campos(),
+        //             'route_index'=>route('bairros.index'),
+        //             'id_form'=>'frm-bairros',
+        //             'action'=>route('bairros.store'),
+        //             'campo_id'=>'id',
+        //             'campo_bus'=>'nome',
+        //             'label'=>'Etapa',
+        //         ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM bairros WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
+        //         'event'=>'onchange=carregaMatricula($(this).val(),\'familias\')',
+        //         //'event'=>'onchange=carregaMatricula($(this).val())',
+        //         'tam'=>'6',
+        //         'value'=>@$_GET['bairro'],
+        //     ],
+        //     'quadra'=>[
+        //         'label'=>'Quadra',
+        //         'active'=>true,
+        //         'type'=>'selector',
+        //         'data_selector'=>[
+        //             'campos'=>$quadra->campos(),
+        //             'route_index'=>route('quadras.index'),
+        //             'id_form'=>'frm-quadras',
+        //             'action'=>route('quadras.store'),
+        //             'campo_id'=>'id',
+        //             'campo_bus'=>'nome',
+        //             'label'=>'Quadra',
+        //             'value_transport'=>'bairro',//valor a transportar
+        //         ],
+        //         'arr_opc'=>$arr_opc_quadras,
+        //         'exibe_busca'=>'d-block',
+        //         'event'=>'onchange=lib_abrirModalConsultaVinculo(\'loteamento\',\'fechar\');',
+        //         'tam'=>'3',
+        //         //'class'=>'select2'
+        //         'value'=>@$_GET['quadra'],
+        //     ],
+        //     'matricula'=>['label'=>'Matricula','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>''],
+        //     //'area_alvo'=>['label'=>'Área Alvo','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'2','placeholder'=>''],
+        //     //'endereco'=>['label'=>'Rua','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'10'],
+        //     //'numero'=>['label'=>'Número','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
 
-            'loteamento'=>[
-                'label'=>'Informações do lote',
-                'active'=>false,
-                'type'=>'html_vinculo',
-                'exibe_busca'=>'d-none',
-                'event'=>'',
-                'tam'=>'12',
-                'script'=>'',
-                'data_selector'=>[
-                    'campos'=>$lote->campos(),
-                    'route_index'=>route('lotes.index'),
-                    'id_form'=>'frm-loteamento',
-                    'tipo'=>'array', // int para somente um ou array para vários
-                    'action'=>route('lotes.store'),
-                    'campo_id'=>'id',
-                    'campo_bus'=>'nome',
-                    'campo'=>'loteamento',
-                    'value'=>[],
-                    'label'=>'Informações do lote',
-                    'table'=>[
-                        //'id'=>['label'=>'Id','type'=>'text'],
-                        'quadra'=>['label'=>'Quadra','type'=>'arr_tab',
-                        'conf_sql'=>[
-                            'tab'=>'quadras',
-                            'campo_bus'=>'id',
-                            'select'=>'nome',
-                            'param'=>['bairro','etapa'],
-                            ]
-                        ],
-                        'nome'=>['label'=>'Lote','type'=>'text'],
-                    ],
-                    'tab' =>'lotes',
-                    'placeholder' =>'Digite somente o número do Lote...',
-                    'janela'=>[
-                        'url'=>route('lotes.create').'',
-                        'param'=>['bairro','etapa','quadra'],
-                        'form-param'=>'',
-                    ],
-                    'salvar_primeiro' =>false,//exigir cadastro do vinculo antes de cadastrar este
-                ],
-                'script' =>'familias.loteamento',
-            ],
-            'id_beneficiario'=>[
-                'label'=>'Prorietário',
-                'active'=>false,
-                'type'=>'html_vinculo',
-                'exibe_busca'=>'d-none',
-                'event'=>'',
-                'tam'=>'12',
-                'script'=>'',
-                'data_selector'=>[
-                    'campos'=>$beneficiario->campos(),
-                    //'route_index'=>route('beneficiarios.index').'?filter[tipo]=1',
-                    'route_index'=>route('beneficiarios.index'),
-                    'id_form'=>'frm-beneficiario',
-                    'action'=>route('beneficiarios.store'),
-                    'campo_id'=>'id',
-                    'campo_bus'=>'nome',
-                    'campo'=>'id_beneficiario',
-                    'value'=>['tipo'=>1],
-                    'label'=>'Proprietário',
-                    'table'=>[
-                        'id'=>['label'=>'Id','type'=>'text'],
-                        'nome'=>['label'=>'Nome','type'=>'text'],
-                        'cpf'=>['label'=>'CPF','type'=>'text']
-                    ],
-                    'tab' =>'beneficiarios',
-                ],
-            ],
-            'id_conjuge'=>[
-                'label'=>'Cônjuge ou Parceiro(a)',
-                'active'=>false,
-                'type'=>'html_vinculo',
-                'exibe_busca'=>'d-none',
-                'event'=>'',
-                'tam'=>'12',
-                'script'=>'',
-                'data_selector'=>[
-                    //'campos'=>$beneficiario->campos_parceiro(),
-                    'campos'=>$beneficiario->campos(),
-                    //'route_index'=>route('beneficiarios.index').'?filter[tipo]=2',
-                    'route_index'=>route('beneficiarios.index'),
-                    'id_form'=>'frm-conjuge',
-                    'action'=>route('beneficiarios.store'),
-                    'campo_id'=>'id',
-                    'campo_bus'=>'nome',
-                    'campo'=>'id_conjuge',
-                    'value'=>['tipo'=>2],
-                    'label'=>'Cônjuge ou Parceiro(a)',
-                    'table'=>[
-                        'id'=>['label'=>'Id','type'=>'text'],
-                        'nome'=>['label'=>'Nome','type'=>'text'],
-                        'cpf'=>['label'=>'CPF','type'=>'text']
-                    ],
-                    'tab' =>'beneficiarios',
-                ],
-            ],
-            'config[registro]'=>['label'=>'Registro','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>'','cp_busca'=>'config][registro'],
-            'config[livro]'=>['label'=>'Livro','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>'','cp_busca'=>'config][livro'],
-            //'lote'=>['label'=>'Lote*','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            //'nome_completo'=>['label'=>'Proprietário','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
-            //'cpf'=>['label'=>'CPF proprietário','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
-            //'nome_conjuge'=>['label'=>'Nome do Cônjuge','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
-            //'cpf_conjuge'=>['label'=>'CPF do Cônjuge','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
-            //'telefone'=>['label'=>'Telefone','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);'],
-            //'config[telefone2]'=>['label'=>'Telefone2','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','cp_busca'=>'config][telefone2'],
-            /*
-            'escolaridade'=>[
-                'label'=>'Escolaridade',
-                'active'=>true,
-                'type'=>'selector',
-                'data_selector'=>[
-                    'campos'=>$escolaridade->campos(),
-                    'route_index'=>route('escolaridades.index'),
-                    'id_form'=>'frm-escolaridades',
-                    'action'=>route('escolaridades.store'),
-                    'campo_id'=>'id',
-                    'campo_bus'=>'nome',
-                    'label'=>'Escolaridade',
-                ],
-                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM escolaridades WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
-                'event'=>'',
-                'tam'=>'3',
-                'class'=>'select2',
-            ],
-            'estado_civil'=>[
-                'label'=>'Estado Civil',
-                'active'=>true,
-                'type'=>'selector',
-                'data_selector'=>[
-                    'campos'=>$estadocivil->campos(),
-                    'route_index'=>route('estado-civil.index'),
-                    'id_form'=>'frm-estado-civil',
-                    'action'=>route('estado-civil.store'),
-                    'campo_id'=>'id',
-                    'campo_bus'=>'nome',
-                    'label'=>'Estado Civil',
-                ],
-                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM estadocivils WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
-                'event'=>'',
-                'tam'=>'3',
-                'class'=>'select2',
-            ],*/
-            //'situacao_profissional'=>['label'=>'Situação Profissional','type'=>'text','active'=>true,'exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
-            'bcp_bolsa_familia'=>['label'=>'BPC ou Bolsa Família','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'3'],
-            'renda_familiar'=>['label'=>'Renda Fam.','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'3','class'=>''],
-            'doc_imovel'=>['label'=>'Doc Imóvel','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
-            'qtd_membros'=>['label'=>'Membros','active'=>true,'type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
-            'membros'=>['label'=>'lista de Membros','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'familias.lista_membros','script_show'=>'familias.show_membros'],
-            'idoso'=>['label'=>'Idoso','active'=>true,'type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            'crianca_adolescente'=>['label'=>'Criança e Adolescente','active'=>true,'exibe_busca'=>'d-none','event'=>'','type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            'obs'=>['label'=>'Observação','active'=>true,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','rows'=>'4','cols'=>'80','tam'=>'12'],
-        ];
+        //     'loteamento'=>[
+        //         'label'=>'Informações do lote',
+        //         'active'=>false,
+        //         'type'=>'html_vinculo',
+        //         'exibe_busca'=>'d-none',
+        //         'event'=>'',
+        //         'tam'=>'12',
+        //         'script'=>'',
+        //         'data_selector'=>[
+        //             'campos'=>$lote->campos(),
+        //             'route_index'=>route('lotes.index'),
+        //             'id_form'=>'frm-loteamento',
+        //             'tipo'=>'array', // int para somente um ou array para vários
+        //             'action'=>route('lotes.store'),
+        //             'campo_id'=>'id',
+        //             'campo_bus'=>'nome',
+        //             'campo'=>'loteamento',
+        //             'value'=>[],
+        //             'label'=>'Informações do lote',
+        //             'table'=>[
+        //                 //'id'=>['label'=>'Id','type'=>'text'],
+        //                 'quadra'=>['label'=>'Quadra','type'=>'arr_tab',
+        //                 'conf_sql'=>[
+        //                     'tab'=>'quadras',
+        //                     'campo_bus'=>'id',
+        //                     'select'=>'nome',
+        //                     'param'=>['bairro','etapa'],
+        //                     ]
+        //                 ],
+        //                 'nome'=>['label'=>'Lote','type'=>'text'],
+        //             ],
+        //             'tab' =>'lotes',
+        //             'placeholder' =>'Digite somente o número do Lote...',
+        //             'janela'=>[
+        //                 'url'=>route('lotes.create').'',
+        //                 'param'=>['bairro','etapa','quadra'],
+        //                 'form-param'=>'',
+        //             ],
+        //             'salvar_primeiro' =>false,//exigir cadastro do vinculo antes de cadastrar este
+        //         ],
+        //         'script' =>'familias.loteamento',
+        //     ],
+        //     'id_beneficiario'=>[
+        //         'label'=>'Prorietário',
+        //         'active'=>false,
+        //         'type'=>'html_vinculo',
+        //         'exibe_busca'=>'d-none',
+        //         'event'=>'',
+        //         'tam'=>'12',
+        //         'script'=>'',
+        //         'data_selector'=>[
+        //             'campos'=>$beneficiario->campos(),
+        //             //'route_index'=>route('beneficiarios.index').'?filter[tipo]=1',
+        //             'route_index'=>route('beneficiarios.index'),
+        //             'id_form'=>'frm-beneficiario',
+        //             'action'=>route('beneficiarios.store'),
+        //             'campo_id'=>'id',
+        //             'campo_bus'=>'nome',
+        //             'campo'=>'id_beneficiario',
+        //             'value'=>['tipo'=>1],
+        //             'label'=>'Proprietário',
+        //             'table'=>[
+        //                 'id'=>['label'=>'Id','type'=>'text'],
+        //                 'nome'=>['label'=>'Nome','type'=>'text'],
+        //                 'cpf'=>['label'=>'CPF','type'=>'text']
+        //             ],
+        //             'tab' =>'beneficiarios',
+        //         ],
+        //     ],
+        //     'id_conjuge'=>[
+        //         'label'=>'Cônjuge ou Parceiro(a)',
+        //         'active'=>false,
+        //         'type'=>'html_vinculo',
+        //         'exibe_busca'=>'d-none',
+        //         'event'=>'',
+        //         'tam'=>'12',
+        //         'script'=>'',
+        //         'data_selector'=>[
+        //             //'campos'=>$beneficiario->campos_parceiro(),
+        //             'campos'=>$beneficiario->campos(),
+        //             //'route_index'=>route('beneficiarios.index').'?filter[tipo]=2',
+        //             'route_index'=>route('beneficiarios.index'),
+        //             'id_form'=>'frm-conjuge',
+        //             'action'=>route('beneficiarios.store'),
+        //             'campo_id'=>'id',
+        //             'campo_bus'=>'nome',
+        //             'campo'=>'id_conjuge',
+        //             'value'=>['tipo'=>2],
+        //             'label'=>'Cônjuge ou Parceiro(a)',
+        //             'table'=>[
+        //                 'id'=>['label'=>'Id','type'=>'text'],
+        //                 'nome'=>['label'=>'Nome','type'=>'text'],
+        //                 'cpf'=>['label'=>'CPF','type'=>'text']
+        //             ],
+        //             'tab' =>'beneficiarios',
+        //         ],
+        //     ],
+        //     'config[registro]'=>['label'=>'Registro','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>'','cp_busca'=>'config][registro'],
+        //     'config[livro]'=>['label'=>'Livro','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>'','cp_busca'=>'config][livro'],
+        //     //'lote'=>['label'=>'Lote*','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+        //     //'nome_completo'=>['label'=>'Proprietário','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+        //     //'cpf'=>['label'=>'CPF proprietário','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+        //     //'nome_conjuge'=>['label'=>'Nome do Cônjuge','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+        //     //'cpf_conjuge'=>['label'=>'CPF do Cônjuge','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+        //     //'telefone'=>['label'=>'Telefone','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);'],
+        //     //'config[telefone2]'=>['label'=>'Telefone2','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','cp_busca'=>'config][telefone2'],
+        //     /*
+        //     'escolaridade'=>[
+        //         'label'=>'Escolaridade',
+        //         'active'=>true,
+        //         'type'=>'selector',
+        //         'data_selector'=>[
+        //             'campos'=>$escolaridade->campos(),
+        //             'route_index'=>route('escolaridades.index'),
+        //             'id_form'=>'frm-escolaridades',
+        //             'action'=>route('escolaridades.store'),
+        //             'campo_id'=>'id',
+        //             'campo_bus'=>'nome',
+        //             'label'=>'Escolaridade',
+        //         ],
+        //         'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM escolaridades WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
+        //         'event'=>'',
+        //         'tam'=>'3',
+        //         'class'=>'select2',
+        //     ],
+        //     'estado_civil'=>[
+        //         'label'=>'Estado Civil',
+        //         'active'=>true,
+        //         'type'=>'selector',
+        //         'data_selector'=>[
+        //             'campos'=>$estadocivil->campos(),
+        //             'route_index'=>route('estado-civil.index'),
+        //             'id_form'=>'frm-estado-civil',
+        //             'action'=>route('estado-civil.store'),
+        //             'campo_id'=>'id',
+        //             'campo_bus'=>'nome',
+        //             'label'=>'Estado Civil',
+        //         ],
+        //         'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM estadocivils WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
+        //         'event'=>'',
+        //         'tam'=>'3',
+        //         'class'=>'select2',
+        //     ],*/
+        //     //'situacao_profissional'=>['label'=>'Situação Profissional','type'=>'text','active'=>true,'exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
+        //     'bcp_bolsa_familia'=>['label'=>'BPC ou Bolsa Família','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'3'],
+        //     'renda_familiar'=>['label'=>'Renda Fam.','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'3','class'=>''],
+        //     'doc_imovel'=>['label'=>'Doc Imóvel','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+        //     'qtd_membros'=>['label'=>'Membros','active'=>true,'type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+        //     'membros'=>['label'=>'lista de Membros','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'familias.lista_membros','script_show'=>'familias.show_membros'],
+        //     'idoso'=>['label'=>'Idoso','active'=>true,'type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+        //     'crianca_adolescente'=>['label'=>'Criança e Adolescente','active'=>true,'exibe_busca'=>'d-none','event'=>'','type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+        //     'obs'=>['label'=>'Observação','active'=>true,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','rows'=>'4','cols'=>'80','tam'=>'12'],
+        // ];
     }
     public function camposJson(User $user)
     {
