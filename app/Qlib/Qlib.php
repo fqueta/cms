@@ -547,6 +547,51 @@ class Qlib
         }
         return $ret;
     }
+    static public function dados_tab_SERVER($tab = null,$config=false)
+    {
+        $ret = false;
+        if($tab){
+            $id = isset($config['id']) ? $config['id']:false;
+            $sql = isset($config['sql']) ? $config['sql']:false;
+            $dominio = Qlib::dominio();
+            $mysql = isset($config['mysql']) ? $config['mysql']:'mysql_ger';
+            if($sql){
+                $d = DB::connection($mysql)->select($sql);
+                $arr_list = $d;
+                $list = false;
+                foreach ($arr_list as $k => $v) {
+                    if(is_object($v)){
+                        $list[$k] = (array)$v;
+                        foreach ($list[$k] as $k1 => $v1) {
+                            if(Qlib::isJson($v1)){
+                                $list[$k][$k1] = Qlib::lib_json_array($v1);
+                            }
+                        }
+                    }
+                }
+                $ret = $list;
+                return $ret;
+            }else{
+                if($tab=='contas_usuarios' && $dominio){
+                    $obj_list = DB::connection($mysql)->table($tab)->where('dominio','=',$dominio)->get();
+                }else{
+                    if($id)
+                        $obj_list = DB::connection($mysql)->table($tab)->find($id);
+                }
+            }
+            if($obj_list->count()>0 && $list=$obj_list){
+                if(is_array($list)){
+                        foreach ($list as $k => $v) {
+                            if(Qlib::isJson($v)){
+                                $list[$k] = Qlib::lib_json_array($v);
+                            }
+                        }
+                    }
+                    $ret = $list;
+            }
+        }
+        return $ret;
+    }
     static public function buscaValorDb($config = false)
     {
         /*Qlib::buscaValorDd([
@@ -879,5 +924,8 @@ class Qlib
             return $arr_tipo_profissao[$var];
         }
     }
-
+    static function dominio(){
+        $url_atual = "http" . (isset($_SERVER['HTTPS']) ? (($_SERVER['HTTPS']=="on") ? "s" : "") : "") . "://" . "$_SERVER[HTTP_HOST]";
+        return $url_atual;
+    }
 }

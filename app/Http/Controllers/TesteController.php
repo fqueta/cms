@@ -39,7 +39,10 @@ class TesteController extends Controller
         // ]);
         // return $email;
         //$ret = Qlib::redirectLogin();
-
+        //$dados = DB::connection('mysql_ger')->table('contas_usuarios')->where('dominio','=','https://demo.ctloja.com.br/')->get();
+        //dd(Qlib::dominio());
+        $dados = Qlib::dados_tab_SERVER('contas_usuarios');
+        dd($dados);
        //dd(base_path().'/');
        //$user = Auth::user();
         //$doc = new LotesController($user);
