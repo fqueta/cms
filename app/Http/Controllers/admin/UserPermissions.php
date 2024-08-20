@@ -18,13 +18,13 @@ class UserPermissions extends Controller
     public $routa;
     public $label;
     public $view;
-    public $url;
+    public $tab;
     public function __construct(User $user)
     {
         $this->middleware('auth');
         $this->user = $user;
-        $this->url = 'permissions';
         $this->routa = 'permissions';
+        $this->tab = 'permissions';
         $this->label = 'Permissões';
         $this->view = 'padrao';
     }
@@ -109,22 +109,24 @@ class UserPermissions extends Controller
             'name'=>['label'=>'Nome da permissão','active'=>true,'placeholder'=>'Ex.: Cadastrados','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'active'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'redirect_login'=>['label'=>'link da pagina','active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'12'],
             'description'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            'id_menu'=>['label'=>'lista de Permissões','active'=>false,'type'=>'html_blade','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'permissions.check_permissao','dados'=>@$dados['id_menu']],
+            'id_menu'=>['label'=>'lista de Permissões','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'permissions.check_permissao','dados'=>@$dados['id_menu']],
 
         ];
     }
     public function index(User $user)
     {
-        $this->authorize('ler', $this->url);
+        $this->authorize('ler', $this->routa);
         $title = 'Permissões Cadastradas';
         $titulo = $title;
         $queryPermissions = $this->queryPermissions($_GET);
         $queryPermissions['config']['exibe'] = 'html';
         $routa = $this->routa;
-        $url = $this->routa;
         $view = $this->view;
 
+        //REGISTRAR EVENTOS
+        (new EventController)->listarEvent(['tab'=>$this->tab,'this'=>$this]);
         return view($routa.'.index',[
             'dados'=>$queryPermissions['permission'],
             'title'=>$title,
@@ -135,7 +137,6 @@ class UserPermissions extends Controller
             'arr_titulo'=>$queryPermissions['arr_titulo'],
             'config'=>$queryPermissions['config'],
             'routa'=>$routa,
-            'url'=>$url,
             'view'=>$view,
             'i'=>0,
         ]);
@@ -149,7 +150,6 @@ class UserPermissions extends Controller
             'ac'=>'cad',
             'frm_id'=>'frm-permissions',
             'route'=>$this->routa,
-            'url'=>$this->url,
         ];
         $value = [
             'token'=>uniqid(),
@@ -221,12 +221,11 @@ class UserPermissions extends Controller
     public function edit($permission,User $user)
     {
         $this->authorize('is_admin');
-        $this->authorize('update', $this->url);
+        $this->authorize('update', $this->routa);
         $id = $permission;
         $dados = Permission::where('id',$id)->get();
         $routa = 'permissions';
-
-        if(!empty($dados)){
+        if($dados->count()>0){
             $title = 'Editar Cadastro de permissions';
             $titulo = $title;
             $dados[0]['ac'] = 'alt';
@@ -241,13 +240,11 @@ class UserPermissions extends Controller
                 'ac'=>'alt',
                 'frm_id'=>'frm-permissions',
                 'route'=>$this->routa,
-                'url'=>$this->url,
                 'id'=>$id,
             ];
             $arrMenus = $this->listMenusPermisson();
-
             $campos = $this->campos([
-                'id_menu'=>$arrMenus,
+                'id_menu'=>@$arrMenus,
             ]);
             $ret = [
                 'value'=>$dados[0],
@@ -259,7 +256,6 @@ class UserPermissions extends Controller
                 'arrMenus'=>$arrMenus,
                 'exec'=>true,
             ];
-
             return view($routa.'.createedit',$ret);
         }else{
             $ret = [
@@ -319,6 +315,10 @@ class UserPermissions extends Controller
                 'mens'=>'Erro ao receber dados',
                 'color'=>'danger',
             ];
+        }
+        if($atualizar){
+            //REGISTRAR EVENTOS
+            (new EventController)->listarEvent(['tab'=>$this->tab,'this'=>$this]);
         }
         if($ajax=='s'){
             $ret['return'] = route($route).'?idCad='.$id;

@@ -1,7 +1,8 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\tenant;
 
+use App\Models\Menu;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -14,24 +15,16 @@ class MenuTenantSeeder extends Seeder
      */
     public function run()
     {
+        Menu::truncate();
         DB::table('menus')->insert([
             [
-                'categoria'=>'MÓDULOS',
+                'categoria'=>'CONTEÚDO',
                 'description'=>'Postagens do Site',
                 'icon'=>'fas fa-globe',
                 'actived'=>true,
                 'url'=>'cad-conteudo',
                 'route'=>'',
                 'pai'=>''
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Posts',
-                'icon'=>'fas fa-blog',
-                'actived'=>true,
-                'url'=>'posts',
-                'route'=>'posts.index',
-                'pai'=>'cad-conteudo'
             ],
             [
                 'categoria'=>'',
@@ -44,6 +37,51 @@ class MenuTenantSeeder extends Seeder
             ],
             [
                 'categoria'=>'',
+                'description'=>'Notícias',
+                'icon'=>'fas fa-blog',
+                'actived'=>true,
+                'url'=>'posts',
+                'route'=>'posts.index',
+                'pai'=>'cad-conteudo'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Documentos',
+                'icon'=>'fas fa-file-word',
+                'actived'=>true,
+                'url'=>'documentos',
+                'route'=>'documentos.index',
+                'pai'=>'cad-conteudo'
+            ],
+            [
+                'categoria'=>'LICITAÇÕES',
+                'description'=>'Processos',
+                'icon'=>'fas fa-info',
+                'actived'=>true,
+                'url'=>'precessos',
+                'route'=>'',
+                'pai'=>''
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Todos processos',
+                'icon'=>'fas fa-file-pdf',
+                'actived'=>true,
+                'url'=>'biddings',
+                'route'=>'biddings.index',
+                'pai'=>'precessos'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Áreas',
+                'icon'=>'fas fa-file-list',
+                'actived'=>true,
+                'url'=>'bidding_categories',
+                'route'=>'bidding_categories.index',
+                'pai'=>'precessos'
+            ],
+            [
+                'categoria'=>'TRANSPARENCIA',
                 'description'=>'Sic',
                 'icon'=>'fas fa-info',
                 'actived'=>true,
@@ -86,15 +124,6 @@ class MenuTenantSeeder extends Seeder
                 'url'=>'config',
                 'route'=>'sistema.config',
                 'pai'=>''
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Documentos',
-                'icon'=>'fas fa-file-word',
-                'actived'=>true,
-                'url'=>'documentos',
-                'route'=>'documentos.index',
-                'pai'=>'config'
             ],
             [
                 'categoria'=>'',

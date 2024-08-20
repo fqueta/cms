@@ -1,6 +1,8 @@
 <?php
 
 namespace Database\Seeders;
+
+use App\Models\Permission;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Database\Seeder;
@@ -32,6 +34,7 @@ class PermissionSeeder extends Seeder
                 "delete"=>["posts"=>"s","pages"=>"s","lotes"=>"s","bairros"=>"s","beneficiarios"=>"s","etapas"=>"s","escolaridades"=>"s","estado-civil"=>"s","relatorios_social"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s","documentos"=>"s"]
             ],
         ];
+        Permission::truncate();
         DB::table('permissions')->insert([
             [
                 'name'=>'Master',

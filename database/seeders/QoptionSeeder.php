@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Qoption;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -14,6 +15,7 @@ class QoptionSeeder extends Seeder
      */
     public function run()
     {
+        Qoption::truncate();
         DB::table('qoptions')->insert([
             [
                 'nome'=>'Integração com o wordpress',

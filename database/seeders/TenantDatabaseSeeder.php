@@ -5,6 +5,7 @@ use App\Models\Company;
 use App\Models\Prefeituras;
 use App\Tenant\Tenant;
 use Database\Seeders\tenant\UserTenantSeeder;
+use Database\Seeders\tenant\MenuTenantSeeder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -23,14 +24,14 @@ class TenantDatabaseSeeder extends Seeder
         // Tenant::setTenant($company);
         $this->call([
             UserTenantSeeder::class,
-            // escolaridadeSeeder::class,
-            // estadocivilSeeder::class,
-            // ProfissaoSeeder::class,
+            escolaridadeSeeder::class,
+            estadocivilSeeder::class,
+            ProfissaoSeeder::class,
             // PrefeiturasSeeder::class,
-            // tagSeeder::class,
-            // MenuSeeder::class,
-            // PermissionSeeder::class,
-            // QoptionSeeder::class,
+            tagSeeder::class,
+            MenuTenantSeeder::class,
+            PermissionSeeder::class,
+            QoptionSeeder::class,
 
         ]);
         // $this->call(CategoriesTableSeeder::class);

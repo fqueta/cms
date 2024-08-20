@@ -35,10 +35,16 @@
                     'option_select'=>false,
                     'class_div'=>'pt-4 text-right',
                 ])}}
-                @can('create',$url)
+                @can('create',$routa)
 
                 <div class="col-md-2 text-right mt-4">
-                    <a href="{{ route($routa.'.create') }}" class="btn btn-success btn-block">
+                    @php
+                        $r_create = route( $routa.'.create');
+                        if($routa=='leiloes_adm'){
+                            $r_create = route('quick.add.leilao');
+                        }
+                    @endphp
+                    <a href="{{ $r_create }}" class="btn btn-success btn-block">
                         <i class="fa fa-plus" aria-hidden="true"></i> Cadastrar
                     </a>
                 </div>

@@ -54,6 +54,7 @@ Route::middleware(['web', TenancyMiddleware::class])->group(function () {
             Route::resource('permissions','\App\Http\Controllers\admin\UserPermissions',['parameters' => [
                 'permissions' => 'id'
             ]]);
+
             Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
             Route::get('/',function(){
                 return redirect()->route('login');
@@ -68,6 +69,55 @@ Route::middleware(['web', TenancyMiddleware::class])->group(function () {
             Route::resource('tags','\App\Http\Controllers\admin\TagsController',['parameters' => [
                 'tags' => 'id'
             ]]);
+
+            /**Rotas do sistema antigo */
+            // Route::post('/uploads', 'FilesController@fileUpload');
+            // Route::get('/', "UsersController@index");
+            // Route::get('/home', "UsersController@index");
+            // Route::resource('/users', 'UsersController', ['except' => ['show']]);
+            // Route::resource('/players', 'PlayersController', ['except' => ['show']]);
+            // Route::resource('/players/order', 'PlayersController@postSort');
+            // Route::resource('/banners', 'BannersController', ['except' => ['show']]);
+            // Route::resource('/banners/order', 'BannersController@postSort');
+            // Route::resource('/floaters', 'FloatersController', ['except' => ['show']]);
+            // Route::resource('/floaters/order', 'FloatersController@postSort');
+            // Route::resource('/pages', 'PagesController', ['except' => ['show']]);
+            // Route::resource('/pages/order', 'PagesController@postSort');
+            // Route::resource('pages.subpages', 'SubpagesController', ['except' => 'show']);
+            // Route::resource('/receivers', 'ReceiversController', ['except' => ['show']]);
+            // Route::resource('/contacts', 'ContactsController', ['except' => ['show']]);
+            // Route::resource('/sections', 'SectionsController', ['except' => ['show']]);
+
+            Route::resource('/biddings', 'BiddingsController', ['except' => ['show']]);
+            Route::resource('/attachments', 'AttachmentsController', ['except' => ['show']]);
+            Route::resource('biddings.attachments', 'AttachmentsController', ['except' => ['show']]);
+            Route::resource('biddings.notifications', 'NotificationsController', ['except' => ['show']]);
+            Route::resource('biddings.newsletters', 'BiddingNewslettersController', ['except' => ['show']]);
+            Route::resource('/biddings/{parent_id}/attachments/order', 'AttachmentsController@postSort');
+
+            // Route::resource('/b_trimestrals', 'B_trimestralsController', ['except' => ['show']]);
+            // Route::resource('/attachments', 'A_trimestralsController', ['except' => ['show']]);
+            // Route::resource('b_trimestrals.attachments', 'A_trimestralsController', ['except' => ['show']]);
+            // Route::resource('b_trimestrals.notifications', 'NotificationsController', ['except' => ['show']]);
+            // Route::resource('b_trimestrals.newsletters', 'BiddingNewslettersController', ['except' => ['show']]);
+            // Route::resource('/b_trimestrals/{parent_id}/attachments/order', 'A_trimestralsController@postSort');
+
+            // Route::resource('/file_uploads', 'UploadsController', ['only' => ['index', 'create', 'store', 'show', 'destroy']]);
+            // Route::resource('/categories', 'CategoriesController', ['except' => ['show']]);
+            // Route::resource('/categories/order', 'CategoriesController@postSort');
+            Route::resource('/bidding_categories', 'BiddingCategoriesController', ['except' => ['show']]);
+            // Route::resource('/bidding_categories/order', 'BiddingCategoriesController@postSort');
+            // Route::resource('/posts', 'PostsController', ['except' => ['show']]);
+            // Route::resource('/notices', 'NoticesController', ['except' => ['show']]);
+            // Route::resource('/newsletters', 'NewslettersController', ['except' => ['show']]);
+            // Route::resource('/posts/order', 'PostsController@postSort');
+            // Route::resource('/diaries', 'DiariesController', ['except' => ['show']]);
+            // Route::resource('/docs', 'docsController', ['except' => ['show']]);
+            // Route::get('/test', 'testController@index');
+            Route::resource('/docfile', 'DocfileController',['parameters' => [
+                'docfile' => 'id'
+            ]]);
+
         });
 
         // Route::prefix($prefixo_site.'internautas')->group(function(){

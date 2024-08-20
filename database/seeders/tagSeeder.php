@@ -371,7 +371,7 @@ class tagSeeder extends Seeder
             ],
 
         ];
-
+        Tag::truncate();
         foreach ($arr as $key => $value) {
             $d = $value;
             $d['value']=uniqid();

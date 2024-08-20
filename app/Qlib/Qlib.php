@@ -984,4 +984,63 @@ class Qlib
             return false;
         }
     }
+    static function is_backend(){
+        $ret = false;
+        // $urlAt = Qlib::UrlAtual();
+        $seg1 = request()->segment(1);
+        if($seg1 == 'admin'){
+            $ret = true;
+        }
+        return $ret;
+    }
+    static function is_frontend(){
+        $ret = false;
+        // $urlAt = Qlib::UrlAtual();
+        $seg1 = request()->segment(1);
+        if($seg1 != 'admin'){
+            $ret = true;
+        }
+        return $ret;
+    }
+
+    static function get_slug_post_by_id($post_id){
+        return self::buscaValorDb0('posts','ID', $post_id,'post_name');
+    }
+    // public static function createSlug($str, $delimiter = '-'){
+
+    //     $slug = \Str::slug($str);
+    //     return $slug;
+    // }
+    static public function buscaValorDb0($tab,$campo_bus,$valor,$select,$compleSql=false,$debug=false)
+    {
+        $ret = false;
+        if($tab && $campo_bus && $valor && $select){
+            $sql = "SELECT $select FROM $tab WHERE $campo_bus='$valor' $compleSql";
+            if(isset($debug)&&$debug){
+                echo $sql;
+            }
+            $d = DB::select($sql);
+            if($d)
+                $ret = $d[0]->$select;
+        }
+        return $ret;
+    }
+    static function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP']))
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        else if(isset($_SERVER['HTTP_X_FORWARDED']))
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        else if(isset($_SERVER['HTTP_FORWARDED']))
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        else if(isset($_SERVER['REMOTE_ADDR']))
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        else
+            $ipaddress = 'UNKNOWN';
+        return $ipaddress;
+    }
 }
