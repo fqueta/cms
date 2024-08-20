@@ -13,7 +13,9 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'version' => '1.0.0.0',
+    'name' => env('APP_NAME', 'CMSP'),
+
 
     /*
     |--------------------------------------------------------------------------
@@ -163,8 +165,8 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-        Yajra\DataTables\DataTablesServiceProvider::class,
-        Spatie\Permission\PermissionServiceProvider::class,
+        // Yajra\DataTables\DataTablesServiceProvider::class,
+        // Spatie\Permission\PermissionServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
         /*

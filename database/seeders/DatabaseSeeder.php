@@ -22,15 +22,11 @@ class DatabaseSeeder extends Seeder
             escolaridadeSeeder::class,
             estadocivilSeeder::class,
             ProfissaoSeeder::class,
-            //bairroSeeder::class,
-            //QuadraSeeder::class,
-            //etapaSeeder::class,
+            PrefeiturasSeeder::class,
             tagSeeder::class,
             MenuSeeder::class,
             PermissionSeeder::class,
-            //DocumentoSeeder::class,
             QoptionSeeder::class,
-            //BeneficiarioSeeder::class,
         ]);
 
     }

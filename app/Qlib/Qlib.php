@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Permission;
 use App\Models\Qoption;
+use Illuminate\Support\Facades\Config;
 
 class Qlib
 {
@@ -927,5 +928,60 @@ class Qlib
     static function dominio(){
         $url_atual = "http" . (isset($_SERVER['HTTPS']) ? (($_SERVER['HTTPS']=="on") ? "s" : "") : "") . "://" . "$_SERVER[HTTP_HOST]";
         return $url_atual;
+    }
+    /**
+     * Metodo para retornar o nome do subdominio o vazio caso não seja um subdominio
+     */
+    static function is_subdominio(){
+        $ret = explode('.', request()->getHost())[0];
+        return $ret;
+    }
+    static function selectDefaultConnection($connection='mysql',$conn=false){
+        if($connection=='tenant'){
+            if(isset($conn['name']) && isset($conn['user']) && isset($conn['pass'])){
+                $db = isset($conn['name'])?$conn['name']:false;
+                $user = isset($conn['user'])?$conn['user']:false;
+                $pass = isset($conn['pass'])?$conn['pass']:false;
+                if($user && $db){
+                    Config::set('database.connections.tenant.database', trim($db));
+                    Config::set('database.connections.tenant.username', trim($user));
+                    Config::set('database.connections.tenant.password', trim($pass));
+                }
+            }else{
+                $arr_tenancy = session()->get('tenancy');
+                if(isset($arr_tenancy['config']) && Qlib::isJson($arr_tenancy['config'])){
+                    $arr_config=Qlib::lib_json_array($arr_tenancy['config']);
+                    $db = isset($arr_config['name'])?$arr_config['name']:false;
+                    $user = isset($arr_config['user'])?$arr_config['user']:false;
+                    $pass = isset($arr_config['pass'])?$arr_config['pass']:false;
+                    if($user && $db){
+                        Config::set('database.connections.tenant.database', trim($db));
+                        Config::set('database.connections.tenant.username', trim($user));
+                        Config::set('database.connections.tenant.password', trim($pass));
+                    }
+                }
+            }
+            // $clone = config('database.connections.mysql');
+            // $clone['database'] = $db;
+            // Config::set('database.connections.'.$connection, $clone);
+
+        }
+        DB::purge($connection);
+        DB::reconnect($connection);
+        DB::setDefaultConnection($connection);
+        // Config::set('database.default', $connection);
+        return DB::getDefaultConnection();
+
+    }
+    /**
+     * Metodo que verifica se a conexão atual é de um tenant ou não
+     */
+    static function is_tenant(){
+        $conn = DB::getDefaultConnection();
+        if($conn == 'tenant'){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use PhpParser\Node\Stmt\TryCatch;
 
 class portalController extends Controller
 {
@@ -217,7 +218,6 @@ class portalController extends Controller
         }
         $dados['id_permission'] = Qlib::qoption('id_permission_front')? Qlib::qoption('id_permission_front'): 5;
         $dados['ativo'] = 's';
-        //dd($dados);
 
         $salvar = User::create($dados);
         $route = $this->routa.'.index';
@@ -230,12 +230,17 @@ class portalController extends Controller
                     'email'=>$dados['email'],
                     'password'=>$dados['password'],
                 ]);
-                $enviarEmail = Mail::send(new \App\Mail\veriUser($salvos));
-                if(count(Mail::failures()) > 0){
-                    $mens .= 'Falha ao enviar e-mail entre em contato com o nosso suporte!';
-                }else{
-                    $mens .= 'Um e-mail foi enviado para sua caixa de e-mails, contendo um link para ativação do seu cadastro. Caso não encontre na caixa de entrada, por favor consulte o spam. <p>Lembre-se é <b>obrigatório a confirmação do E-mail</b> para ativação do seu cadastro e poder utilizar os <b>serviços do portal.</b></p>';
+                try {
+                    $enviarEmail = Mail::send(new \App\Mail\veriUser($salvos));
+                    //code...
+                } catch (\Throwable $e) {
+                    $mens .= $e->getMessage();
                 }
+                // if(count(Mail::failures()) > 0){
+                //     $mens .= 'Falha ao enviar e-mail entre em contato com o nosso suporte!';
+                // }else{
+                //     $mens .= 'Um e-mail foi enviado para sua caixa de e-mails, contendo um link para ativação do seu cadastro. Caso não encontre na caixa de entrada, por favor consulte o spam. <p>Lembre-se é <b>obrigatório a confirmação do E-mail</b> para ativação do seu cadastro e poder utilizar os <b>serviços do portal.</b></p>';
+                // }
             }else{
                 $mens .= ' Mais não foi encontrado!';
 

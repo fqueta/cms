@@ -5,6 +5,7 @@ namespace App\Tenant;
 
 
 use App\Models\Company;
+use App\Models\Prefeituras;
 use Illuminate\Support\Facades\Schema;
 
 class TenantManager
@@ -38,8 +39,8 @@ class TenantManager
 
     public function loadConnections()
     {
-        if (Schema::hasTable((new Company())->getTable())) {
-            $companies = Company::all();
+        if (Schema::hasTable((new Prefeituras())->getTable())) {
+            $companies = Prefeituras::all();
             foreach ($companies as $company) {
                 $clone = config('database.connections.system');
                 $clone['database'] = $company->database;
@@ -49,6 +50,6 @@ class TenantManager
     }
 
     public function isTenantRequest(){
-        return !\Request::is('system/*') && \Request::route('prefix');
+        return !\Request::is('gerente.*') && \Request::route('prefix');
     }
 }

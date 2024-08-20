@@ -27,6 +27,7 @@ class StoreUserRequest extends FormRequest
     public function rules()
     {
         $this->sanitize();
+
         return [
             'nome'=>['required',new FullName],
             'email'=>['required','string','unique:users'],
