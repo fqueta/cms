@@ -1,15 +1,15 @@
 @extends('adminlte::page')
 
-@include('admin.title')
+@section('title', 'Dashboard')
+
 @section('content_header')
-<h3>{!!$titulo!!}</h3>
+    <h3>{{$titulo}}</h3>
 @stop
 @section('content')
 <div class="row">
     <div class="col-md-12 mens">
-        {{ App\Qlib\Qlib::formatMensagem( $_GET) }}
     </div>
-    <div class="col-md-12">
+    <div class="col-md-8">
         <div class="card card-primary">
             <div class="card-header">
                 <h3 class="card-title">Informações</h3>
@@ -29,7 +29,6 @@
             </div>
         </div>
     </div>
-    <!--
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
@@ -41,17 +40,20 @@
                 </div>
             </div>
             <div class="card-body">
-                App\Qlib\Qlib::gerUploadAquivos([
-                    'pasta'=>'bairros/'.date('Y').'/'.date('m'),
+                {{App\Qlib\Qlib::gerUploadAquivos([
+                    'pasta'=>$config['route'].'/'.date('Y').'/'.date('m'),
                     'token_produto'=>$value['token'],
-                    'tab'=>'bairros',
+                    'tab'=>$config['route'],
                     'listFiles'=>@$listFiles,
+                    'routa'=>@$config['route'],
+                    'url'=>@$config['url'],
+                    'arquivos'=>@$config['arquivos'],
+                    'typeN'=>@$config['typeN'],
                 ])}}
             </div>
         </div>
-    </div>-->
+    </div>
 </div>
-
 @stop
 
 @section('css')

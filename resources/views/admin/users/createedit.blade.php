@@ -1,8 +1,9 @@
 @extends('adminlte::page')
 
-@include('admin.title')
+@section('title', 'Dashboard')
+
 @section('content_header')
-<h3>{!!$titulo!!}</h3>
+    <h3>{{$titulo}}</h3>
 @stop
 @section('content')
 <div class="row">

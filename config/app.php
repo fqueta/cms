@@ -182,6 +182,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\QlibServiceProvider::class,
+        App\Providers\TenancyServiceProvider::class
 
     ],
 

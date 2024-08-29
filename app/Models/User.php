@@ -8,12 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-// use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-
+    // protected $connection = 'tenant';
     protected $fillable = [
         'tipo_pessoa',
         'nome',
@@ -43,11 +42,11 @@ class User extends Authenticatable
         'config' => 'array',
         'preferencias' => 'array',
     ];
-    private function dUser(){
-        $dados = Qlib::dados_tab_SERVER('contas_usuarios');
-        $usuario = isset($dados[0]['usuario']) ? $dados[0]['usuario']:'demo';
-        return $usuario;
-    }
+    // private function dUser(){
+    //     $dados = Qlib::dados_tab_SERVER('contas_usuarios');
+    //     $usuario = isset($dados[0]['usuario']) ? $dados[0]['usuario']:'demo';
+    //     return $usuario;
+    // }
 
-    // protected $connection = $this->dUser();
+
 }

@@ -3,6 +3,7 @@
     $campos     = $conf['campos'];
     $value      = $conf['value'];
     $ambiente   = isset($config['ambiente'])?$config['ambiente']:'back'; //back = bakend  //front =  frontend
+
 @endphp
 
 <form id="{{$config['frm_id']}}" class="{{@$config['frm_class']}}" action="@if($config['ac']=='cad'){{ route($config['route'].'.store') }}@elseif($config['ac']=='alt'){{ route($config['route'].'.update',['id'=>$config['id']]) }}@endif" method="post" {{@$config['event']}}>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\UserController;
+use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use App\Qlib\Qlib;
 use Illuminate\Http\Request;
@@ -65,24 +66,24 @@ class LoginController extends Controller
             return $this->sendLockoutResponse($request);
         }
 
-        if ($this->guard()->validate($this->credentials($request))) {
+        // dd($this->guard()->validate($this->credentials($request)),$this->credentials($request));
+        // dd(User::all());
+        // if ($this->guard()->validate($this->credentials($request))) {
             $key = 'email';
             if (is_numeric($request->get('email'))) {
                 $key = 'mobile_no';
             }
-            // $credentials = $request->only('email', 'password');
+            // DB::setDefaultConnection('tenant');
             $credentials = [$key => $request->email, 'password' => $request->password, 'ativo' => 's', 'excluido' => 'n'];
             $logar = Auth::guard('web')->attempt($credentials, $request->filled('remember'));
             // $logar = (new UserController)->login([$key => $request->email, 'password' => $request->password, 'ativo' => 's', 'excluido' => 'n']);
+            // $databaseName = \DB::connection('tenant')->getDatabaseName();
+            // dump($databaseName);
             if ($logar) {
                 $dUser =  Auth::user();
-                // dump(\DB::getDefaultConnection());
-                // dump($credentials);
-                // dump($dUser);
-                // dd($logar);
-
-                $id_cliente = 5;
+                session()->push('user_l', $dUser); //usuario logado
                 // dd($dUser);
+                $id_cliente = 5;
                 if($request->has('r')){
                     //nesse caso redirect ulr
                     return redirect($request->get('r'));
@@ -94,7 +95,7 @@ class LoginController extends Controller
                     // return redirect()->route('home');
                     // dump($dUser);
                     // dd(url('/home'));
-                    return redirect()->route('home');
+                    return redirect()->route('home.admin');
                 } else {
                     //login do cliente
                     return redirect()->route('internautas.index');
@@ -106,14 +107,14 @@ class LoginController extends Controller
                 Session::flash('alert-class', 'alert-danger');
                 return redirect()->back();
             }
-        } else {
+        // } else {
 
-            $this->incrementLoginAttempts($request);
+        //     $this->incrementLoginAttempts($request);
 
-            Session::flash('message', 'Cadastro não encontrado!');
-            Session::flash('alert-class', 'alert-danger');
-            return redirect()->back();
-        }
+        //     Session::flash('message', 'Cadastro não encontrado!');
+        //     Session::flash('alert-class', 'alert-danger');
+        //     return redirect()->back();
+        // }
     }
 
     protected function credentials(Request $request)

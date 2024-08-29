@@ -41,6 +41,7 @@ class UserSeeder extends Seeder
                 'id_permission' => '5',
             ],
         ];
+        User::truncate();
         foreach ($arr as $key => $value) {
             User::create($value);
         }

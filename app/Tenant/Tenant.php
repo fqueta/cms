@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+// declare(strict_types=1);
 
 namespace App\Tenant;
 
@@ -34,10 +34,9 @@ class Tenant
         $clone['database'] = self::$tenant->database;
         Config::set('database.connections.tenant', $clone);
         $connection = 'tenant';
+        DB::purge($connection);
         DB::reconnect($connection);
         DB::setDefaultConnection($connection);
-        // $cone = DB::getDefaultConnection();
-        // dd($cone);
     }
 
     public static function loadConnections()

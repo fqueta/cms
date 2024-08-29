@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Prefeituras;
+use App\Models\User;
 use App\Qlib\Qlib;
 use App\Tenant\Tenant;
 use Closure;
@@ -35,17 +36,26 @@ class TenancyMiddleware
             $tenancy =  Prefeituras::where('prefix',$urlEmpresa)->firstOrFail();
             $arr_t = $tenancy->toArray();
             session()->push('tenancy', $arr_t);
+            if(isset($tenancy->database)){
+                Qlib::selectDefaultConnection('tenant',$tenancy->database);
+        // dump(\DB::getDefaultConnection());
+        // dump(Auth::guard('web')->check());
+        // dd(Auth::guard('web')->user());
+        // $users = User::all();
+        // dd($users);
+                // dump(\DB::getDefaultConnection());
+            }else{
+                return false;
+            }
             // if(isset($arr_t['config']) && Qlib::isJson($arr_t['config'])){
                 // dump($tenancy->toArray());
                 Config::set('adminlte.title', config('app.name').' - '.$tenancy['nome']);
-                $arr_config = Qlib::lib_json_array($arr_t['config']);
-                // Qlib::selectDefaultConnection('tenant',$arr_config);
-                Tenant::setTenant($tenancy);
-
+                // $arr_config = Qlib::lib_json_array($arr_t['config']);
+                // Tenant::setTenant($tenancy);
             // }
             //carrega a nova coneaxao
-            // (new Connect($tenancy))->setDefault();
-            // dump(Auth::user());
+
+
         }
         return $next($request);
     }

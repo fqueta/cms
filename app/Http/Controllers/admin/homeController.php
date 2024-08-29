@@ -3,95 +3,65 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Qlib\Qlib;
 
-class homeController extends Controller
+class HomeController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
     protected $user;
-    public function __construct(User $user)
+    public $tab;
+    public $title;
+    public $routa;
+    public function __construct()
     {
-        $this->middleware('auth');
-        $this->user = $user;
+        // $this->middleware('auth');
+        $this->user = Auth::user();
+        $this->tab = 'home';
+        $this->title = 'Dashboard ' ;
+        $this->routa = 'painel';
     }
 
-    public function index()
+    public function teste(){
+      //$dados = $request->all();
+      //var_dump($dados);
+      return view('teste');
+    }
+    public function upload(Request $request){
+      $dados = $request->all();
+      var_dump($dados);
+    }
+
+
+    public function index(Request $request)
     {
-        /*$controlerFamilias = new FamiliaController(Auth::user());
-        $dadosFamilias = $controlerFamilias->queryFamilias();
+        $this->authorize('ler', $this->routa);
+        // $controlerFamilias = new FamiliaController(Auth::user());
+        // $controlerMapas = new MapasController(Auth::user());
+        // $dadosFamilias = $controlerFamilias->queryFamilias();
+        // $id_quadra_home = Qlib::qoption('id_quadra_home')?Qlib::qoption('id_quadra_home'):@$_GET['id_qh'];
+        // if($id_quadra_home){
+        //     $dadosMp = $controlerMapas->queryQuadras($id_quadra_home);
+        // }else{
+        //     $dadosMp = false;
+        // }
+        //REGISTRAR EVENTOS
+        // (new EventController)->listarEvent(['tab'=>$this->tab,'this'=>$this]);
+        // $totalDecretos = Post::where('post_type','=','decreto')->count();
         $config = [
-            'c_familias'=>$dadosFamilias,
-        ];*/
+            // 'c_familias'=>$dadosFamilias,
+            // 'mapa'=>$dadosMp,
+            // 'totalDecretos'=>$totalDecretos,
+        ];
+        dd($request->all());
         return view('home',[
-            'config'=>[],
+            'config'=>$config,
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }

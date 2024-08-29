@@ -144,13 +144,13 @@
         </div>
     @elseif ($config['type']=='html')
         @php
-           $config['script'] = isset($config['script'])?$config['script']:false;
-
+            $config['script'] = isset($config['script'])?$config['script']:false;
         @endphp
         <div class="col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
             @if ($config['script'])
-                @if(isset($config['dados']))
-                    {{-- {{dd($config['script'])}} --}}
+                @if(isset($config['text_html']) && !empt($config['text_html']))
+                    {!!$config['text_html']!!}
+                @elseif(isset($config['dados']))
                     @include($config['script'],['dados'=>$config['dados']])
                 @else
                     @include($config['script'])
