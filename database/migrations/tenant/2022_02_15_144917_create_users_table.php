@@ -16,7 +16,8 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->enum('tipo_pessoa',['pf','pj']); //pf = pessoa fisica, pj = pessoa juridica
-            $table->string('nome');
+            // $table->string('nome');
+            $table->string('name');
             $table->string('razao')->nullable();
             $table->string('cpf')->nullable();
             $table->string('cnpj')->nullable();

@@ -5,11 +5,15 @@
 @section('content_header')
     <h3>{{$titulo}}</h3>
 @stop
+@php
+    $tam_col1 = isset($config['tam_col1'])?$config['tam_col1'] : 'col-md-8';
+    $tam_col2 = isset($config['tam_col2'])?$config['tam_col2'] : 'col-md-4';
+@endphp
 @section('content')
 <div class="row">
     <div class="col-md-12 mens">
     </div>
-    <div class="col-md-8">
+    <div class="{{$tam_col1}}">
         <div class="card card-primary">
             <div class="card-header">
                 <h3 class="card-title">Informações</h3>
@@ -29,30 +33,32 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Arquivos</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                      <i class="fas fa-minus"></i>
-                    </button>
+    @if (isset($value['token']))
+        <div class="{{$tam_col2}}">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Arquivos</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {{App\Qlib\Qlib::gerUploadAquivos([
+                        'pasta'=>$config['route'].'/'.date('Y').'/'.date('m'),
+                        'token_produto'=>isset($value['token'])?$value['token']:false,
+                        'tab'=>$config['route'],
+                        'listFiles'=>@$listFiles,
+                        'routa'=>@$config['route'],
+                        'url'=>@$config['url'],
+                        'arquivos'=>@$config['arquivos'],
+                        'typeN'=>@$config['typeN'],
+                    ])}}
                 </div>
             </div>
-            <div class="card-body">
-                {{App\Qlib\Qlib::gerUploadAquivos([
-                    'pasta'=>$config['route'].'/'.date('Y').'/'.date('m'),
-                    'token_produto'=>$value['token'],
-                    'tab'=>$config['route'],
-                    'listFiles'=>@$listFiles,
-                    'routa'=>@$config['route'],
-                    'url'=>@$config['url'],
-                    'arquivos'=>@$config['arquivos'],
-                    'typeN'=>@$config['typeN'],
-                ])}}
-            </div>
         </div>
-    </div>
+    @endif
 </div>
 @stop
 

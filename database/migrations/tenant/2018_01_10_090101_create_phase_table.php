@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBiddingCategoriesTable extends Migration
+class CreatePhaseTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,17 @@ class CreateBiddingCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('bidding_categories', function (Blueprint $table) {
+        Schema::create('bidding_phases', function (Blueprint $table) {
+            $table->string('name', 255);
             $table->id();
-            $table->string('name', 255)->nullable();
-            $table->timestamps();
+            // $table->string('nome', 255)->nullable();
             $table->enum('ativo',['s','n']);
             $table->integer('autor')->nullable();
             $table->enum('excluido',['n','s']);
             $table->text('reg_excluido')->nullable();
             $table->enum('deletado',['n','s']);
             $table->text('reg_deletado')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -33,6 +34,6 @@ class CreateBiddingCategoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('genres');
+        Schema::dropIfExists('phases');
     }
 }

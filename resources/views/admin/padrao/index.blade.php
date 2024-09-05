@@ -1,14 +1,13 @@
 @extends('adminlte::page')
-
-@section('title', 'Dashboard')
-
+@include('admin.title')
 @section('content_header')
     <h3>{{$titulo}}</h3>
 @stop
 @section('content')
   <!--<p>Selecione os publicadores do seu familia para enviar o relatorio para o secretário</p>-->
   <div class="row">
-      @include('qlib.config_exibe')
+
+    @include('qlib.config_exibe')
       <div class="col-md-12 mens">
     </div>
     @can('is_admin')
@@ -39,6 +38,7 @@
                 @include('qlib.dropdow_acaomassa')
             </div>
             @endcan
+
         </div>
         <div class="card-body">
             <div class="table-responsive">

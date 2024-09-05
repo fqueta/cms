@@ -4,35 +4,31 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBiddingCategoriesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('bidding_categories', function (Blueprint $table) {
+        Schema::create('bidding_genres', function (Blueprint $table) {
+            $table->string('name', 255);
             $table->id();
-            $table->string('name', 255)->nullable();
-            $table->timestamps();
             $table->enum('ativo',['s','n']);
             $table->integer('autor')->nullable();
             $table->enum('excluido',['n','s']);
             $table->text('reg_excluido')->nullable();
             $table->enum('deletado',['n','s']);
             $table->text('reg_deletado')->nullable();
+            $table->timestamps();
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('genres');
+        Schema::dropIfExists('bidding_genres');
     }
-}
+};

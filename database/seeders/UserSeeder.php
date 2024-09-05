@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
@@ -17,7 +18,7 @@ class UserSeeder extends Seeder
     {
         $arr = [
             [
-                'nome' => 'Fernando Queta',
+                'name' => 'Fernando Queta',
                 'email' => 'fernando@maisaqui.com.br',
                 'password' => Hash::make('ferqueta'),
                 'status' => 'actived',
@@ -25,7 +26,7 @@ class UserSeeder extends Seeder
                 'id_permission' => '1',
             ],
             [
-                'nome' => 'Usuario de teste',
+                'name' => 'Usuario de teste',
                 'email' => 'teste@databrasil.app.br',
                 'password' => Hash::make('mudar123'),
                 'status' => 'actived',
@@ -33,7 +34,7 @@ class UserSeeder extends Seeder
                 'id_permission' => '2',
             ],
             [
-                'nome' => 'Usuario de teste front',
+                'name' => 'Usuario de teste front',
                 'email' => 'ger.maisaqui1@gmail.com',
                 'password' => Hash::make('mudar123'),
                 'status' => 'actived',
@@ -45,5 +46,8 @@ class UserSeeder extends Seeder
         foreach ($arr as $key => $value) {
             User::create($value);
         }
+        //Aproveitando para incluir dados padroes para os processos de licitações
+        DB::table('bidding_categories')->insert(['name' => 'Pregão', 'name' => 'Concorrência', 'name' => 'Tomada de preço']);
+        DB::table('bidding_phases')->insert(['name' => 'Aberto', 'name' => 'Finalizado']);
     }
 }

@@ -14,7 +14,18 @@ class MenuSeeder extends Seeder
      */
     public function run()
     {
+        DB::table('menus')->truncate();
         DB::table('menus')->insert([
+
+            [
+                'categoria'=>'',
+                'description'=>'Painel',
+                'icon'=>'fa fa-tachometer-alt',
+                'actived'=>true,
+                'url'=>'painel',
+                'route'=>'home.admin',
+                'pai'=>''
+            ],
             [
                 'categoria'=>'MÓDULOS',
                 'description'=>'Postagens do Site',
@@ -77,6 +88,60 @@ class MenuSeeder extends Seeder
                 'url'=>'sic',
                 'route'=>'admin.sic.config',
                 'pai'=>'admin.sic'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Licitações',
+                'icon'=>'fas fa-gavel',
+                'actived'=>true,
+                'url'=>'licitacoes',
+                'route'=>'',
+                'pai'=>''
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Processos',
+                'icon'=>'fas fa-list',
+                'actived'=>true,
+                'url'=>'biddings',
+                'route'=>'biddings.index',
+                'pai'=>'licitacoes'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Categorias',
+                'icon'=>'fas fa-list',
+                'actived'=>true,
+                'url'=>'biddings_categories',
+                'route'=>'biddings_categories.index',
+                'pai'=>'licitacoes'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Fases',
+                'icon'=>'fas fa-list',
+                'actived'=>true,
+                'url'=>'biddings_phases',
+                'route'=>'biddings_phases.index',
+                'pai'=>'licitacoes'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Modalidade',
+                'icon'=>'fas fa-list',
+                'actived'=>true,
+                'url'=>'biddings_genres',
+                'route'=>'biddings_genres.index',
+                'pai'=>'licitacoes'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Tipos',
+                'icon'=>'fas fa-list',
+                'actived'=>true,
+                'url'=>'biddings_types',
+                'route'=>'biddings_types.index',
+                'pai'=>'licitacoes'
             ],
             [
                 'categoria'=>'SISTEMA',

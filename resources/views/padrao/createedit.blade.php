@@ -29,30 +29,32 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Arquivos</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                      <i class="fas fa-minus"></i>
-                    </button>
+    @if (isset($value['token']))
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Arquivos</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {{App\Qlib\Qlib::gerUploadAquivos([
+                        'pasta'=>$config['route'].'/'.date('Y').'/'.date('m'),
+                        'token_produto'=>isset($value['token'])?$value['token']:false,
+                        'tab'=>$config['route'],
+                        'listFiles'=>@$listFiles,
+                        'routa'=>@$config['route'],
+                        'url'=>@$config['url'],
+                        'arquivos'=>@$config['arquivos'],
+                        'typeN'=>@$config['typeN'],
+                    ])}}
                 </div>
             </div>
-            <div class="card-body">
-                {{App\Qlib\Qlib::gerUploadAquivos([
-                    'pasta'=>$config['route'].'/'.date('Y').'/'.date('m'),
-                    'token_produto'=>$value['token'],
-                    'tab'=>$config['route'],
-                    'listFiles'=>@$listFiles,
-                    'routa'=>@$config['route'],
-                    'url'=>@$config['url'],
-                    'arquivos'=>@$config['arquivos'],
-                    'typeN'=>@$config['typeN'],
-                ])}}
-            </div>
         </div>
-    </div>
+    @endif
 </div>
 @stop
 

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class BiddingsController extends Controller
 {
@@ -17,13 +18,15 @@ class BiddingsController extends Controller
     public $routa;
     public $label;
     public $view;
-    public function __construct(User $user)
+    public $tab;
+    public function __construct(Request $request)
     {
         $this->middleware('auth');
-        $this->user = $user;
-        $this->routa = 'biddings';
-        $this->label = 'Biddings';
-        $this->view = 'padrao';
+        $this->user     = Auth::user();
+        $this->routa    = 'biddings';
+        $this->label    = 'processos';
+        $this->view     = 'admin.padrao';
+        $this->tab      = 'biddings';
     }
     public function queryBiddings($get=false,$config=false)
     {
@@ -36,12 +39,10 @@ class BiddingsController extends Controller
             'limit'=>isset($get['limit']) ? $get['limit']: 50,
             'order'=>isset($get['order']) ? $get['order']: 'desc',
         ];
-
-        $biddings =  Biddings::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        $biddings = Biddings::where('excluido','=','n')->orderBy('id',$config['order']);
         //$biddings =  DB::table('biddings')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
-
-        $escolaridade_totais = new stdClass;
-        $campos = isset($_SESSION['campos_escolaridades_exibe']) ? $_SESSION['campos_escolaridades_exibe'] : $this->campos();
+        $biddings_totais = new stdClass;
+        $campos = $this->campos();
         $tituloTabela = 'Lista de todos cadastros';
         $arr_titulo = false;
         if(isset($get['filter'])){
@@ -78,34 +79,97 @@ class BiddingsController extends Controller
         }else{
             $biddings = $biddings->paginate($config['limit']);
         }
-        $escolaridade_totais->todos = $registros->count();
-        $escolaridade_totais->esteMes = $novos->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
-        $escolaridade_totais->ativos = $ativos->where('active','=','s')->count();
-        $escolaridade_totais->inativos = $inativos->where('active','=','n')->count();
+        $biddings_totais->todos = $registros->count();
+        $biddings_totais->esteMes = $novos->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
+        $biddings_totais->ativos = $ativos->where('active','=','s')->count();
+        $biddings_totais->inativos = $inativos->where('active','=','n')->count();
         $ret['Biddings'] = $biddings;
-        $ret['escolaridade_totais'] = $escolaridade_totais;
+        $ret['biddings_totais'] = $biddings_totais;
         $ret['arr_titulo'] = $arr_titulo;
         $ret['campos'] = $campos;
         $ret['config'] = $config;
         $ret['tituloTabela'] = $tituloTabela;
         $ret['config']['resumo'] = [
-            'todos_registro'=>['label'=>'Todos cadastros','value'=>$escolaridade_totais->todos,'icon'=>'fas fa-calendar'],
-            'todos_mes'=>['label'=>'Cadastros recentes','value'=>$escolaridade_totais->esteMes,'icon'=>'fas fa-calendar-times'],
-            'todos_ativos'=>['label'=>'Cadastros ativos','value'=>$escolaridade_totais->ativos,'icon'=>'fas fa-check'],
-            'todos_inativos'=>['label'=>'Cadastros inativos','value'=>$escolaridade_totais->inativos,'icon'=>'fas fa-archive'],
+            'todos_registro'=>['label'=>'Todos cadastros','value'=>$biddings_totais->todos,'icon'=>'fas fa-calendar'],
+            'todos_mes'=>['label'=>'Cadastros recentes','value'=>$biddings_totais->esteMes,'icon'=>'fas fa-calendar-times'],
+            'todos_ativos'=>['label'=>'Cadastros ativos','value'=>$biddings_totais->ativos,'icon'=>'fas fa-check'],
+            'todos_inativos'=>['label'=>'Cadastros inativos','value'=>$biddings_totais->inativos,'icon'=>'fas fa-archive'],
         ];
         return $ret;
     }
-    public function campos(){
+    public function campos($id=null){
+        $biddings_categories = new BiddingCategoriesController();
+        $biddings_phases = new DefaultController(['route'=>'biddings_phases']);
+        $biddings_genres = new DefaultController(['route'=>'biddings_genres']);
+        $biddings_types = new DefaultController(['route'=>'biddings_types']);
+        $tambcampos = 12; //6
+        $tambcampos1 = 12;
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'nome'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Ensino médio completo','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            'ativo'=>['label'=>'Ativado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'indentifier'=>['label'=>'Número do processo (Ano+N.°Processo)','active'=>true,'placeholder'=>'Processo','type'=>'number','exibe_busca'=>'d-block','event'=>'required','tam'=>$tambcampos,'validate'=>['required']],
+            'title'=>['label'=>'Título','active'=>true,'placeholder'=>'Título','type'=>'text','exibe_busca'=>'d-block','event'=>'required','tam'=>$tambcampos,'validate'=>['required','string', Rule::unique($this->tab)->ignore($id)]],
+            'subtitle'=>['label'=>'Subtítulo','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>$tambcampos],
+            'bidding_category_id'=>[
+                'label'=>'Categoria',
+                'active'=>true,
+                'type'=>'selector',
+                'data_selector'=>[
+                    'campos'=>$biddings_categories->campos(),
+                    'route_index'=>route('biddings_categories.index'),
+                    'id_form'=>'frm-biddings_categories',
+                    'action'=>route('biddings_categories.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'name',
+                    'label'=>'Categoria',
+                ],'arr_opc'=>Qlib::sql_array("SELECT id,name FROM bidding_categories WHERE ativo='s'",'name','id'),'exibe_busca'=>'d-block',
+                'event'=>'required',
+                //'event'=>'onchange=carregaMatricula($(this).val())',
+                'tam'=>$tambcampos,
+                'value'=>@$_GET['bidding_category_id'],
+            ],
+            'phase_id'=>[
+                'label'=>'Fase',
+                'active'=>true,
+                'type'=>'selector',
+                'data_selector'=>[
+                    'campos'=>$biddings_phases->campos(),
+                    'route_index'=>route('biddings_phases.index'),
+                    'id_form'=>'frm-biddings_phases',
+                    'action'=>route('biddings_phases.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'name',
+                    'label'=>'Fase',
+                ],'arr_opc'=>Qlib::sql_array("SELECT id,name FROM bidding_phases WHERE ativo='s'",'name','id'),'exibe_busca'=>'d-block',
+                'event'=>'required',
+                //'event'=>'onchange=carregaMatricula($(this).val())',
+                'tam'=>$tambcampos,
+                'value'=>@$_GET['phase_id'],
+            ],
+            'genre_id'=>[
+                'label'=>'Modalidade',
+                'active'=>true,
+                'type'=>'selector',
+                'data_selector'=>[
+                    'campos'=>$biddings_genres->campos(),
+                    'route_index'=>route('biddings_genres.index'),
+                    'id_form'=>'frm-biddings_genres',
+                    'action'=>route('biddings_genres.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'name',
+                    'label'=>'Modalidade',
+                ],'arr_opc'=>Qlib::sql_array("SELECT id,name FROM bidding_genres WHERE ativo='s'",'name','id'),'exibe_busca'=>'d-block',
+                'event'=>'required',
+                //'event'=>'onchange=carregaMatricula($(this).val())',
+                'tam'=>$tambcampos,
+                'value'=>@$_GET['genre_id'],
+            ],
+            'opening'=>['label'=>'Data de abertura','active'=>true,'placeholder'=>'','type'=>'datetime-local','exibe_busca'=>'d-block','event'=>'','tam'=>$tambcampos,'validate'=>['required']],
+            'object'=>['label'=>'Objeto','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>$tambcampos1],
+            'active'=>['label'=>'publicado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
         ];
     }
-    public function index(User $user)
+    public function index()
     {
         $this->authorize('ler', $this->routa);
         $title = 'Cadastro de Biddings';
@@ -118,7 +182,7 @@ class BiddingsController extends Controller
             'title'=>$title,
             'titulo'=>$titulo,
             'campos_tabela'=>$queryBiddings['campos'],
-            'escolaridade_totais'=>$queryBiddings['escolaridade_totais'],
+            'biddings_totais'=>$queryBiddings['biddings_totais'],
             'titulo_tabela'=>$queryBiddings['tituloTabela'],
             'arr_titulo'=>$queryBiddings['arr_titulo'],
             'config'=>$queryBiddings['config'],
@@ -135,6 +199,8 @@ class BiddingsController extends Controller
         $config = [
             'ac'=>'cad',
             'frm_id'=>'frm-biddings',
+            'tam_col1'=>'col-md-10',
+            'tam_col2'=>'col-md-2',
             'route'=>$this->routa,
         ];
         $value = [
@@ -151,15 +217,23 @@ class BiddingsController extends Controller
     }
     public function store(Request $request)
     {
+        $campos = $this->campos();
         $this->authorize('create', $this->routa);
-        $validatedData = $request->validate([
-            'nome' => ['required','string','unique:biddings'],
-        ]);
+        $arr_validate = array();
+        if(is_array($campos)){
+            foreach ($campos as $k => $value) {
+                if(isset($value['validate'])){
+                    $arr_validate[$k] = $value['validate'];
+                }
+            }
+        }
+        if(count($arr_validate)>0){
+            $validatedData = $request->validate($arr_validate);
+        }
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
-        $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
-
-        //dd($dados);
+        $dados['active'] = isset($dados['active'])?$dados['active']:0;
+        $dados['excluido'] = isset($dados['excluido'])?$dados['excluido']:'n';
         $salvar = Biddings::create($dados);
         $route = $this->routa.'.index';
         $ret = [
@@ -190,9 +264,8 @@ class BiddingsController extends Controller
         $dados = Biddings::where('id',$id)->get();
         $routa = 'biddings';
         $this->authorize('ler', $this->routa);
-
         if(!empty($dados)){
-            $title = 'Editar cadastro de Biddings';
+            $title = 'Editar cadastro de '.$this->label;
             $titulo = $title;
             $dados[0]['ac'] = 'alt';
             if(isset($dados[0]['config'])){
@@ -207,6 +280,8 @@ class BiddingsController extends Controller
                 'ac'=>'alt',
                 'frm_id'=>'frm-biddings',
                 'route'=>$this->routa,
+                'tam_col1'=>'col-md-6',
+                'tam_col2'=>'col-md-6',
                 'id'=>$id,
             ];
 
@@ -219,7 +294,6 @@ class BiddingsController extends Controller
                 'campos'=>$campos,
                 'exec'=>true,
             ];
-
             return view($this->view.'.createedit',$ret);
         }else{
             $ret = [
@@ -232,9 +306,17 @@ class BiddingsController extends Controller
     public function update(Request $request, $id)
     {
         $this->authorize('update', $this->routa);
-        $validatedData = $request->validate([
-            'nome' => ['required'],
-        ]);
+        $campos = $this->campos($id);
+        if(is_array($campos)){
+            foreach ($campos as $k => $value) {
+                if(isset($value['validate'])){
+                    $arr_validate[$k] = $value['validate'];
+                }
+            }
+        }
+        if(count($arr_validate)>0){
+            $validatedData = $request->validate($arr_validate);
+        }
         $data = [];
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
@@ -254,8 +336,9 @@ class BiddingsController extends Controller
             }
         }
         $userLogadon = Auth::id();
-        $data['ativo'] = isset($data['ativo'])?$data['ativo']:'n';
-        $data['autor'] = $userLogadon;
+
+        $data['active'] = isset($data['active'])?$data['active']:'n';
+        $data['author_id'] = $userLogadon;
         if(isset($dados['config'])){
             $dados['config'] = Qlib::lib_array_json($dados['config']);
         }

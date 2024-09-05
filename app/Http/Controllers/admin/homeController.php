@@ -20,7 +20,7 @@ class HomeController extends Controller
     public $routa;
     public function __construct()
     {
-        // $this->middleware('auth');
+        $this->middleware('auth');
         $this->user = Auth::user();
         $this->tab = 'home';
         $this->title = 'Dashboard ' ;
@@ -58,7 +58,7 @@ class HomeController extends Controller
             // 'mapa'=>$dadosMp,
             // 'totalDecretos'=>$totalDecretos,
         ];
-        dd($request->all());
+        // dd($request->all());
         return view('home',[
             'config'=>$config,
         ]);

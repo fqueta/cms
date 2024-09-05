@@ -13,20 +13,26 @@ return new class extends Migration
     {
         Schema::create('biddings', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('genre_id');
-            $table->integer('phase_id');
-            $table->string('title', 255);
-            $table->string('subtitle', 255);
-            $table->string('indentifier', 255);
-            $table->text('description');
-            $table->string('object', 255);
-            $table->integer('order');
-            $table->integer('bidding_category_id');
-            $table->integer('type_id');
-            $table->boolean('active');
-            $table->string('type_doc',200);
+            $table->integer('genre_id')->nullable();
+            $table->integer('phase_id')->nullable();
+            $table->string('title', 255)->nullable();
+            $table->string('subtitle', 255)->nullable();
+            $table->string('indentifier', 255)->nullable();
+            $table->text('description')->nullable();
+            $table->string('object', 255)->nullable();
+            $table->integer('order')->nullable();
+            $table->integer('bidding_category_id')->nullable();
+            $table->integer('type_id')->nullable();
+            $table->integer('author_id')->nullable();
+            $table->enum('active',['s','n']);
+            $table->string('type_doc',200)->nullable();
             $table->dateTime('opening');
-            $table->timestamps();});
+            // $table->enum('excluido',['n','s']);
+            // $table->text('reg_excluido')->nullable();
+            // $table->enum('deletado',['n','s']);
+            // $table->text('reg_deletado')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**

@@ -11,6 +11,8 @@ class BiddingCategory extends Model
     protected $table = 'bidding_categories';
     protected $fillable = [
         'name',
+        'ativo',
+        'autor',
         'excluido',
         'deletado',
     ];

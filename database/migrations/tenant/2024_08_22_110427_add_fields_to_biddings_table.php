@@ -12,9 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('biddings', function (Blueprint $table) {
-            $table->enum('excluido',['n','s'])->after('opening');
-            $table->enum('deletado',['n','s'])->after('excluido');
-            $table->longtext('reg_exluido')->after('deletado')->nulable();
+
+
+            $table->string('token', 255)->nullable();
+            $table->json('config')->nullable();
+            $table->enum('excluido',['n','s'])->after('opening')->nullable();
+            $table->enum('deletado',['n','s'])->after('excluido')->nullable();
+            $table->longtext('reg_exluido')->after('deletado')->nullable();
         });
     }
 

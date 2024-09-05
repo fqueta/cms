@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateAttachmentsTable extends Migration
 {
@@ -14,7 +15,13 @@ class CreateAttachmentsTable extends Migration
     {
         Schema::create('attachments', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title', 255);
+            $table->string('title', 255)->nullable();
+            $table->integer('bidding_id')->nullable();
+            $table->string('file_file_name', 255)->nullable();
+            $table->integer('file_file_size')->nullable();
+            $table->string('file_content_type', 255)->nullable();
+            // $table->string('file_updated_at', 255)->nullable();
+            $table->integer('order')->nullable();
             $table->timestamps();
         });
     }

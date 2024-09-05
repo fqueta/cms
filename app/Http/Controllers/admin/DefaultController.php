@@ -10,23 +10,35 @@ use App\Models\User;
 use App\Models\_upload;
 use App\Models\admin\BiddingCategory;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
-class BiddingCategoriesController extends Controller
+class DefaultController extends Controller
 {
     protected $user;
     public $routa;
     public $label;
+    public $tab;
     public $view;
-    public function __construct()
+    public function __construct($config=[])
     {
-        $this->middleware('auth');
         $user = Auth::user();
+        $this->middleware('auth');
         $this->user = $user;
-        $this->routa = 'biddings_categories';
-        $this->label = 'Biddings_categories';
+        $routeName = isset($config['route']) ? $config['route'] : false;
+        $routeName = $routeName?$routeName: explode('.',request()->route()->getName())[0];
+        $this->routa = $routeName;
+        $arr_cf = [
+            'biddings_phases'=>['label'=>'Fases','tab'=>'bidding_phases'],
+            'biddings_genres'=>['label'=>'Fases','tab'=>'bidding_genres'],
+            'biddings_types'=>['label'=>'Fases','tab'=>'bidding_types'],
+        ];
+        $this->label = $arr_cf[$this->routa]['label'];
+        $this->tab = $arr_cf[$this->routa]['tab'];
+        // $this->dbtab = DB::table($this->tab);
         $this->view = 'admin.padrao';
     }
-    public function queryBiddings_categories($get=false,$config=false)
+    public function queryDefault($get=false,$config=false)
     {
 
         $ret = false;
@@ -39,11 +51,11 @@ class BiddingCategoriesController extends Controller
             'order'=>isset($get['order']) ? $get['order']: 'desc',
         ];
 
-        $biddings_categories =  BiddingCategory::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
-        //$biddings_categories =  DB::table('biddings_categories')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        // $biddings_categories =  BiddingCategory::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        $biddings_categories =  DB::table($this->tab)->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
         $escolaridade_totais = new stdClass;
-        $campos = isset($_SESSION['campos_escolaridades_exibe']) ? $_SESSION['campos_escolaridades_exibe'] : $this->campos();
+        $campos = $this->campos();
         $tituloTabela = 'Lista de todos cadastros';
         $arr_titulo = false;
         if(isset($get['filter'])){
@@ -84,7 +96,7 @@ class BiddingCategoriesController extends Controller
         $escolaridade_totais->esteMes = $novos->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
         $escolaridade_totais->ativos = $ativos->where('ativo','=','s')->count();
         $escolaridade_totais->inativos = $inativos->where('ativo','=','n')->count();
-        $ret['Biddings_categories'] = $biddings_categories;
+        $ret['Defaulf'] = $biddings_categories;
         $ret['escolaridade_totais'] = $escolaridade_totais;
         $ret['arr_titulo'] = $arr_titulo;
         $ret['campos'] = $campos;
@@ -98,35 +110,50 @@ class BiddingCategoriesController extends Controller
         ];
         return $ret;
     }
-    public function campos(){
-        return [
-            'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            // 'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'autor'=>['label'=>'autor','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'name'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Saúde','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            'ativo'=>['label'=>'Ativado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            // 'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-        ];
+    /**
+     * Metodo para sanitizar dados nele inicialmente aproveitamos para remover alguns campos que não temos no banco de dados
+     */
+    public function sanitizeDados($dados){
+        $ret = array();
+        if(is_array($dados)){
+            unset($dados['_token'],$dados['ajax']);
+            $ret = $dados;
+        }
+        return $ret;
+    }
+    public function campos($id=null){
+        if($this->routa=='biddings_phases' || $this->routa=='biddings_types' || $this->routa=='biddings_genres'){
+            return [
+                'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                // 'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'autor'=>['label'=>'autor','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'name'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Suspenso','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12','validate'=>['required','string',Rule::unique($this->tab)->ignore($id)]],
+                'ativo'=>['label'=>'Ativado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+                // 'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            ];
+        }else{
+
+        }
     }
     public function index(Request $request)
     {
         $this->authorize('ler', $this->routa);
-        $title = __('Cadastro de categorias');
+        $title = __('Cadastro de ').$this->label;
         $titulo = $title;
-        $queryBiddings_categories = $this->queryBiddings_categories($_GET);
-        $queryBiddings_categories['config']['exibe'] = 'html';
+        $queryDefault = $this->queryDefault($_GET);
+        $queryDefault['config']['exibe'] = 'html';
         $routa = $this->routa;
         // dump($this->view);
-        // dd($queryBiddings_categories);
+        // dd($queryDefault);
         return view($this->view.'.index',[
-            'dados'=>$queryBiddings_categories['Biddings_categories'],
+            'dados'=>$queryDefault['Defaulf'],
             'title'=>$title,
             'titulo'=>$titulo,
-            'campos_tabela'=>$queryBiddings_categories['campos'],
-            'escolaridade_totais'=>$queryBiddings_categories['escolaridade_totais'],
-            'titulo_tabela'=>$queryBiddings_categories['tituloTabela'],
-            'arr_titulo'=>$queryBiddings_categories['arr_titulo'],
-            'config'=>$queryBiddings_categories['config'],
+            'campos_tabela'=>$queryDefault['campos'],
+            'escolaridade_totais'=>$queryDefault['escolaridade_totais'],
+            'titulo_tabela'=>$queryDefault['tituloTabela'],
+            'arr_titulo'=>$queryDefault['arr_titulo'],
+            'config'=>$queryDefault['config'],
             'routa'=>$routa,
             'view'=>$this->view,
             'i'=>0,
@@ -157,26 +184,47 @@ class BiddingCategoriesController extends Controller
     }
     public function store(Request $request)
     {
+        $campos = $this->campos();
         $this->authorize('create', $this->routa);
-        $validatedData = $request->validate([
-            'name' => ['required','string','unique:bidding_categories'],
-        ]);
+        $arr_validate = array();
+        if(is_array($campos)){
+            foreach ($campos as $k => $value) {
+                if(isset($value['validate'])){
+                    $arr_validate[$k] = $value['validate'];
+                }
+            }
+        }
+        if(count($arr_validate)>0){
+            $validatedData = $request->validate($arr_validate);
+        }
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
-        $salvar = BiddingCategory::create($dados);
-        $route = $this->routa.'.index';
+        //remover variaveis que não tenham um campo no banco de dados
+        $dados = $this->sanitizeDados($dados);
+        $reg_id = DB::table($this->tab)->insertGetId($dados);
+        if($reg_id){
+            $color = 'success';
+            $idCad = $reg_id;
+            $exec = true;
+            $route = $this->routa.'.index';
+        }else{
+            $color = 'danger';
+            $idCad = 0;
+            $exec = false;
+
+        }
         $ret = [
             'mens'=>$this->label.' cadastrada com sucesso!',
-            'color'=>'success',
-            'idCad'=>$salvar->id,
-            'exec'=>true,
+            'color'=>$color,
+            'idCad'=>$idCad,
+            'exec'=>$exec,
             'dados'=>$dados
         ];
 
         if($ajax=='s'){
-            $ret['return'] = route($route).'?idCad='.$salvar->id;
-            $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
+            $ret['return'] = route($route).'?idCad='.$idCad;
+            $ret['redirect'] = route($this->routa.'.edit',['id'=>$idCad]);
             return response()->json($ret);
         }else{
             return redirect()->route($route,$ret);
@@ -188,14 +236,14 @@ class BiddingCategoriesController extends Controller
         //
     }
 
-    public function edit($biddings_categories,User $user)
+    public function edit($id)
     {
-        $id = $biddings_categories;
-        $dados = BiddingCategory::where('id',$id)->get();
-        $routa = 'biddings_categories';
-        $this->authorize('ler', $this->routa);
-
-        if(!empty($dados)){
+        $routa = $this->routa;
+        $this->authorize('ler', $routa);
+        $dados = DB::table($this->tab)->where('id',$id)->get()->toArray();
+        if(isset($dados[0]) && !empty($dados[0])){
+            $dados[0] = (array)$dados[0];
+            // dd($dados[0]);
             $title = __('Editar cadastro d)e categorias');
             $titulo = $title;
             $dados[0]['ac'] = 'alt';
@@ -236,9 +284,21 @@ class BiddingCategoriesController extends Controller
     public function update(Request $request, $id)
     {
         $this->authorize('update', $this->routa);
-        $validatedData = $request->validate([
-            'name' => ['required'],
-        ]);
+        $campos = $this->campos($id);
+        if(is_array($campos)){
+            foreach ($campos as $k => $value) {
+                if(isset($value['validate'])){
+                    $arr_validate[$k] = $value['validate'];
+                }
+            }
+        }
+        if(count($arr_validate)>0){
+            $validatedData = $request->validate($arr_validate);
+        }
+
+        // $validatedData = $request->validate([
+        //     'nome' => ['required'],
+        // ]);
         $data = [];
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
@@ -265,7 +325,7 @@ class BiddingCategoriesController extends Controller
         }
         $atualizar=false;
         if(!empty($data)){
-            $atualizar=BiddingCategory::where('id',$id)->update($data);
+            $atualizar=DB::table($this->tab)->where('id',$id)->update($data);
             $route = $this->routa.'.index';
             $ret = [
                 'exec'=>$atualizar,
@@ -297,8 +357,10 @@ class BiddingCategoriesController extends Controller
         $this->authorize('delete', $this->routa);
         $config = $request->all();
         $ajax =  isset($config['ajax'])?$config['ajax']:'n';
+        $qli = Qlib::qoption('lixeira');
+        $lixeira = $qli ? $qli : 's'; // verifica se a lixeira esta ativa s para sim e n para não
         $routa = $this->routa;
-        if (!$post = BiddingCategory::find($id)){
+        if (!$reg = DB::table($this->tab)->find($id)){
             if($ajax=='s'){
                 $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route($this->routa.'.index')]);
             }else{
@@ -306,8 +368,12 @@ class BiddingCategoriesController extends Controller
             }
             return $ret;
         }
-
-        BiddingCategory::where('id',$id)->delete();
+        if($lixeira =='s'){
+            $reg_excluido = ['data'=>date('d-m-Y H:i:s'),'autor'=>$id];
+            DB::table($this->tab)->where('id',$id)->update(['excluido'=>'s','reg_excluido'=>Qlib::lib_array_json($reg_excluido)]);
+        }else{
+            DB::table($this->tab)->where('id',$id)->delete();
+        }
         if($ajax=='s'){
             $ret = response()->json(['mens'=>__('Registro '.$id.' deletado com sucesso!'),'color'=>'success','return'=>route($this->routa.'.index')]);
         }else{
