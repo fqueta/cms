@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 class Post extends Model
 {
     use HasFactory,Notifiable;
-    protected $table = 'wp_posts';
+    protected $table = 'posts';
     const CREATED_AT = 'post_date';
     const UPDATED_AT = 'post_modified';
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\admin\AttachmentsController;
 use App\Http\Controllers\portal\sicController;
 use App\Models\Familia;
 use App\Models\User;
@@ -41,17 +42,19 @@ class TesteController extends Controller
         //$ret = Qlib::redirectLogin();
         //$dados = DB::connection('mysql_ger')->table('contas_usuarios')->where('dominio','=','https://demo.ctloja.com.br/')->get();
         //dd(Qlib::dominio());
-        $dados = Qlib::dados_tab_SERVER('contas_usuarios');
-        dd($dados);
-       //dd(base_path().'/');
-       //$user = Auth::user();
-        //$doc = new LotesController($user);
-        $lote = isset($_GET['lote'])?$_GET['lote']:201;
-        $oc = isset($_GET['oc'])?$_GET['oc']:289;
-        $config = [
-            //'docs'=>$doc->fichaOcupante($lote,$oc),
-        ];
-        return view('teste',$config);
+    //     $dados = Qlib::dados_tab_SERVER('contas_usuarios');
+    //     dd($dados);
+    //    //dd(base_path().'/');
+    //    //$user = Auth::user();
+    //     //$doc = new LotesController($user);
+    //     $lote = isset($_GET['lote'])?$_GET['lote']:201;
+    //     $oc = isset($_GET['oc'])?$_GET['oc']:289;
+    //     $config = [
+    //         //'docs'=>$doc->fichaOcupante($lote,$oc),
+    //     ];
+        $ret = (new AttachmentsController)->update_attachmeta(4,'pa','josequeta');
+        dd($ret);
+        // return view('teste',$config);
     }
     public function ajax(){
         $limit = isset($_GET['limit']) ?$_GET['limit'] : 50;

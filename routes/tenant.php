@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\HomeController;
 use App\Http\Controllers\EtapaController;
 use App\Http\Controllers\portal\sicController;
 use App\Http\Controllers\portalController;
+use App\Http\Controllers\TesteController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -160,7 +161,7 @@ Route::middleware([
         // Route::resource('/posts/order', 'PostsController@postSort');
         // Route::resource('/diaries', 'DiariesController', ['except' => ['show']]);
         // Route::resource('/docs', 'docsController', ['except' => ['show']]);
-        // Route::get('/test', 'testController@index');
+        Route::get('/test', [TesteController::class,'index']);
         Route::resource('/docfile', '\App\Http\Controllers\admin\DocfileController',['parameters' => [
             'docfile' => 'id'
         ]]);

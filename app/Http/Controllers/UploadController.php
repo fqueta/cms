@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\admin\AttachmentsController;
+use App\Http\Controllers\admin\BiddingsController;
 use App\Http\Controllers\wp\ApiWpController;
 use App\Models\_upload;
+use App\Models\admin\attachment;
+use App\Models\admin\Biddings;
 use App\Models\Post;
 use App\Qlib\Qlib;
 use Facade\FlareClient\Http\Response;
@@ -18,26 +22,31 @@ class UploadController extends Controller
     public function __construct()
     {
         $this->i_wp = Qlib::qoption('i_wp');//indegração com Wp s para sim
-        $this->wp_api = new ApiWpController();
+        // $this->wp_api = new ApiWpController();
         $this->url = 'uploads';
     }
     public function index(Request $request)
     {
+
         $ret['exec'] = false;
         $arquivos = false;
         if($request->has('token_produto')){
             $id=$request->get('token_produto');
-            $dados = Post::where('id',$id)->get();
-            if($this->i_wp=='s' && $dados->count()>0){
-                $dadosApi = $this->wp_api->list([
-                    'params'=>'/'.$dados[0]['post_name'].'?_type='.$dados[0]['post_type'],
-                ]);
-                if(isset($dadosApi['arr']['arquivos'])){
-                    $arquivos = $dadosApi['arr']['arquivos'];
+            // $dados = Post::where('id',$id)->get();
+            // if($this->i_wp=='s' && $dados->count()>0){
+            //     $dadosApi = $this->wp_api->list([
+            //         'params'=>'/'.$dados[0]['post_name'].'?_type='.$dados[0]['post_type'],
+            //     ]);
+            //     if(isset($dadosApi['arr']['arquivos'])){
+            //         $arquivos = $dadosApi['arr']['arquivos'];
+            //     }
+            // }else{
+                if($request->has('local') && $request->get('local')=='biddings'){
+                    $arquivos = (new BiddingsController)->list_files($id);
+                }else{
+                    $arquivos = _upload::where('token_produto','=',$id)->get();
                 }
-            }else{
-                $arquivos = _upload::where('token_produto','=',$id)->get();
-            }
+            // }
             if($arquivos){
                 $ret['exec'] = true;
                 $ret['arquivos'] = $arquivos;
@@ -45,7 +54,6 @@ class UploadController extends Controller
         }
         return response()->json($ret);
     }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -65,12 +73,15 @@ class UploadController extends Controller
         // Get just ext
         $extension = $file->getClientOriginalExtension();
         // Filename to store
+        $tab_storage = isset($request->tab_storage) ? $request->tab_storage : false;
         $typeN = isset($request->typeN) ? $request->typeN : 1;
         if($typeN==1){
             $fileNameToStore= $filename.'_'.time().'.'.$extension;
         }else{
             $fileNameToStore= $filename.'.'.$extension;
         }
+        $size = $file->getSize();
+        $mimeType = $file->getClientMimeType();
         $arquivos = isset($request->arquivos) ? $request->arquivos : 'jpg,jpeg,png,zip,pdf,PDF';
         if($arquivos){
             $arr_extension = explode(',',$arquivos);
@@ -78,24 +89,52 @@ class UploadController extends Controller
         //if($extension=='jpg' || $extension=='jpeg' || $extension=='png' || $extension=='zip' || $extension=='pdf' || $extension=='PDF'){
         if(in_array($extension,$arr_extension)){
             $dados = $request->all();
-            $token_produto = $dados['token_produto'];
-            $ultimoValor = _upload::where('token_produto','=',$token_produto)->max('ordem');
-            $ordem = $ultimoValor ? $ultimoValor : 0;
-            $ordem++;
-            $pasta = $dados['pasta'];
-            $nomeArquivoSavo = $file->storeAs($pasta,$fileNameToStore);
-            $exec = false;
-            $salvar = false;
             $local = isset($dados['local'])?$dados['local']:false;
-            if($nomeArquivoSavo){
-                $exec = true;
-                $salvar = _upload::create([
-                    'token_produto'=>$token_produto,
-                    'pasta'=>$nomeArquivoSavo,
-                    'ordem'=>$ordem,
-                    'nome'=>$filenameWithExt,
-                    'config'=>json_encode(['extenssao'=>$extension,'local'=>$local]),
-                ]);
+            if($local=='attachments'){
+                $bidding_id = $dados['bidding_id'];
+                $ultimoValor = attachment::where('bidding_id','=',$bidding_id)->max('order');
+                $ordem = $ultimoValor ? $ultimoValor : 0;
+                $ordem++;
+                $pasta = $dados['pasta'];
+                $title = explode('.',$fileNameToStore)[0];
+                $nomeArquivoSavo = $file->storeAs($pasta,$fileNameToStore);
+                $exec = false;
+                $salvar = false;
+                if($nomeArquivoSavo){
+                    $exec = true;
+                    $salvar = attachment::create([
+                        'bidding_id'=>$bidding_id,
+                        'title'=>$title,
+                        'file_file_size'=>$size,
+                        'order'=>$ordem,
+                        'file_file_name'=>$filenameWithExt,
+                        'file_content_type'=>$mimeType,
+                        // 'config'=>json_encode(['extenssao'=>$extension,'local'=>$local]),
+                    ]);
+                    if(isset($salvar->id) && $salvar->id>0){
+                        // dd($salvar,$nomeArquivoSavo);
+                        $metasave = (new AttachmentsController)->update_attachmeta($salvar->id,'file_path',$nomeArquivoSavo);
+                    }
+                }
+            }else{
+                $token_produto = $dados['token_produto'];
+                $ultimoValor = _upload::where('token_produto','=',$token_produto)->max('ordem');
+                $ordem = $ultimoValor ? $ultimoValor : 0;
+                $ordem++;
+                $pasta = $dados['pasta'];
+                $nomeArquivoSavo = $file->storeAs($pasta,$fileNameToStore);
+                $exec = false;
+                $salvar = false;
+                if($nomeArquivoSavo){
+                    $exec = true;
+                    $salvar = _upload::create([
+                        'token_produto'=>$token_produto,
+                        'pasta'=>$nomeArquivoSavo,
+                        'ordem'=>$ordem,
+                        'nome'=>$filenameWithExt,
+                        'config'=>json_encode(['extenssao'=>$extension,'local'=>$local]),
+                    ]);
+                }
             }
             //$lista = _upload::where('token_produto','=',$token_produto)->get();
             if($salvar){

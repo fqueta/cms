@@ -9,6 +9,7 @@ use App\Models\_upload;
 use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\admin\attachment;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -19,13 +20,13 @@ class BiddingsController extends Controller
     public $label;
     public $view;
     public $tab;
-    public function __construct(Request $request)
+    public function __construct()
     {
         $this->middleware('auth');
         $this->user     = Auth::user();
         $this->routa    = 'biddings';
         $this->label    = 'processos';
-        $this->view     = 'admin.padrao';
+        $this->view     = 'admin.biddings';
         $this->tab      = 'biddings';
     }
     public function queryBiddings($get=false,$config=false)
@@ -274,7 +275,7 @@ class BiddingsController extends Controller
             $listFiles = false;
             $campos = $this->campos();
             if(isset($dados[0]['token'])){
-                $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
+                $listFiles = attachment::where('bidding_id','=',$dados[0]['id'])->get();
             }
             $config = [
                 'ac'=>'alt',
@@ -283,6 +284,11 @@ class BiddingsController extends Controller
                 'tam_col1'=>'col-md-6',
                 'tam_col2'=>'col-md-6',
                 'id'=>$id,
+                'bidding_id'=>$id,
+                'pasta'=>'/biddings/'.date('Y').'/'.date('m'),
+                'local'=>'attachments', //a tabela de armazenandmo dos arquivos
+                'token_produto'=>$dados[0]['token'],
+                'arquivos'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg',
             ];
 
             $ret = [
@@ -394,4 +400,22 @@ class BiddingsController extends Controller
         }
         return $ret;
     }
+    /**
+     * Metodo para listar todos os arquivos das licitações
+     */
+    public function list_files($bidding_id){
+        $ret = [];
+        if($bidding_id){
+            $files = attachment::where('bidding_id','=',$bidding_id)->get();
+            if($files->count() > 0){
+                $ac = new AttachmentsController;
+                foreach ($files as $kf => $vf) {
+                    $ret[$kf] = $vf;
+                    $ret[$kf]['file_path'] = $ac->get_attachmeta($vf['id'],'file_path');
+                }
+            }
+        }
+        return $ret;
+    }
+
 }

@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    @if (isset($value['token']))
+    @if (isset($value['id']) && $value['id']>0)
         <div class="{{$tam_col2}}">
             <div class="card">
                 <div class="card-header">
@@ -46,7 +46,8 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    {{App\Qlib\Qlib::gerUploadAquivos([
+                    @include('admin.biddings.attachments')
+                    {{-- {{App\Qlib\Qlib::gerUploadAquivos([
                         'pasta'=>$config['route'].'/'.date('Y').'/'.date('m'),
                         'token_produto'=>isset($value['token'])?$value['token']:false,
                         'tab'=>$config['route'],
@@ -55,7 +56,7 @@
                         'url'=>@$config['url'],
                         'arquivos'=>@$config['arquivos'],
                         'typeN'=>@$config['typeN'],
-                    ])}}
+                    ])}} --}}
                 </div>
             </div>
         </div>

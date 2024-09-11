@@ -825,19 +825,6 @@ class Qlib
         }
         return $ret;
     }
-    /*
-    static function salvarAlterar($config = null)
-    {
-        $ret = false;
-        if(isset($config['tab'])&&isset($config['dados']&&isset($config['where']))){
-            //consultar
-            $sqlFIl
-            $enc = DB::table($config['tab']);
-            //Se encontrar atualizar
-            //se não encontrar inserir novo registro
-        }
-        return $ret;
-    }*/
     /***
      * Busca um tipo de routa padrão do sistema
      * Ex.: routa que será aberta ao logar
@@ -1028,6 +1015,12 @@ class Qlib
         }
         return $ret;
     }
+    static function dataBanco(){
+        global $dtBanco;
+        $dtBanco = date('Y-m-d H:i:s', time());
+        return $dtBanco;
+    }
+
     static function get_client_ip() {
         $ipaddress = '';
         if (isset($_SERVER['HTTP_CLIENT_IP']))
@@ -1045,5 +1038,69 @@ class Qlib
         else
             $ipaddress = 'UNKNOWN';
         return $ipaddress;
+    }
+    /**
+     * Metodo buscar o post_id com o token
+     * @param string $token
+     * @return string $ret;
+     */
+    static function get_id_by_token($token)
+    {
+        if($token){
+            return Qlib::buscaValorDb0('posts','token',$token,'ID');
+        }
+    }
+    /**
+     * Metodo para salvar ou atualizar os meta posts
+     */
+    static function update_postmeta($post_id,$meta_key=null,$meta_value=null)
+    {
+        $ret = false;
+        $tab = 'postmeta';
+        if($post_id&&$meta_key&&$meta_value){
+            $verf = Qlib::totalReg($tab,"WHERE post_id='$post_id' AND meta_key='$meta_key'");
+            if($verf){
+                $ret=DB::table($tab)->where('post_id',$post_id)->where('meta_key',$meta_key)->update([
+                    'meta_value'=>$meta_value,
+                    'updated_at'=>self::dataBanco(),
+                ]);
+            }else{
+                $ret=DB::table($tab)->insert([
+                    'post_id'=>$post_id,
+                    'meta_value'=>$meta_value,
+                    'meta_key'=>$meta_key,
+                    'created_at'=>self::dataBanco(),
+                ]);
+            }
+            //$ret = DB::table($tab)->storeOrUpdate();
+        }
+        return $ret;
+    }
+
+    /**
+     * Metodo para pegar os meta posts
+     */
+    static function get_postmeta($post_id,$meta_key=null,$string=null)
+    {
+        $ret = false;
+        $tab = 'postmeta';
+        if($post_id){
+            if($meta_key){
+                $d = DB::table($tab)->where('post_id',$post_id)->where('meta_key',$meta_key)->get();
+                if($d->count()){
+                    if($string){
+                        $ret = $d[0]->meta_value;
+                    }else{
+                        $ret = [$d[0]->meta_value];
+                    }
+                }else{
+                    $post_id = self::get_id_by_token($post_id);
+                    if($post_id){
+                        $ret = self::get_postmeta($post_id,$meta_key,$string);
+                    }
+                }
+            }
+        }
+        return $ret;
     }
 }

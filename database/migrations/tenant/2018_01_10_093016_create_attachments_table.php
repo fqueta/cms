@@ -20,7 +20,7 @@ class CreateAttachmentsTable extends Migration
             $table->string('file_file_name', 255)->nullable();
             $table->integer('file_file_size')->nullable();
             $table->string('file_content_type', 255)->nullable();
-            // $table->string('file_updated_at', 255)->nullable();
+            // $table->json('file_config')->nullable();
             $table->integer('order')->nullable();
             $table->timestamps();
         });

@@ -504,6 +504,35 @@ function visualizaArquivos(token_produto,ajaxurl,painel){
         }
     });
 }
+function visualizaArquivos2(token_produto,ajaxurl,painel){
+    if(typeof painel=='undefined'){
+        painel = '';
+    }
+    $.ajax({
+        type: 'GET',
+        url: ajaxurl,
+        data: {
+            token_produto:token_produto,//ou post_id
+            local:'biddings',//ou post_id
+        },
+        dataType: 'json',
+        success: function (data) {
+
+          if(data.exec && data.arquivos){
+            var list = listFiles(data.arquivos,token_produto,painel);
+            $('#lista-files').html(list);
+            if(data.mens){
+              lib_formatMensagem('.mens',data.mens,'success');
+            }
+          }else{
+            lib_formatMensagem('.mens',data.mens,'danger');
+          }
+        },
+        error: function (data) {
+            console.log(data);
+        }
+    });
+}
 function listFiles(arquivos,token_produto,painel){
     if(typeof token_produto == 'undefined'){
         token_produto = '';
