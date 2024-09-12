@@ -3,6 +3,7 @@
 <!-- Button trigger modal -->
 <div class="row">
     <div class="col-md-12 mb-2">
+        <input type="hidden" id="dados-lista-files" value="{{$listFilesCode}}">
         <span id="lista-files">
             {{-- {{App\Qlib\Qlib::gerUploadAquivos([
                 'parte'=>'lista',
@@ -28,7 +29,6 @@
 
     </div>
 </div>
-
 
 <!-- Modal -->
 <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\admin\attachment;
 use App\Qlib\Qlib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +55,24 @@ class AttachmentsController extends Controller
                         $ret = [$d[0]->meta_value];
                     }
                 }
+            }
+        }
+        return $ret;
+    }
+    /**
+     * Metodo para atualizar
+     */
+    public function update(Request $request){
+        $d = $request->all();
+        $ret['exec'] = false;
+        $ret['mens'] = 'Erro ao salvar';
+        $ret['color'] = 'danger';
+        if(isset($d['id'])){
+            $salv = attachment::where('id', $d['id'])->update($d);
+            if($salv){
+                $ret['exec'] = true;
+                $ret['mens'] = 'Atualizado com sucesso';
+                $ret['color'] = 'success';
             }
         }
         return $ret;

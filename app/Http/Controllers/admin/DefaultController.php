@@ -26,15 +26,16 @@ class DefaultController extends Controller
         $this->middleware('auth');
         $this->user = $user;
         $routeName = isset($config['route']) ? $config['route'] : false;
-        $routeName = $routeName?$routeName: explode('.',request()->route()->getName())[0];
+        $routeName = $routeName ? $routeName : explode('.',request()->route()->getName())[0];
+        // $routeName = $routeName ? $routeName : '';
         $this->routa = $routeName;
         $arr_cf = [
             'biddings_phases'=>['label'=>'Fases','tab'=>'bidding_phases'],
             'biddings_genres'=>['label'=>'Fases','tab'=>'bidding_genres'],
             'biddings_types'=>['label'=>'Fases','tab'=>'bidding_types'],
         ];
-        $this->label = $arr_cf[$this->routa]['label'];
-        $this->tab = $arr_cf[$this->routa]['tab'];
+        $this->label = @$arr_cf[$this->routa]['label'];
+        $this->tab = @$arr_cf[$this->routa]['tab'];
         // $this->dbtab = DB::table($this->tab);
         $this->view = 'admin.padrao';
     }

@@ -272,10 +272,10 @@ class BiddingsController extends Controller
             if(isset($dados[0]['config'])){
                 $dados[0]['config'] = Qlib::lib_json_array($dados[0]['config']);
             }
-            $listFiles = false;
+            $listFiles = [];
             $campos = $this->campos();
-            if(isset($dados[0]['token'])){
-                $listFiles = attachment::where('bidding_id','=',$dados[0]['id'])->get();
+            if(isset($dados[0]['id'])){
+                $listFiles = $this->list_files($dados[0]['id']);
             }
             $config = [
                 'ac'=>'alt',
@@ -297,6 +297,7 @@ class BiddingsController extends Controller
                 'title'=>$title,
                 'titulo'=>$titulo,
                 'listFiles'=>$listFiles,
+                'listFilesCode'=>Qlib::encodeArray($listFiles),
                 'campos'=>$campos,
                 'exec'=>true,
             ];
@@ -408,6 +409,7 @@ class BiddingsController extends Controller
         if($bidding_id){
             $files = attachment::where('bidding_id','=',$bidding_id)->get();
             if($files->count() > 0){
+                $files =  $files->toArray();
                 $ac = new AttachmentsController;
                 foreach ($files as $kf => $vf) {
                     $ret[$kf] = $vf;

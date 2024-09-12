@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\admin\AttachmentsController;
 use App\Http\Controllers\admin\HomeController;
 use App\Http\Controllers\EtapaController;
 use App\Http\Controllers\portal\sicController;
@@ -115,6 +116,9 @@ Route::middleware([
             Route::get('export/all', [UploadController::class, 'exportAll'])->name('uploads.export_all');
             Route::get('export/filter', [UploadController::class, 'exportFilter'])->name('uploads.export_filter');
         });
+        Route::prefix('ajax')->group(function(){
+            Route::post('/attachments/{id}',[AttachmentsController::class,'update'])->where('id', '[0-9]+')->name('attachments.update-ajax');
+        });
         Route::fallback(function () {
             return view('erro404');
         });
@@ -135,8 +139,12 @@ Route::middleware([
         Route::resource('/biddings', '\App\Http\Controllers\admin\BiddingsController', ['except' => ['show'],'parameters'=>[
             'biddings' => 'id'
         ]]);
-        Route::resource('/attachments', '\App\Http\Controllers\admin\AttachmentsController', ['except' => ['show']]);
-        Route::resource('biddings.attachments', '\App\Http\Controllers\admin\AttachmentsController', ['except' => ['show']]);
+        Route::resource('/attachments', '\App\Http\Controllers\admin\AttachmentsController', ['except' => ['show'],'parameters'=>[
+            'attachments' => 'id'
+        ]]);
+        // Route::resource('biddings.attachments', '\App\Http\Controllers\admin\AttachmentsController', ['except' => ['show'],'parameters'=>[
+        //     'biddings.attachments' => 'id'
+        // ]]);
         // Route::resource('biddings.notifications', '\App\Http\Controllers\admin\NotificationsController', ['except' => ['show']]);
         // Route::resource('biddings.newsletters', '\App\Http\Controllers\admin\BiddingNewslettersController', ['except' => ['show']]);
         Route::resource('/biddings/{parent_id}/attachments/order', '\App\Http\Controllers\admin\AttachmentsController@postSort');

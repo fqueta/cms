@@ -79,6 +79,8 @@
             $('[mask-cnpj]').inputmask('99.999.999/9999-99');
             $('[mask-data]').inputmask('99/99/9999');
             $('[mask-cep]').inputmask('99.999-999');
+            // lista os arquivos gravados caso tenha
+            list_arquivos_biddings('#dados-lista-files');
         });
 
     </script>

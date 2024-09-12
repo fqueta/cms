@@ -66,7 +66,10 @@
 @section('css')
     @include('qlib.csslib')
 @stop
-
+{{-- <script>
+    window.onload = ()=>{
+    }
+</script> --}}
 @section('js')
     @include('qlib.jslib')
     <script type="text/javascript">

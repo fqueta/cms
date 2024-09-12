@@ -506,7 +506,7 @@ function visualizaArquivos(token_produto,ajaxurl,painel){
 }
 function visualizaArquivos2(token_produto,ajaxurl,painel){
     if(typeof painel=='undefined'){
-        painel = '';
+        painel = 'biddings';
     }
     $.ajax({
         type: 'GET',
@@ -549,6 +549,13 @@ function listFiles(arquivos,token_produto,painel){
             '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button>'+
             '</span>'+
             '</div>';
+        }else if(painel=='biddings'){
+            var tema1 = '<table class="table"><tbody>{li}</tbody></table>';
+            var tema2 = '<tr class="" id="item-{id}">'+
+            '<td style="width:10%"><a href="{href}" target="_blank">{icon}</a></td>'+
+            '<td style="width:80%"><div class="row"><div class="col-9"><input type="text" value="{nome}" name="file[{id}][title]" class="form-control" /></div><div class="col-3 px-0 text-right"><button {event_edit} type="button" title="Gravar o nome do arquivo" class="btn btn-outline-secondary"><i class="fa fa-check"></i></button></div></div></td>'+
+            '<td style="width:10%" class="text-right"><button type="button" {event} class="btn btn-outline-danger" title="Excluir"><i class="fas fa-trash "></i></button></td>'+
+            '</tr>';
         }else{
             var tema1 = '<ul class="list-group">{li}</ul>';
             var tema2 = '<li class="list-group-item d-flex justify-content-between align-items-center" id="item-{id}">'+
@@ -566,12 +573,20 @@ function listFiles(arquivos,token_produto,painel){
                 var id = arq.id;
                 var href = '/storage/'+arq.pasta;
             }
-            var event = 'onclick="excluirArquivo(\''+id+'\',\'/uploads/'+id+'\')"';
+            var event = 'onclick="excluirArquivo(\''+id+'\',\'/uploads/'+id+'\')"',event_edit = 'onclick="save_name_attachment(\'{id}\');"';
             var icon = '';
-            li += tema2.replaceAll('{event}',event);
-            li = li.replaceAll('{nome}',arq.nome);
-            li = li.replaceAll('{id}',id);
-            li = li.replaceAll('{href}',href);
+            if(painel=='biddings'){
+                li += tema2.replaceAll('{event}',event);
+                li = li.replaceAll('{event_edit}',event_edit);
+                li = li.replaceAll('{nome}',arq.title);
+                li = li.replaceAll('{id}',id);
+                li = li.replaceAll('{href}',href);
+            }else{
+                li += tema2.replaceAll('{event}',event);
+                li = li.replaceAll('{nome}',arq.nome);
+                li = li.replaceAll('{id}',id);
+                li = li.replaceAll('{href}',href);
+            }
             if(painel=='i_wp'){
                 if(conf = arq.config){
                     var config = JSON.parse(conf);
@@ -593,6 +608,36 @@ function listFiles(arquivos,token_produto,painel){
         return ret;
 
     }
+}
+function list_arquivos_biddings(sel){
+    var code_arquivos = document.querySelector(sel).value,arquivos = decodeArray(code_arquivos);
+    var mont_file = listFiles(arquivos,false,'biddings');
+    console.log(arquivos);
+    document.querySelector('#lista-files').innerHTML = mont_file;
+}
+function save_name_attachment(id){
+    var title = document.querySelector('[name="file['+id+'][title]"]').value;
+    ajaxurl = '/admin/ajax/attachments/'+id
+    $.ajaxSetup({
+        headers: {
+           'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    $.ajax({
+        type: 'POST',
+        url: ajaxurl,
+        data: {
+            id:id,
+            title:title,
+        },
+        dataType: 'json',
+        success: function (data) {
+            lib_formatMensagem('.mens',data.mens,data.color);
+        },
+        error: function (data) {
+            console.log(data);
+        }
+    });
 }
 function excluirArquivo(id,ajaxurl){
     $.ajaxSetup({
