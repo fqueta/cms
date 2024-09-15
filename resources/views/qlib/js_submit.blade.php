@@ -1,3 +1,6 @@
+@php
+    $compleUrl = isset($config['compleUrl']) ? $config['compleUrl'] : '';
+@endphp
 <script>
     $(function(){
         $("#{{$config['frm_id']}}").validate({
@@ -51,7 +54,9 @@
                         alert('erros');
                         console.log(res.errors);
                     }
-                });
+                },function(res){
+                    lib_funError(res);
+                },'&'+$('#files').serialize());
                 /*
                 $(form).submit(function(e){
                     e.preventDefault();

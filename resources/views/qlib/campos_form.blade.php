@@ -139,7 +139,7 @@
         <div class="col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
             <div class="form-group">
             <label for="{{$config['campo']}}">{{$config['label']}}</label><br>
-            <textarea name="{{$config['campo']}}" class="form-control @error($config['campo']) is-invalid @enderror {{$config['class']}}" rows="{{@$config['rows']}}" cols="{{@$config['cols']}}">@if(isset($config['value'])){{$config['value']}}@elseif($config['ac']=='cad'){{old($config['campo'])}}@endif</textarea>
+            <textarea name="{{$config['campo']}}" {{$config['event']}} class="form-control @error($config['campo']) is-invalid @enderror {{$config['class']}}" rows="{{@$config['rows']}}" cols="{{@$config['cols']}}">@if(isset($config['value'])){{$config['value']}}@elseif($config['ac']=='cad'){{old($config['campo'])}}@endif</textarea>
             </div>
         </div>
     @elseif ($config['type']=='html')

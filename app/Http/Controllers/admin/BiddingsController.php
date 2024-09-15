@@ -165,8 +165,26 @@ class BiddingsController extends Controller
                 'tam'=>$tambcampos,
                 'value'=>@$_GET['genre_id'],
             ],
+            'type_id'=>[
+                'label'=>'Tipo',
+                'active'=>true,
+                'type'=>'selector',
+                'data_selector'=>[
+                    'campos'=>$biddings_types->campos(),
+                    'route_index'=>route('biddings_types.index'),
+                    'id_form'=>'frm-biddings_types',
+                    'action'=>route('biddings_types.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'name',
+                    'label'=>'Tipo',
+                ],'arr_opc'=>Qlib::sql_array("SELECT id,name FROM bidding_types WHERE ativo='s'",'name','id'),'exibe_busca'=>'d-block',
+                'event'=>'required',
+                //'event'=>'onchange=carregaMatricula($(this).val())',
+                'tam'=>$tambcampos,
+                'value'=>@$_GET['genre_id'],
+            ],
             'opening'=>['label'=>'Data de abertura','active'=>true,'placeholder'=>'','type'=>'datetime-local','exibe_busca'=>'d-block','event'=>'','tam'=>$tambcampos,'validate'=>['required']],
-            'object'=>['label'=>'Objeto','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>$tambcampos1],
+            'object'=>['label'=>'Objeto','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>$tambcampos1],
             'active'=>['label'=>'publicado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
         ];
     }
@@ -289,6 +307,7 @@ class BiddingsController extends Controller
                 'local'=>'attachments', //a tabela de armazenandmo dos arquivos
                 'token_produto'=>$dados[0]['token'],
                 'arquivos'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg',
+                'compleUrl'=>"+$('#files').serialize()"//complemento de url ao postar via ajax
             ];
 
             $ret = [
@@ -350,6 +369,8 @@ class BiddingsController extends Controller
             $dados['config'] = Qlib::lib_array_json($dados['config']);
         }
         $atualizar=false;
+        $d_order = isset($data['order'])?$data['order']:false;
+        unset($data['file'],$data['order']);
         if(!empty($data)){
             $atualizar=Biddings::where('id',$id)->update($data);
             $route = $this->routa.'.index';
@@ -361,6 +382,10 @@ class BiddingsController extends Controller
                 'idCad'=>$id,
                 'return'=>$route,
             ];
+            if(is_array($d_order)){
+                //atualizar ordem dos arquivos
+                $ret['order_update'] = (new AttachmentsController)->order_update($d_order);
+            }
         }else{
             $route = $this->routa.'.edit';
             $ret = [
@@ -407,13 +432,17 @@ class BiddingsController extends Controller
     public function list_files($bidding_id){
         $ret = [];
         if($bidding_id){
-            $files = attachment::where('bidding_id','=',$bidding_id)->get();
+            $files = attachment::where('bidding_id','=',$bidding_id)->orderBy('order','asc')->get();
             if($files->count() > 0){
                 $files =  $files->toArray();
                 $ac = new AttachmentsController;
                 foreach ($files as $kf => $vf) {
                     $ret[$kf] = $vf;
-                    $ret[$kf]['file_path'] = $ac->get_attachmeta($vf['id'],'file_path');
+                    $arr_c = Qlib::lib_json_array($vf['file_config']);
+                    $ret[$kf]['file_path'] = $arr_c['file_path'];
+                    $ret[$kf]['extension'] = @$arr_c['extension'];
+                    // $ret[$kf]['file_path'] = $ac->get_attachmeta($vf['id'],'file_path');
+                    // $ret[$kf]['extension'] = $ac->get_attachmeta($vf['id'],'extension');
                 }
             }
         }

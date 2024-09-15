@@ -112,12 +112,13 @@ Route::middleware([
             Route::get('/{id}/edit',[UploadController::class,'edit'])->name('uploads.edit');
             Route::put('/{id}',[UploadController::class,'update'])->where('id', '[0-9]+')->name('uploads.update');
             Route::post('/{id}',[UploadController::class,'update'])->where('id', '[0-9]+')->name('uploads.update-ajax');
-            Route::post('/{id}',[UploadController::class,'destroy'])->where('id', '[0-9]+')->name('uploads.destroy');
+            Route::post('/{id}/delete',[UploadController::class,'destroy'])->where('id', '[0-9]+')->name('uploads.destroy');
             Route::get('export/all', [UploadController::class, 'exportAll'])->name('uploads.export_all');
             Route::get('export/filter', [UploadController::class, 'exportFilter'])->name('uploads.export_filter');
         });
         Route::prefix('ajax')->group(function(){
             Route::post('/attachments/{id}',[AttachmentsController::class,'update'])->where('id', '[0-9]+')->name('attachments.update-ajax');
+            // Route::post('/attachments/{id}',[AttachmentsController::class,'update'])->where('id', '[0-9]+')->name('attachments.destroy-ajax');
         });
         Route::fallback(function () {
             return view('erro404');
@@ -182,4 +183,32 @@ Route::middleware([
 
     });
 
+});
+
+Route::name('api.')->prefix('api/v1')->middleware([
+    'api',
+    // 'auth:sanctum',
+    InitializeTenancyByDomain::class,
+    PreventAccessFromCentralDomains::class,
+])->group(function () {
+
+    // Route::redirect('/', 'api.login');
+
+    // Auth::routes();
+    //  Route::group(['prefix' => '/api', 'namespace' => 'Api'], function () {
+        // Route::resource('/pages', 'PostsController', ['only' => ['index', 'show']]);
+        // Route::resource('/posts', 'PostsController', ['only' => ['index', 'show', 'update']]);
+        // Route::resource('/notices', 'NoticesController', ['only' => ['index']]);
+        // Route::resource('/players', 'PlayersController', ['only' => ['index']]);
+        // Route::resource('/banners', 'BannersController', ['only' => ['index']]);
+        // Route::resource('/floaters', 'FloatersController', ['only' => ['index']]);
+        Route::resource('/biddings', '\App\Http\Controllers\api\BiddingsController', ['only' => ['index']]);
+        // Route::resource('/btrimestrals', 'BtrimestralsController', ['only' => ['index']]);
+        // Route::resource('/sections', 'SectionsController', ['only' => ['index']]);
+        // Route::resource('/newsletters', 'NewslettersController', ['only' => ['store']]);
+        // Route::resource('/contacts', 'ContactsController', ['only' => ['store']]);
+        // Route::resource('/uploads', 'UploadsController', ['only' => ['show']]);
+        // Route::resource('/search', 'SearchController', ['only' => ['index']]);
+        // Route::resource('/diaries', 'DiariesController', ['only' => ['index']]);
+    // });
 });

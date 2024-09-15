@@ -47,16 +47,6 @@
                 </div>
                 <div class="card-body">
                     @include('admin.biddings.attachments')
-                    {{-- {{App\Qlib\Qlib::gerUploadAquivos([
-                        'pasta'=>$config['route'].'/'.date('Y').'/'.date('m'),
-                        'token_produto'=>isset($value['token'])?$value['token']:false,
-                        'tab'=>$config['route'],
-                        'listFiles'=>@$listFiles,
-                        'routa'=>@$config['route'],
-                        'url'=>@$config['url'],
-                        'arquivos'=>@$config['arquivos'],
-                        'typeN'=>@$config['typeN'],
-                    ])}} --}}
                 </div>
             </div>
         </div>

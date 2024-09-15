@@ -106,15 +106,16 @@ class UploadController extends Controller
                         'bidding_id'=>$bidding_id,
                         'title'=>$title,
                         'file_file_size'=>$size,
-                        'order'=>$ordem,
                         'file_file_name'=>$filenameWithExt,
                         'file_content_type'=>$mimeType,
-                        // 'config'=>json_encode(['extenssao'=>$extension,'local'=>$local]),
+                        'order'=>$ordem,
+                        'file_config'=>json_encode(['extension'=>$extension,'file_path'=>$nomeArquivoSavo]),
                     ]);
-                    if(isset($salvar->id) && $salvar->id>0){
-                        // dd($salvar,$nomeArquivoSavo);
-                        $metasave = (new AttachmentsController)->update_attachmeta($salvar->id,'file_path',$nomeArquivoSavo);
-                    }
+                    // if(isset($salvar->id) && $salvar->id>0){
+                    //     // dd($salvar,$nomeArquivoSavo);
+                    //     $metasave = (new AttachmentsController)->update_attachmeta($salvar->id,'file_path',$nomeArquivoSavo);
+                    //     $metasave = (new AttachmentsController)->update_attachmeta($salvar->id,'extension',$extension);
+                    // }
                 }
             }else{
                 $token_produto = $dados['token_produto'];
@@ -138,7 +139,7 @@ class UploadController extends Controller
             }
             //$lista = _upload::where('token_produto','=',$token_produto)->get();
             if($salvar){
-                return response()->json(['Arquivo enviado com sucesso'=>200]);
+                return response()->json(['Arquivo enviado com sucesso'=>200,'exec'=>$exec]);
             }
         }else{
             return response()->json('O Formato .'.$extension.' não é permitido', 400);
@@ -200,7 +201,7 @@ class UploadController extends Controller
         //
     }
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
         // if($this->i_wp=='s'){
         //     $ret = $this->wp_api->delete([
@@ -213,15 +214,33 @@ class UploadController extends Controller
         //     return $ret;
 
         // }else{
-
-            $dados = _upload::find($id);
+        $d = $request->all();
+        if($id=$d['id']){
+            $painel = isset($d['painel']) ? $d['painel'] : '';
             $dele_file = false;
+            if($painel=='biddings'){
+                $dados = attachment::find($id);
+                if($dados->count()>0 && isset($dados['id'])){
+                    $ac = new AttachmentsController;
+                    // $path_file =  $ac->get_attachmeta($dados['id'],'file_path');
+                    $arr_c = Qlib::lib_json_array($dados['file_config']);
+                    $path_file = isset($arr_c['file_path'])?$arr_c['file_path']:false;
+                    if ($path_file && Storage::exists($path_file)){
+                        $dele_file = Storage::delete($path_file);
+                        // $delete_meta = $ac->delete_attachmeta($dados['id']);
+                    }
+                    $delete = attachment::where('id',$id)->delete();
+                }
+            }else{
+                $dados = _upload::find($id);
+                if (Storage::exists($dados->pasta))
+                    $dele_file = Storage::delete($dados->pasta);
+                $delete = _upload::where('id',$id)->delete();
+            }
             //dd($dados->pasta);
-            if (Storage::exists($dados->pasta))
-                $dele_file = Storage::delete($dados->pasta);
 
-            $delete = _upload::where('id',$id)->delete();
             return response()->json(['exec'=>$delete,'dele_file'=>$dele_file]);
+        }
         // }
     }
 }

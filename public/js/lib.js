@@ -521,6 +521,7 @@ function visualizaArquivos2(token_produto,ajaxurl,painel){
           if(data.exec && data.arquivos){
             var list = listFiles(data.arquivos,token_produto,painel);
             $('#lista-files').html(list);
+            $( ".sortable" ).sortable();
             if(data.mens){
               lib_formatMensagem('.mens',data.mens,'success');
             }
@@ -540,80 +541,109 @@ function listFiles(arquivos,token_produto,painel){
     if(typeof painel == 'undefined'){
         painel = '';
     }
+    var ret = __translate('Nenhum arquivo');
     if(arquivos.length>0){
-        if(painel=='i_wp'){
-            var tema1 = '<div class="list-group">{li}</div>';
-            var tema2 = '<div class="list-group-item d-flex justify-content-between align-items-center px-0" id="item-{id}">'+
-            '<a href="{href}" class="venobox"><img src="{href}" alt="{nome}" style="width: 100%"></a>'+
-            '<span style="position: absolute;top:2px;right:2px">'+
-            '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button>'+
-            '</span>'+
-            '</div>';
-        }else if(painel=='biddings'){
-            var tema1 = '<table class="table"><tbody>{li}</tbody></table>';
-            var tema2 = '<tr class="" id="item-{id}">'+
-            '<td style="width:10%"><a href="{href}" target="_blank">{icon}</a></td>'+
-            '<td style="width:80%"><div class="row"><div class="col-9"><input type="text" value="{nome}" name="file[{id}][title]" class="form-control" /></div><div class="col-3 px-0 text-right"><button {event_edit} type="button" title="Gravar o nome do arquivo" class="btn btn-outline-secondary"><i class="fa fa-check"></i></button></div></div></td>'+
-            '<td style="width:10%" class="text-right"><button type="button" {event} class="btn btn-outline-danger" title="Excluir"><i class="fas fa-trash "></i></button></td>'+
-            '</tr>';
-        }else{
-            var tema1 = '<ul class="list-group">{li}</ul>';
-            var tema2 = '<li class="list-group-item d-flex justify-content-between align-items-center" id="item-{id}">'+
-            '<a href="{href}" target="_blank">{icon} {nome}</a>'+
-            '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button></li>';
-        }
-        var li = '';
-        var temaIcon = '<i class="fas fa-file-{tipo} fa-2x"></i>';
-        for (let index = 0; index < arquivos.length; index++) {
-            const arq = arquivos[index];
+        try {
+
             if(painel=='i_wp'){
-                var href = arq.guid;
-                var id = arq.ID;
+                var tema1 = '<div class="list-group">{li}</div>';
+                var tema2 = '<div class="list-group-item d-flex justify-content-between align-items-center px-0" id="item-{id}">'+
+                '<a href="{href}" class="venobox"><img src="{href}" alt="{nome}" style="width: 100%"></a>'+
+                '<span style="position: absolute;top:2px;right:2px">'+
+                '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button>'+
+                '</span>'+
+                '</div>';
+            }else if(painel=='biddings'){
+                var tema1 = '<form id="files"><table class="table"><thead><tr><th title="'+__translate('Visualizar')+'">Ver</th><th>Nome</th><th>Ação</th></tr></thead><tbody class="sortable">{li}</tbody></table></form>';
+                var tema2 = '<tr class="" id="item-{id}">'+
+                '<td class=""> <i class="fas fa-arrows-alt-v mr-2" style="cursor:pointer" title="'+__translate('Arraste e solte para mudar a ordem')+'"></i> <a href="{href}" title="'+__translate('Ver o arquivo')+'" target="_blank">{icon}</a></td>'+
+                '<td style=""><input type="hidden" name="order[]" value="{id}" /><input title="'+__translate('Editar o nome do arquivo')+'" type="text" value="{nome}" name="file[{id}][title]" class="form-control" /></td>'+
+                '<td style="" class="text-right"><button {event_edit} type="button" title="'+__translate('Gravar o nome do arquivo')+'" class="btn btn-outline-secondary mr-1"><i class="fa fa-check"></i></button><button  title="'+__translate('Excluir o arquivo')+'" type="button" {event} class="btn btn-outline-danger" title="Excluir"><i class="fas fa-trash "></i></button></td>'+
+                '</tr>';
             }else{
-                var id = arq.id;
-                var href = '/storage/'+arq.pasta;
+                var tema1 = '<ul class="list-group">{li}</ul>';
+                var tema2 = '<li class="list-group-item d-flex justify-content-between align-items-center" id="item-{id}">'+
+                '<a href="{href}" target="_blank">{icon} {nome}</a>'+
+                '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button></li>';
             }
-            var event = 'onclick="excluirArquivo(\''+id+'\',\'/uploads/'+id+'\')"',event_edit = 'onclick="save_name_attachment(\'{id}\');"';
-            var icon = '';
-            if(painel=='biddings'){
-                li += tema2.replaceAll('{event}',event);
-                li = li.replaceAll('{event_edit}',event_edit);
-                li = li.replaceAll('{nome}',arq.title);
-                li = li.replaceAll('{id}',id);
-                li = li.replaceAll('{href}',href);
-            }else{
-                li += tema2.replaceAll('{event}',event);
-                li = li.replaceAll('{nome}',arq.nome);
-                li = li.replaceAll('{id}',id);
-                li = li.replaceAll('{href}',href);
-            }
-            if(painel=='i_wp'){
-                if(conf = arq.config){
-                    var config = JSON.parse(conf);
-                    if(config.extenssao == 'jpg' || config.extenssao=='png' || config.extenssao == 'jpeg'){
-                        var tipo = 'image';
-                    }else if(config.extenssao == 'doc' || config.extenssao == 'docx') {
-                        var tipo = 'word';
-                    }else if(config.extenssao == 'xls' || config.extenssao == 'xlsx') {
-                        var tipo = 'excel';
+            var li = '';
+            var temaIcon = '<i class="fas fa-file{tipo} fa-2x"></i>',tenant_asset=document.getElementById('tenant_asset').value;
+            for (let index = 0; index < arquivos.length; index++) {
+                const arq = arquivos[index];
+                if(painel=='i_wp'){
+                    var href = arq.guid;
+                    var id = arq.ID;
+                }else if(painel=='biddings'){
+                    var href = tenant_asset+'/'+arq.file_path;
+                    var id = arq.id;
+                }else{
+                    var id = arq.id;
+                    var href = '/storage/'+arq.pasta;
+                }
+
+                var event = 'onclick="excluirArquivo(\''+id+'\',\''+painel+'\')"',event_edit = 'onclick="save_name_attachment(\''+id+'\');"';
+                var icon = '';
+                if(painel=='biddings'){
+                    li += tema2.replaceAll('{event}',event);
+                    li = li.replaceAll('{event_edit}',event_edit);
+                    li = li.replaceAll('{nome}',arq.title);
+                    li = li.replaceAll('{order}',arq.order);
+                    li = li.replaceAll('{id}',id);
+                    li = li.replaceAll('{href}',href);
+                    // var tf = arq.file_content_type,tfr=tf.split('/')[1];
+                    var tfr = arq.extension;
+                    if(tfr=='pdf' || tfr=='PDF'){
+                        var tipo = '-pdf';
+                    }else if(tfr=='docx' || tfr=='doc'){
+                        var tipo = '-word';
+                    }else if(tfr=='xls' || tfr=='xlsx'){
+                        var tipo = '-excel';
+                    }else if(tfr=='jpg' || tfr=='png' || tfr=='jpeg'){
+                        var tipo = '-image';
                     }else{
-                        var tipo = 'download';
+                        var tipo = '';
                     }
                     icon = temaIcon.replace('{tipo}',tipo);
+                }else{
+                    li += tema2.replaceAll('{event}',event);
+                    li = li.replaceAll('{nome}',arq.nome);
+                    li = li.replaceAll('{id}',id);
+                    li = li.replaceAll('{href}',href);
                 }
-            }
-            li = li.replace('{icon}',icon);
-        }
-        ret = tema1.replace('{li}',li);
-        return ret;
+                if(painel=='i_wp'){
+                    if(conf = arq.config){
+                        var config = JSON.parse(conf);
+                        if(config.extenssao == 'jpg' || config.extenssao=='png' || config.extenssao == 'jpeg'){
+                            var tipo = '-image';
+                        }else if(config.extenssao == 'doc' || config.extenssao == 'docx') {
+                            var tipo = '-word';
+                        }else if(config.extenssao == 'xls' || config.extenssao == 'xlsx') {
+                            var tipo = '-excel';
+                        }else{
+                            var tipo = '-download';
+                        }
+                        icon = temaIcon.replace('{tipo}',tipo);
+                    }
+                }
+                if(painel == 'biddings'){
 
+                }
+                li = li.replace('{icon}',icon);
+            }
+            ret = tema1.replace('{li}',li);
+        } catch (error) {
+            ret = 'erro ao renderizar lista entre em contato com o suporte';
+            console.log(error);
+        }
     }
+    return ret;
 }
 function list_arquivos_biddings(sel){
     var code_arquivos = document.querySelector(sel).value,arquivos = decodeArray(code_arquivos);
     var mont_file = listFiles(arquivos,false,'biddings');
     console.log(arquivos);
     document.querySelector('#lista-files').innerHTML = mont_file;
+    $( ".sortable" ).sortable();
 }
 function save_name_attachment(id){
     var title = document.querySelector('[name="file['+id+'][title]"]').value;
@@ -639,7 +669,8 @@ function save_name_attachment(id){
         }
     });
 }
-function excluirArquivo(id,ajaxurl){
+function excluirArquivo(id,painel){
+    var ajaxurl = '/admin/uploads/'+id+'/delete';
     $.ajaxSetup({
         headers: {
            'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
@@ -650,6 +681,7 @@ function excluirArquivo(id,ajaxurl){
         url: ajaxurl,
         data: {
             id:id,
+            painel:painel,
         },
         dataType: 'json',
         success: function (data) {

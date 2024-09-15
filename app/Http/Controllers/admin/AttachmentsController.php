@@ -60,6 +60,19 @@ class AttachmentsController extends Controller
         return $ret;
     }
     /**
+     * Metodo para remover meta campos
+     * se $meta_key não estiver selecionando ele remove todos os meta keys estiver selecionado
+     */
+    public function delete_attachmeta($attach_id,$meta_key=false){
+        $tab = 'meta_attachment';
+        if($attach_id && $meta_key){
+            $ret = DB::table($tab)->where('attachment_id',$attach_id)->where('meta_key',$meta_key)->delete();
+        }elseif(!$meta_key){
+            $ret = DB::table($tab)->where('attachment_id',$attach_id)->delete();
+        }
+        return $ret;
+    }
+    /**
      * Metodo para atualizar
      */
     public function update(Request $request){
@@ -73,6 +86,22 @@ class AttachmentsController extends Controller
                 $ret['exec'] = true;
                 $ret['mens'] = 'Atualizado com sucesso';
                 $ret['color'] = 'success';
+            }
+        }
+        return $ret;
+    }
+    /**
+     * Metodo para atualizar a ordem dos arquivos das licitações
+     * @param array $d_order dados das odens um array contendo ordem e o id
+     */
+    public function order_update($d_order){
+        $ret['exec'] = false;
+        if(is_array($d_order)){
+            foreach ($d_order as $order => $id) {
+                $salv = attachment::where('id', $id)->update(['order' => $order]);
+                if($salv){
+                    $ret['exec'] = true;
+                }
             }
         }
         return $ret;

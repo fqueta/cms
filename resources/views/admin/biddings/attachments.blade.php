@@ -4,6 +4,7 @@
 <div class="row">
     <div class="col-md-12 mb-2">
         <input type="hidden" id="dados-lista-files" value="{{$listFilesCode}}">
+        <input type="hidden" id="tenant_asset" value="{{tenant_asset('/')}}">
         <span id="lista-files">
             {{-- {{App\Qlib\Qlib::gerUploadAquivos([
                 'parte'=>'lista',
