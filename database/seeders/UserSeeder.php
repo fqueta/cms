@@ -82,16 +82,5 @@ class UserSeeder extends Seeder
                 DB::table($table)->insert($vbc);
             }
         }
-        // DB::table('bidding_phases')->truncate();
-        // foreach ($arr_bc as $kbc => $vbc) {
-        //     DB::table('bidding_categories')->insert($vbc);
-        // }
-        // DB::table('bidding_phases')->insert([
-
-        // ]);
-        // DB::table('bidding_genres')->truncate();
-        // DB::table('bidding_genres')->insert();
-        // DB::table('bidding_types')->truncate();
-        // DB::table('bidding_types')->insert();
     }
 }
