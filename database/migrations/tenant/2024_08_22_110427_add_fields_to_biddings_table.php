@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('biddings', function (Blueprint $table) {
 
 
+            $table->integer('year')->nullable();
             $table->string('token', 255)->nullable();
             $table->json('config')->nullable();
             $table->enum('excluido',['n','s'])->after('opening')->nullable();

@@ -47,7 +47,51 @@ class UserSeeder extends Seeder
             User::create($value);
         }
         //Aproveitando para incluir dados padroes para os processos de licitações
-        DB::table('bidding_categories')->insert(['name' => 'Pregão', 'name' => 'Concorrência', 'name' => 'Tomada de preço']);
-        DB::table('bidding_phases')->insert(['name' => 'Aberto', 'name' => 'Finalizado']);
+        $arr_t = [
+            'bidding_categories'=>[
+                ['name' => 'Saúde'], ['name' => 'Contrução'], ['name' => 'Geral'],
+                ['name' => 'Transporte'], ['name' => 'Informatica'], ['name' => 'Equipamentos Hospitalares'],
+                ['name' => 'Outros'],
+            ],
+            'bidding_phases'=>[
+                ['name' => 'Em Andamento'], ['name' => 'Adjudicado'],
+                ['name' => 'Homologado'], ['name' => 'Suspenso'],
+                ['name' => 'Cancelado'], ['name' => 'Deserta'],
+                ['name' => 'Concluido'], ['name' => 'Anulado'],
+                ['name' => 'Revogado'],
+            ],
+            'bidding_genres'=>[
+                ['name' => 'Concorrência'], ['name' => 'Concurso'],
+                ['name' => 'Convite'], ['name' => 'Dispensa'],
+                ['name' => 'Inexigibilidade'], ['name' => 'Leilão'],
+                ['name' => 'Pregão'], ['name' => 'Pregão Eletrônico'],
+                ['name' => 'Adesão RP'], ['name' => 'Dispensa Eletrônica'],
+            ],
+            'bidding_types'=>[
+                ['name' => 'Menor Preço - Item'], ['name' => 'Menor Preço - Global'],
+                ['name' => 'Menor Preço - Item - Valor Máximo'], ['name' => 'Menor Preço - Global - Valor Máximo'],
+                ['name' => 'Menor Preço - Lote'], ['name' => 'Maior Desconto'],
+                ['name' => 'Maior Lance ou Oferta - Item'], ['name' => 'Maior Lance ou Oferta - Lote'],
+                ['name' => 'Melhor Técnica'], ['name' => 'Técnica e Preço'],
+                ['name' => 'Menor Taxa de Administração'],
+            ]
+        ];
+        foreach ($arr_t as $table => $value) {
+            DB::table($table)->truncate();
+            foreach ($value as $kbc => $vbc) {
+                DB::table($table)->insert($vbc);
+            }
+        }
+        // DB::table('bidding_phases')->truncate();
+        // foreach ($arr_bc as $kbc => $vbc) {
+        //     DB::table('bidding_categories')->insert($vbc);
+        // }
+        // DB::table('bidding_phases')->insert([
+
+        // ]);
+        // DB::table('bidding_genres')->truncate();
+        // DB::table('bidding_genres')->insert();
+        // DB::table('bidding_types')->truncate();
+        // DB::table('bidding_types')->insert();
     }
 }
