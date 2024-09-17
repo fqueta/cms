@@ -11,6 +11,7 @@ use App\Models\Post;
 use App\Qlib\Qlib;
 use App\Models\User;
 use App\Models\_upload;
+use App\Models\Documento;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -22,24 +23,33 @@ class PostsController extends Controller
     public $view;
     public $post_type;
     public $sec;
+    public $tab;
     public $i_wp;//integração com wp
     public $wp_api;//integração com wp
+    public $d_pagina;//integração com wp
     public function __construct(User $user)
     {
         $this->middleware('auth');
         $seg1 = request()->segment(2);
         $type = false;
         if($seg1){
-            $type = substr($seg1,0,-1);
+            // $type = substr($seg1,0,-1);
+            $type = $seg1;
         }
         $this->post_type = $type;
         $this->sec = $seg1;
         $this->user = $user;
         $this->routa = $this->sec;
         $this->label = 'Posts';
-        $this->view = 'posts';
+        if($this->sec=='pages'){
+            $this->view = 'posts';
+        }else{
+            $this->view = 'admin.padrao';
+        }
+        $this->tab = 'posts';
         $this->i_wp = Qlib::qoption('i_wp');//indegração com Wp s para sim
-        $this->wp_api = new ApiWpController();
+        // $this->wp_api = new ApiWpController();
+        // $this->d_pagina = $d_pagina;
 
     }
     public function queryPost($get=false,$config=false)
@@ -128,27 +138,59 @@ class PostsController extends Controller
         if(Qlib::qoption('editor_padrao')=='laraberg'){
             $hidden_editor = 'hidden';
         }
-        $ret = [
-            'ID'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'post_type'=>['label'=>'tipo de post','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=>$this->post_type],
-            'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'post_title'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Nome do post','type'=>'text','exibe_busca'=>'d-block','event'=>'onkeyup=lib_typeSlug(this)','tam'=>'12'],
-            //'post_name'=>['label'=>'Slug','active'=>true,'placeholder'=>'Ex.: nome-do-post','type'=>'url','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            'post_excerpt'=>['label'=>'Resumo (Opcional)','active'=>true,'placeholder'=>'Uma síntese do um post','type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            //'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            'post_status'=>['label'=>'Publicar','active'=>true,'type'=>'chave_checkbox','value'=>'publish','valor_padrao'=>'publish','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['publish'=>'Publicado','pending'=>'Pendente']],
-            'post_content'=>['label'=>'Conteudo','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>$hidden_editor,'tam'=>'12','class_div'=>'','class'=>'editor-padrao','placeholder'=>__('Escreva seu conteúdo aqui..')],
-        ];
+        $d_pagina = $this->pagina();
+        if(isset($d_pagina['config']) && !empty($d_pagina['config'])){
+            $ret = $d_pagina['config'];
+            // dd($ret);
+        }else{
+            $ret = [
+                'ID'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'post_type'=>['label'=>'tipo de post','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=>$this->post_type],
+                'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'post_title'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Nome do post','type'=>'text','exibe_busca'=>'d-block','event'=>'onkeyup=lib_typeSlug(this)','tam'=>'12'],
+                //'post_name'=>['label'=>'Slug','active'=>true,'placeholder'=>'Ex.: nome-do-post','type'=>'url','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+                'post_excerpt'=>['label'=>'Resumo (Opcional)','active'=>true,'placeholder'=>'Uma síntese do um post','type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+                //'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+                'post_status'=>['label'=>'Publicar','active'=>true,'type'=>'chave_checkbox','value'=>'publish','valor_padrao'=>'publish','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['publish'=>'Publicado','pending'=>'Pendente']],
+                'post_content'=>['label'=>'Conteudo','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>$hidden_editor,'tam'=>'12','class_div'=>'','class'=>'editor-padrao','placeholder'=>__('Escreva seu conteúdo aqui..')],
+            ];
+        }
         return $ret;
+    }
+    /**
+     * Metodo para montar um array que configura a página de acordo com a tabela documentos dessa forma essa area será dinamica
+     */
+    public function pagina($sec=false){
+        $sec = $this->sec ? $this->sec : false;
+        if(!$sec){
+            return false;
+        }
+        $d = Documento::where('token', '=', $this->sec)->get();
+        if($d->count()){
+            $d = $d[0];
+            if(isset($d['config'])){
+                $d['config'] = Qlib::lib_json_array($d['config']);
+            }
+            return $d->toArray();
+        } else{
+            return false;
+        }
     }
     public function index(User $user)
     {
         $this->authorize('is_admin', $user);
-        if($this->sec=='posts'){
-            $title = 'Cadastro de postagens';
-        }elseif($this->sec=='pages'){
-            $title = 'Cadastro de paginas';
+        //buscar os dados da página
+        $d_pagina = $this->pagina();
+        if(!$d_pagina){
+            if($this->sec=='posts'){
+                $title = 'Cadastro de postagens';
+            }elseif($this->sec=='pages'){
+                $title = 'Cadastro de paginas';
+            }
+        }else{
+            $title = 'Cadastro de '.$d_pagina['nome'];
         }
+
         $titulo = $title;
         $queryPost = $this->queryPost($_GET);
         $queryPost['config']['exibe'] = 'html';
@@ -171,11 +213,8 @@ class PostsController extends Controller
     public function create(User $user)
     {
         $this->authorize('is_admin', $user);
-        if($this->sec=='posts'){
-            $title = 'Cadastro de postagens';
-        }elseif($this->sec=='pages'){
-            $title = 'Cadastro de paginas';
-        }
+        $selTypes = $this->selectType($this->sec);
+        $title = $selTypes['title'];
         $titulo = $title;
         $config = [
             'ac'=>'cad',
@@ -253,6 +292,7 @@ class PostsController extends Controller
                 $mens = 'Parametros invalidos!';
             }
         }else{
+            $dados['post_author'] = isset($dados['post_author']) ? $dados['post_author'] : Auth::id();
             $salvar = Post::create($dados);
             if(isset($salvar->id) && $salvar->id){
                 $mens = $this->label.' cadastrado com sucesso!';
@@ -307,23 +347,73 @@ class PostsController extends Controller
         }
         return $params;
     }
+    public function selectType($sec=false)
+    {
+        $ret['exec']=false;
+        $ret['title']=false;
+        $title = false;
+        if($sec){
+            $name = request()->route()->getName();
+            // if($sec=='posts'){
+            //     $title = __('Cadastro de postagens');
+            // }elseif($sec=='produtos'){
+            //     $title = __('Cadastro de contratos');
+            //     if($name=='produtos.edit'){
+            //         $title = __('Editar Cadastro de contratos');
+            //     }
+            // }elseif($sec=='leiloes_adm'){
+            //     $title = __('Cadastro de leilao');
+            //     if($name=='leilao.edit'){
+            //         $title = __('Editar Cadastro de leilao');
+            //     }
+            // }elseif($sec=='paginas'){
+            //     $title = __('Cadastro de paginas');
+            // }elseif($sec=='menus'){
+            //     $title = __('Cadastro de menus');
+            // }elseif($sec=='pacotes_lances'){
+            //     $title = __('Cadastro de pacotes');
+            // }else{
+            //     $title = __('Sem titulo');
+            // }
+            $d_pagina = $this->pagina();
+            if(!$d_pagina){
+                if($this->sec=='posts'){
+                    $title = 'Cadastro de postagens';
+                }elseif($this->sec=='pages'){
+                    $title = 'Cadastro de paginas';
+                }else{
+                    $title = __('Sem titulo');
+                }
+            }
+            $title = 'Cadastro de '.$d_pagina['nome'];
 
+        }
+        $ret['title'] = $title;
+        return $ret;
+    }
     public function edit($post,User $user)
     {
         $id = $post;
-        $dados = Post::where('id',$id)->get();
+        $dados = Post::where('id',$id)->where('post_type',$this->post_type)->get();
         $routa = 'posts';
         $this->authorize('ler', $this->routa);
-
-        if(!empty($dados)){
-            $title = 'Editar Cadastro de posts';
+        if($dados->count()){
+            $selTypes = $this->selectType($this->sec);
+            $title = $selTypes['title'];
             $titulo = $title;
             $dados[0]['ac'] = 'alt';
             if(isset($dados[0]['config'])){
                 $dados[0]['config'] = Qlib::lib_json_array($dados[0]['config']);
             }
+            if(isset($dados[0]['post_date_gmt'])){
+                $dExec = explode(' ',$dados[0]['post_date_gmt']);
+                if(isset($dExec[0])){
+                    $dados[0]['post_date_gmt'] = $dExec[0];
+                }
+            }
+            //dd($dados[0]['config']['numero']);
             $listFiles = false;
-            $campos = $this->campos();
+            $campos = $this->campos($id);
             if($this->i_wp=='s' && !empty($dados[0]['post_name'])){
                 $dadosApi = $this->wp_api->list([
                     'params'=>'/'.$dados[0]['post_name'].'?_type='.$dados[0]['post_type'],
@@ -340,18 +430,41 @@ class PostsController extends Controller
                 'ac'=>'alt',
                 'frm_id'=>'frm-posts',
                 'route'=>$this->routa,
+                'view'=>$this->view,
+                'sec'=>$this->sec,
                 'id'=>$id,
-                'arquivos'=>'jpeg,jpg,png',
             ];
-            if(isset($dados[0]['ID'])){
+            $config['media'] = [
+                'files'=>'jpeg,jpg,png,pdf,PDF',
+                'select_files'=>'unique',
+                'field_media'=>'post_parent',
+                'post_parent'=>$id,
+            ];
+            //IMAGEM DESTACADA
+            if(isset($dados[0]['ID']) && $this->i_wp=='s'){
                 $imagem_destacada = DB::table('wp_postmeta')->
                 where('post_id',$dados[0]['ID'])->
                 where('meta_key','imagem_destacada')->get();
                 if(isset($imagem_destacada[0])){
                     $dados[0]['imagem_destacada'] = $imagem_destacada[0];
                 }
-            }
+            }elseif(isset($dados[0]['post_parent'])){
+                // $link_img = Qlib::buscaValorDb([
+                //     'tab'=>'posts',
+                //     'campo_bus'=>'ID',
+                //     'valor'=>$dados[0]['post_parent'],
+                //     'select'=>'guid',
+                //     'compleSql'=>''
+                // ]);
 
+                $imgd = Post::where('ID', '=', $dados[0]['post_parent'])->where('post_status','=','publish')->get();
+                if( $imgd->count() > 0 ){
+                    // dd($imgd[0]['guid']);
+                    $dados[0]['imagem_destacada'] = Qlib::qoption('storage_path'). '/'.$imgd[0]['guid'];
+                }
+            }
+            //REGISTRAR EVENTOS
+            (new EventController)->listarEvent(['tab'=>$this->tab,'this'=>$this]);
             $ret = [
                 'value'=>$dados[0],
                 'config'=>$config,
@@ -366,7 +479,7 @@ class PostsController extends Controller
             $ret = [
                 'exec'=>false,
             ];
-            return redirect()->route($routa.'.index',$ret);
+            return redirect()->route('home',$ret);
         }
     }
 
@@ -454,6 +567,18 @@ class PostsController extends Controller
                 }
             }else{
                 $atualizar=Post::where('id',$id)->update($data);
+                if(isset($atualizar) && $atualizar){
+                    $mens = $this->label.' atualizada com sucesso!';
+                    $color = 'success';
+                    $id = $id;
+                }else{
+                    $mens = 'Erro ao salvar '.$this->label.'';
+                    $color = 'danger';
+                    $id = 0;
+                    // if(isset($atualizar['arr']['status'])&&$atualizar['arr']['status']==400 && isset($atualizar['arr']['message']) && !empty($atualizar['arr']['message'])){
+                    //     $mens = $atualizar['arr']['message'];
+                    // }
+                }
             }
             $route = $this->routa.'.index';
             $ret = [

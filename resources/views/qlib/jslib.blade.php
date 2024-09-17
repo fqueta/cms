@@ -81,7 +81,7 @@
     <script>
         $(function(){
             tinymce.init({
-                selector: ".editor-padrao",theme: "modern",height: 600,
+                selector: ".editor-padrao",theme: "modern",height: 400,
                 language: 'pt_BR',
                 setup: function (editor) {
                     editor.on('change', function () {

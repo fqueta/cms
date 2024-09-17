@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\admin\AttachmentsController;
 use App\Http\Controllers\admin\HomeController;
+use App\Http\Controllers\admin\PostsController;
 use App\Http\Controllers\EtapaController;
 use App\Http\Controllers\portal\sicController;
 use App\Http\Controllers\portalController;
@@ -173,6 +174,24 @@ Route::middleware([
         Route::get('/test', [TesteController::class,'index']);
         Route::resource('/docfile', '\App\Http\Controllers\admin\DocfileController',['parameters' => [
             'docfile' => 'id'
+        ]]);
+        Route::resource('/leis', '\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'leis' => 'id'
+        ]]);
+        Route::resource('/concursos', '\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'concursos' => 'id'
+        ]]);
+        Route::resource('/decretos', '\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'decretos' => 'id'
+        ]]);
+        Route::resource('/diarios', '\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'decretos' => 'id'
+        ]]);
+        Route::resource('/portarias', '\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'decretos' => 'id'
+        ]]);
+        Route::resource('/convenios', '\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'decretos' => 'id'
         ]]);
         Route::get('/pefil',[EtapaController::class,'index'])->name('sistema.perfil');
         Route::get('/pefil',[UserController::class,'perfilShow'])->name('perfil.show');

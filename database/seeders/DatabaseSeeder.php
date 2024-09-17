@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             escolaridadeSeeder::class,
             estadocivilSeeder::class,
             ProfissaoSeeder::class,
-            // PrefeiturasSeeder::class,
+            DocumentSeeder::class,
             tagSeeder::class,
             MenuSeeder::class,
             PermissionSeeder::class,

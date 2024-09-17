@@ -23,6 +23,7 @@ class CreateDocumentosTable extends Migration
             $table->enum('ativo',['s','n']);
             $table->integer('autor')->nullable();
             $table->longText('conteudo')->nullable();
+            $table->json('config')->nullable();
             $table->enum('excluido',['n','s']);
             $table->text('reg_excluido')->nullable();
             $table->enum('deletado',['n','s']);
