@@ -358,6 +358,7 @@ class Qlib
             $config['parte'] = isset($config['parte']) ? $config['parte'] : 'painel';
             $config['token_produto'] = isset($config['token_produto']) ? $config['token_produto'] : false;
             $config['listFiles'] = isset($config['listFiles']) ? $config['listFiles'] : false; // array com a lista
+            $config['listFilesCode'] = isset($config['listFilesCode']) ? $config['listFilesCode'] : false; // array com a lista
             $config['time'] = isset($config['time']) ? $config['time'] : 4000;
             $config['arquivos'] = isset($config['arquivos']) ? $config['arquivos'] : false;
             if($config['listFiles']){

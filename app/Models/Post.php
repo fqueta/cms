@@ -36,5 +36,6 @@ class Post extends Model
         'post_type',
         'post_mime_type',
         'comment_count',
+        'token',
     ];
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\_upload;
 use App\Models\admin\attachment;
 use App\Qlib\Qlib;
 use Illuminate\Http\Request;
@@ -80,8 +81,14 @@ class AttachmentsController extends Controller
         $ret['exec'] = false;
         $ret['mens'] = 'Erro ao salvar';
         $ret['color'] = 'danger';
+
         if(isset($d['id'])){
-            $salv = attachment::where('id', $d['id'])->update($d);
+            if(isset($d['local']) && $d['local']=='uploads'){
+                unset($d['local']);
+                $salv = _upload::where('id', $d['id'])->update($d);
+            }else{
+                $salv = attachment::where('id', $d['id'])->update($d);
+            }
             if($salv){
                 $ret['exec'] = true;
                 $ret['mens'] = 'Atualizado com sucesso';
@@ -94,11 +101,15 @@ class AttachmentsController extends Controller
      * Metodo para atualizar a ordem dos arquivos das licitações
      * @param array $d_order dados das odens um array contendo ordem e o id
      */
-    public function order_update($d_order){
+    public function order_update($d_order,$local=false){
         $ret['exec'] = false;
         if(is_array($d_order)){
             foreach ($d_order as $order => $id) {
-                $salv = attachment::where('id', $id)->update(['order' => $order]);
+                if($local=='uploads'){
+                    $salv = _upload::where('id', $id)->update(['ordem' => $order]);
+                }else{
+                    $salv = attachment::where('id', $id)->update(['order' => $order]);
+                }
                 if($salv){
                     $ret['exec'] = true;
                 }

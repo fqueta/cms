@@ -437,14 +437,11 @@ class BiddingsController extends Controller
             $files = attachment::where('bidding_id','=',$bidding_id)->orderBy('order','asc')->get();
             if($files->count() > 0){
                 $files =  $files->toArray();
-                $ac = new AttachmentsController;
                 foreach ($files as $kf => $vf) {
                     $ret[$kf] = $vf;
                     $arr_c = Qlib::lib_json_array($vf['file_config']);
                     $ret[$kf]['file_path'] = $arr_c['file_path'];
                     $ret[$kf]['extension'] = @$arr_c['extension'];
-                    // $ret[$kf]['file_path'] = $ac->get_attachmeta($vf['id'],'file_path');
-                    // $ret[$kf]['extension'] = $ac->get_attachmeta($vf['id'],'extension');
                 }
             }
         }

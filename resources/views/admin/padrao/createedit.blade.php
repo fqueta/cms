@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    @if (isset($value['token']))
+    @if (isset($value['token']) && @$config['arquivos'])
         <div class="{{$tam_col2}}">
             <div class="card">
                 <div class="card-header">
@@ -51,6 +51,7 @@
                         'token_produto'=>isset($value['token'])?$value['token']:false,
                         'tab'=>$config['route'],
                         'listFiles'=>@$listFiles,
+                        'listFilesCode'=>@$listFilesCode,
                         'routa'=>@$config['route'],
                         'url'=>@$config['url'],
                         'arquivos'=>@$config['arquivos'],
@@ -81,6 +82,7 @@
             $('[mask-cnpj]').inputmask('99.999.999/9999-99');
             $('[mask-data]').inputmask('99/99/9999');
             $('[mask-cep]').inputmask('99.999-999');
+            list_arquivos('#dados-lista-files');
         });
 
     </script>

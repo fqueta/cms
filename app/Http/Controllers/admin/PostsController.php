@@ -220,7 +220,7 @@ class PostsController extends Controller
             'ac'=>'cad',
             'frm_id'=>'frm-posts',
             'route'=>$this->routa,
-            'arquivos'=>'jpeg,jpg,png',
+            'arquivos'=>false,
         ];
         $value = [
             'token'=>uniqid(),
@@ -423,7 +423,7 @@ class PostsController extends Controller
                 }
             }else{
                 if(isset($dados[0]['token'])){
-                    $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
+                    $listFiles = $this->list_files($dados[0]['token']);
                 }
             }
             $config = [
@@ -433,9 +433,13 @@ class PostsController extends Controller
                 'view'=>$this->view,
                 'sec'=>$this->sec,
                 'id'=>$id,
+                'arquivos'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg',
+                'tam_col1'=>'col-md-6',
+                'tam_col2'=>'col-md-6',
+
             ];
             $config['media'] = [
-                'files'=>'jpeg,jpg,png,pdf,PDF',
+                'files'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg',
                 'select_files'=>'unique',
                 'field_media'=>'post_parent',
                 'post_parent'=>$id,
@@ -471,6 +475,7 @@ class PostsController extends Controller
                 'title'=>$title,
                 'titulo'=>$titulo,
                 'listFiles'=>$listFiles,
+                'listFilesCode'=>Qlib::encodeArray($listFiles),
                 'campos'=>$campos,
                 'exec'=>true,
             ];
@@ -482,23 +487,29 @@ class PostsController extends Controller
             return redirect()->route('home',$ret);
         }
     }
-
+    /**
+     * Metodo para listar todos os arquivos das licitações
+     */
+    public function list_files($token_produto){
+        $ret = [];
+        if($token_produto){
+            $files = _upload::where('token_produto','=',$token_produto)->orderBy('ordem','asc')->get();
+            if($files->count() > 0){
+                $files =  $files->toArray();
+                foreach ($files as $kf => $vf) {
+                    $ret[$kf] = $vf;
+                    $arr_c = Qlib::lib_json_array($vf['config']);
+                    $ret[$kf]['file_path'] = $ret[$kf]['pasta'];
+                    $ret[$kf]['extension'] = @$arr_c['extenssao'];
+                    $ret[$kf]['extenssao'] = @$arr_c['extenssao'];
+                }
+            }
+        }
+        return $ret;
+    }
     public function update(StorePostRequest $request, $id)
     {
         $this->authorize('update', $this->routa);
-        /*
-        if($this->i_wp=='s' && isset($dados['post_type'])){
-            $validatedData = $request->validate([
-                'post_title' => ['required'],
-                //'post_name' => ['required'],
-            ]);
-        }else{
-            $validatedData = $request->validate([
-                'post_title' => ['required'],
-                'post_name' => ['required'],
-            ]);
-
-        }*/
         $data = [];
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
@@ -523,7 +534,7 @@ class PostsController extends Controller
                 //}
             }
         }
-        $userLogadon = Auth::id();
+        // $userLogadon = Auth::id();
         //$data['ativo'] = isset($data['ativo'])?$data['ativo']:'n';
         $data['token'] = !empty($data['token'])?$data['token']:uniqid();
         //$data['autor'] = $userLogadon;
@@ -531,6 +542,8 @@ class PostsController extends Controller
             $dados['config'] = Qlib::lib_array_json($dados['config']);
         }
         $atualizar=false;
+        $d_ordem = isset($data['ordem'])?$data['ordem']:false;
+        unset($data['file'],$data['ordem']);
         if(!empty($data)){
             if($this->i_wp=='s' && isset($dados['post_type'])){
                 $endPoint = 'post/'.$id;
@@ -589,6 +602,10 @@ class PostsController extends Controller
                 'idCad'=>$id,
                 'return'=>$route,
             ];
+            if(is_array($d_ordem)){
+                //atualizar ordem dos arquivos
+                $ret['order_update'] = (new AttachmentsController)->order_update($d_ordem,'uploads');
+            }
             if($atualizar && $d_meta){
                 $ret['salvarPostMeta'] = $this->salvarPostMeta($d_meta);
             }

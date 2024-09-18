@@ -1,24 +1,29 @@
+
 @if ($config['parte']=='painel')
         <link rel="stylesheet" href="{{url('/')}}/css/dropzone.min.css" type="text/css" />
         <script src="{{url('/')}}/js/dropzone.min.js"></script>
         <!-- Button trigger modal -->
         <div class="row">
             <div class="col-md-12 mb-2">
+                <input type="hidden" id="dados-lista-files" value="{{@$config['listFilesCode']}}">
+                <input type="hidden" id="tenant_asset" value="{{tenant_asset('/')}}">
+
                 <span id="lista-files">
-                    {{App\Qlib\Qlib::gerUploadAquivos([
+                    {{-- {{App\Qlib\Qlib::gerUploadAquivos([
                         'parte'=>'lista',
                         'token_produto'=>$config['token_produto'],
                         'tipo'=>'list',
                         'listFiles'=>@$config['listFiles'],
+                        'listFilesCode'=>@$config['listFilesCode'],
                         'routa'=>@$config['routa'],
                         'url'=>@$config['url'],
                         'arquivos'=>@$config['arquivos'],
-                        ])}}
+                        ])}} --}}
 
                 </span>
             </div>
             <div class="col-md-12">
-                @can('create',$config['url'])
+                @can('create',@$config['routa'])
                     @if (isset($config['arquivos']) && $config['arquivos'])
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-upload"></i>
                             {{ __('Enviar arquivos') }}
@@ -74,7 +79,7 @@
         -->
 @endif
 @if ($config['parte']=='lista' && isset($config['listFiles']) && is_object($config['listFiles']))
-    <ul class="list-group">
+    {{-- <ul class="list-group">
         @foreach ($config['listFiles'] as $k=>$vl)
 
         <li class="list-group-item d-flex justify-content-between align-items-center" id="item-{{$vl['id']}}">
@@ -86,6 +91,18 @@
             @endcan
         </li>
         @endforeach
-    </ul>
+    </ul> --}}
+
+    <span id="lista-files">
+        {{-- {{App\Qlib\Qlib::gerUploadAquivos([
+            'parte'=>'lista',
+            'token_produto'=>$config['token_produto'],
+            'tipo'=>'list',
+            'listFiles'=>@$config['listFiles'],
+            'routa'=>@$config['routa'],
+            'url'=>@$config['url'],
+            'arquivos'=>@$config['arquivos'],
+            ])}} --}}
+    </span>
 @endif
 

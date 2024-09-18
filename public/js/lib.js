@@ -492,6 +492,8 @@ function visualizaArquivos(token_produto,ajaxurl,painel){
           if(data.exec && data.arquivos){
             var list = listFiles(data.arquivos,token_produto,painel);
             $('#lista-files').html(list);
+            $( ".sortable" ).sortable();
+
             if(data.mens){
               lib_formatMensagem('.mens',data.mens,'success');
             }
@@ -561,10 +563,17 @@ function listFiles(arquivos,token_produto,painel){
                 '<td style="" class="text-right"><button {event_edit} type="button" title="'+__translate('Gravar o nome do arquivo')+'" class="btn btn-outline-secondary mr-1"><i class="fa fa-check"></i></button><button  title="'+__translate('Excluir o arquivo')+'" type="button" {event} class="btn btn-outline-danger" title="Excluir"><i class="fas fa-trash "></i></button></td>'+
                 '</tr>';
             }else{
-                var tema1 = '<ul class="list-group">{li}</ul>';
-                var tema2 = '<li class="list-group-item d-flex justify-content-between align-items-center" id="item-{id}">'+
-                '<a href="{href}" target="_blank">{icon} {nome}</a>'+
-                '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button></li>';
+                // var tema1 = '<ul class="list-group">{li}</ul>';
+                // var tema2 = '<li class="list-group-item d-flex justify-content-between align-items-center" id="item-{id}">'+
+                // '<a href="{href}" target="_blank">{icon} {nome}</a>'+
+                // '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button></li>';
+                var tema1 = '<form id="files"><table class="table"><thead><tr><th title="'+__translate('Visualizar')+'">Ver</th><th>Nome</th><th>Ação</th></tr></thead><tbody class="sortable">{li}</tbody></table></form>';
+                var tema2 = '<tr class="" id="item-{id}">'+
+                '<td class=""> <i class="fas fa-arrows-alt-v mr-2" style="cursor:pointer" title="'+__translate('Arraste e solte para mudar a ordem')+'"></i> <a href="{href}" title="'+__translate('Ver o arquivo')+'" target="_blank">{icon}</a></td>'+
+                '<td style=""><input type="hidden" name="ordem[]" value="{id}" /><input title="'+__translate('Editar o nome do arquivo')+'" type="text" value="{nome}" name="file[{id}][title]" class="form-control" /></td>'+
+                '<td style="" class="text-right"><button {event_edit} type="button" title="'+__translate('Gravar o nome do arquivo')+'" class="btn btn-outline-secondary mr-1"><i class="fa fa-check"></i></button><button  title="'+__translate('Excluir o arquivo')+'" type="button" {event} class="btn btn-outline-danger" title="Excluir"><i class="fas fa-trash "></i></button></td>'+
+                '</tr>';
+
             }
             var li = '';
             var temaIcon = '<i class="fas fa-file{tipo} fa-2x"></i>',tenant_asset=document.getElementById('tenant_asset').value;
@@ -578,8 +587,11 @@ function listFiles(arquivos,token_produto,painel){
                     var id = arq.id;
                 }else{
                     var id = arq.id;
-                    var href = '/storage/'+arq.pasta;
+                    var href = tenant_asset+'/'+arq.pasta;
+                    // var href = '/storage/'+arq.pasta;
                 }
+                console.log(arq);
+                console.log(tenant_asset);
 
                 var event = 'onclick="excluirArquivo(\''+id+'\',\''+painel+'\')"',event_edit = 'onclick="save_name_attachment(\''+id+'\');"';
                 var icon = '';
@@ -590,7 +602,6 @@ function listFiles(arquivos,token_produto,painel){
                     li = li.replaceAll('{order}',arq.order);
                     li = li.replaceAll('{id}',id);
                     li = li.replaceAll('{href}',href);
-                    // var tf = arq.file_content_type,tfr=tf.split('/')[1];
                     var tfr = arq.extension;
                     if(tfr=='pdf' || tfr=='PDF'){
                         var tipo = '-pdf';
@@ -605,10 +616,26 @@ function listFiles(arquivos,token_produto,painel){
                     }
                     icon = temaIcon.replace('{tipo}',tipo);
                 }else{
+                    event_edit = 'onclick="save_name_attachment(\''+id+'\',\'uploads\');"'
                     li += tema2.replaceAll('{event}',event);
+                    li = li.replaceAll('{event_edit}',event_edit);
                     li = li.replaceAll('{nome}',arq.nome);
+                    li = li.replaceAll('{order}',arq.ordem);
                     li = li.replaceAll('{id}',id);
                     li = li.replaceAll('{href}',href);
+                    var tfr = arq.extension;
+                    if(tfr=='pdf' || tfr=='PDF'){
+                        var tipo = '-pdf';
+                    }else if(tfr=='docx' || tfr=='doc'){
+                        var tipo = '-word';
+                    }else if(tfr=='xls' || tfr=='xlsx'){
+                        var tipo = '-excel';
+                    }else if(tfr=='jpg' || tfr=='png' || tfr=='jpeg'){
+                        var tipo = '-image';
+                    }else{
+                        var tipo = '';
+                    }
+                    icon = temaIcon.replace('{tipo}',tipo);
                 }
                 if(painel=='i_wp'){
                     if(conf = arq.config){
@@ -624,9 +651,6 @@ function listFiles(arquivos,token_produto,painel){
                         }
                         icon = temaIcon.replace('{tipo}',tipo);
                     }
-                }
-                if(painel == 'biddings'){
-
                 }
                 li = li.replace('{icon}',icon);
             }
@@ -645,7 +669,14 @@ function list_arquivos_biddings(sel){
     document.querySelector('#lista-files').innerHTML = mont_file;
     $( ".sortable" ).sortable();
 }
-function save_name_attachment(id){
+function list_arquivos(sel){
+    var code_arquivos = document.querySelector(sel).value,arquivos = decodeArray(code_arquivos);
+    var mont_file = listFiles(arquivos,false);
+    console.log(arquivos);
+    document.querySelector('#lista-files').innerHTML = mont_file;
+    $( ".sortable" ).sortable();
+}
+function save_name_attachment(id,local){
     var title = document.querySelector('[name="file['+id+'][title]"]').value;
     ajaxurl = '/admin/ajax/attachments/'+id
     $.ajaxSetup({
@@ -658,7 +689,8 @@ function save_name_attachment(id){
         url: ajaxurl,
         data: {
             id:id,
-            title:title,
+            nome:title,
+            local:local,
         },
         dataType: 'json',
         success: function (data) {
