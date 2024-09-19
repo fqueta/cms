@@ -185,13 +185,13 @@ Route::middleware([
             'decretos' => 'id'
         ]]);
         Route::resource('/diarios', '\App\Http\Controllers\admin\PostsController',['parameters' => [
-            'decretos' => 'id'
+            'diarios' => 'id'
         ]]);
         Route::resource('/portarias', '\App\Http\Controllers\admin\PostsController',['parameters' => [
-            'decretos' => 'id'
+            'portarias' => 'id'
         ]]);
         Route::resource('/convenios', '\App\Http\Controllers\admin\PostsController',['parameters' => [
-            'decretos' => 'id'
+            'convenios' => 'id'
         ]]);
         Route::get('/pefil',[EtapaController::class,'index'])->name('sistema.perfil');
         Route::get('/pefil',[UserController::class,'perfilShow'])->name('perfil.show');
@@ -222,6 +222,7 @@ Route::name('api.')->prefix('api/v1')->middleware([
         // Route::resource('/banners', 'BannersController', ['only' => ['index']]);
         // Route::resource('/floaters', 'FloatersController', ['only' => ['index']]);
         Route::resource('/biddings', '\App\Http\Controllers\api\BiddingsController', ['only' => ['index']]);
+        Route::resource('/documents', '\App\Http\Controllers\api\PostController', ['only' => ['index']]);
         // Route::resource('/btrimestrals', 'BtrimestralsController', ['only' => ['index']]);
         // Route::resource('/sections', 'SectionsController', ['only' => ['index']]);
         // Route::resource('/newsletters', 'NewslettersController', ['only' => ['store']]);

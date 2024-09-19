@@ -185,7 +185,31 @@ class UploadController extends Controller
         }
         //Qlib::lib_print($salvar);
     }
-
+    public function total($token_produto)
+    {
+       return _upload::where('token_produto', $token_produto)->count();
+    }
+    /**
+     * Metodo para listar todos os arquivos das licitações
+     */
+    public function list_files($token_produto){
+        $ret = [];
+        if($token_produto){
+            $files = _upload::select('id', 'nome as name','pasta as link' , 'ordem as ordenar', 'config')->where('token_produto','=',$token_produto)->orderBy('ordem','asc')->get();
+            if($files->count() > 0){
+                $files =  $files->toArray();
+                foreach ($files as $kf => $vf) {
+                    $ret[$kf] = $vf;
+                    $arr_c = Qlib::lib_json_array($vf['config']);
+                    // $ret[$kf]['file_path'] = $ret[$kf]['pasta'];
+                    $ret[$kf]['extension'] = @$arr_c['extenssao'];
+                    $ret[$kf]['extension'] = @$arr_c['extenssao'];
+                    $ret[$kf]['local_file'] = @$ret[$kf]['link'];
+                }
+            }
+        }
+        return $ret;
+    }
     public function show($id)
     {
         //

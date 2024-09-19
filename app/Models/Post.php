@@ -12,7 +12,9 @@ class Post extends Model
     protected $table = 'posts';
     const CREATED_AT = 'post_date';
     const UPDATED_AT = 'post_modified';
-
+    protected $casts = [
+        'config' => 'array',
+    ];
     protected $fillable = [
         'post_author',
         'post_date',
@@ -36,6 +38,12 @@ class Post extends Model
         'post_type',
         'post_mime_type',
         'comment_count',
+        'config',
         'token',
     ];
+    public function doc_files()
+    {
+        $d = $this->hasMany(_upload::class,'token_produto','token')->select(['id', 'nome as name','pasta as url' , 'ordem as ordenar', 'config'])->orderBy('ordem', 'ASC');
+        return $d;
+    }
 }
