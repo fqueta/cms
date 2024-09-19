@@ -33,7 +33,9 @@ class PostController extends Controller
             ->where('post_type', 'LIKE', $request->get("type"))
             ->orderBy('ano', 'asc')
             ->get();
-
+            if($request->has('year') && trim($request->get('year')) !== ""){
+                $posts = $posts->whereYear('post_date_gmt','=',$request->get('year'));
+            }
             // ->get();
             if($request->has('description'))
                 $files = $posts->where('post_content', 'LIKE', '%'.$request->get("description").'%');
