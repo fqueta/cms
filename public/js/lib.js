@@ -1082,7 +1082,7 @@ function qFormCampos(config){
     var ret = '';
     if(Object.entries(config).length>0){
         Object.entries(config).forEach(([key, v]) => {
-            if(v.js || v.active){
+            if(v.js){
                 if(v.type == 'selector' || v.type == 'select'){
                     let op='',arr = v.arr_opc,tm1 = tema['select'].tm1,tm2 = tema['select'].tm2;
                     var value = v.value?v.value:'';

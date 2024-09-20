@@ -133,7 +133,7 @@ class UploadController extends Controller
                         'pasta'=>$nomeArquivoSavo,
                         'ordem'=>$ordem,
                         'nome'=>$filenameWithExt,
-                        'config'=>json_encode(['extenssao'=>$extension,'local'=>$local]),
+                        'config'=>json_encode(['extenssao'=>$extension,'local'=>$local,'size'=>$size]),
                     ]);
                 }
             }

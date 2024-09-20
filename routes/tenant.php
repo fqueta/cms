@@ -193,6 +193,12 @@ Route::middleware([
         Route::resource('/convenios', '\App\Http\Controllers\admin\PostsController',['parameters' => [
             'convenios' => 'id'
         ]]);
+        Route::resource('/archives', '\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'archives' => 'id'
+        ]]);
+        Route::resource('/archives_category', '\App\Http\Controllers\admin\DefaultController',['parameters' => [
+            'archives_category' => 'id'
+        ]]);
         Route::get('/pefil',[EtapaController::class,'index'])->name('sistema.perfil');
         Route::get('/pefil',[UserController::class,'perfilShow'])->name('perfil.show');
         Route::get('/pefil/edit',[UserController::class,'perfilEdit'])->name('perfil.edit');

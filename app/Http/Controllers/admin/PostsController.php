@@ -141,7 +141,31 @@ class PostsController extends Controller
         $d_pagina = $this->pagina();
         if(isset($d_pagina['config']) && !empty($d_pagina['config'])){
             $ret = $d_pagina['config'];
-            // dd($ret);
+            if($this->post_type=='archives'){
+                $route_category = 'archives_category';
+                $archives_category = new DefaultController(['route'=>$route_category]);
+                $id_pai = Qlib::buscaValorDb0('tags','value',$route_category,'id');
+                if(isset($ret['guid'])){
+                    $ret['guid'] = [
+                        'label'=>'Categoria',
+                        'active'=>true,
+                        'type'=>'selector',
+                        'data_selector'=>[
+                            'campos'=>$archives_category->campos(),
+                            'route_index'=>route('archives_category.index'),
+                            'id_form'=>'frm-archives_category',
+                            'action'=>route('archives_category.store'),
+                            'campo_id'=>'id',
+                            'campo_bus'=>'nome',
+                            'label'=>'Categoria',
+                        ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$id_pai'",'nome','id'),'exibe_busca'=>'d-block',
+                        'event'=>'required',
+                        //'event'=>'onchange=carregaMatricula($(this).val())',
+                        'tam'=>'12',
+                        'value'=>@$_GET['archives_category'],
+                    ];
+                }
+            }
         }else{
             $ret = [
                 'ID'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
@@ -384,8 +408,9 @@ class PostsController extends Controller
                 }else{
                     $title = __('Sem titulo');
                 }
+            }else{
+                $title = 'Cadastro de '.$d_pagina['nome'];
             }
-            $title = 'Cadastro de '.$d_pagina['nome'];
 
         }
         $ret['title'] = $title;

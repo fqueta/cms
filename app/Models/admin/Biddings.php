@@ -15,6 +15,7 @@ class Biddings extends Model
         'token',
         'genre_id',
         'phase_id',
+        'year',
         'title',
         'subtitle',
         'indentifier',

@@ -33,6 +33,7 @@ class DefaultController extends Controller
             'biddings_phases'=>['label'=>'Fases','tab'=>'bidding_phases'],
             'biddings_genres'=>['label'=>'Fases','tab'=>'bidding_genres'],
             'biddings_types'=>['label'=>'Fases','tab'=>'bidding_types'],
+            'archives_category'=>['label'=>'Categorias de arquivos','tab'=>'tags'],
         ];
         $this->label = @$arr_cf[$this->routa]['label'];
         $this->tab = @$arr_cf[$this->routa]['tab'];
@@ -53,8 +54,13 @@ class DefaultController extends Controller
         ];
 
         // $biddings_categories =  BiddingCategory::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
-        $biddings_categories =  DB::table($this->tab)->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
-
+        if($this->routa=='archives_category'){
+            //filtrar as categorias de arquivos que esta armazenado na tabel tags
+            $id_pai = Qlib::buscaValorDb0('tags','value',$this->routa,'id');
+            $biddings_categories =  DB::table($this->tab)->where('pai',$id_pai)->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        }else{
+            $biddings_categories =  DB::table($this->tab)->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        }
         $escolaridade_totais = new stdClass;
         $campos = $this->campos();
         $tituloTabela = 'Lista de todos cadastros';
@@ -125,14 +131,34 @@ class DefaultController extends Controller
     public function campos($id=null){
         if($this->routa=='biddings_phases' || $this->routa=='biddings_types' || $this->routa=='biddings_genres'){
             return [
-                'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'id'=>['label'=>'Id','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                 // 'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-                'autor'=>['label'=>'autor','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-                'name'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Suspenso','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12','validate'=>['required','string',Rule::unique($this->tab)->ignore($id)]],
-                'ativo'=>['label'=>'Ativado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+                'autor'=>['label'=>'autor','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'name'=>['label'=>'Nome','active'=>true,'js'=>true,'placeholder'=>'Ex.: Suspenso','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12','validate'=>['required','string',Rule::unique($this->tab)->ignore($id)]],
+                'ativo'=>['label'=>'Ativado','active'=>true,'js'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
                 // 'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             ];
+        }elseif($this->routa=='archives_category'){
+            $id_pai = Qlib::buscaValorDb0('tags','value',$this->routa,'id');
+            return [
+                'id'=>['label'=>'Id','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'pai'=>['label'=>'pai','active'=>true,'js'=>true,'value'=>$id_pai,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                // 'value'=>['label'=>'Valor','active'=>false,'value'=>$this->routa,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'token'=>['label'=>'token','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'autor'=>['label'=>'autor','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'nome'=>['label'=>'Nome','active'=>true,'js'=>true,'placeholder'=>'Ex.: Contratações','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12','validate'=>['required','string',Rule::unique($this->tab)->ignore($id)]],
+                'obs'=>['label'=>'Descrição','active'=>false,'js'=>true,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+                'ativo'=>['label'=>'Ativado','active'=>true,'js'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            ];
         }else{
+            return [
+                'id'=>['label'=>'Id','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                // 'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'autor'=>['label'=>'autor','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'name'=>['label'=>'Nome','active'=>true,'js'=>true,'placeholder'=>'Ex.: Suspenso','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12','validate'=>['required','string',Rule::unique($this->tab)->ignore($id)]],
+                'ativo'=>['label'=>'Ativado','active'=>true,'js'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+                // 'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            ];
 
         }
     }

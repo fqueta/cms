@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\UploadController;
 use App\Models\Post;
+use App\Qlib\Qlib;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,14 @@ class PostController extends Controller
         $limit = false;
         $page = 0;
         if($type = $request->get('type')){
+            if($type == 'archives'){
+                $fcode = 'guid as category_id';
+                $id_pai = Qlib::buscaValorDb0('tags','value','archives_category','id');
+                $all_categories = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$id_pai'",'nome','id');
+            }else{
+                $all_categories = [];
+                $fcode = 'guid as code';
+            }
             $posts = Post::select(
                 'ID as id',
                 'post_type as type',
@@ -23,7 +32,7 @@ class PostController extends Controller
                 'post_content as description',
                 'post_date_gmt as date',
                 'token',
-                'guid as code',
+                $fcode,
                 'config'
             )
             // ->with('doc_files')
@@ -61,11 +70,14 @@ class PostController extends Controller
                 $doc=$doc->toArray();
                 $fi = new UploadController;
                 foreach($doc as $key => $value){
+                    if(isset($value['category_id'])){
+                        $doc[$key]['category'] = @$all_categories[$value['category_id']];
+                    }
                     $doc[$key]['total_files'] = $fi->total($value['token']);
                     $doc[$key]['doc_files'] = $fi->list_files($value['token']);
                 }
             }
-            return ['amount'=>$count,'data' => $doc,'anos'=>$anos];
+            return ['amount'=>$count,'data' => $doc,'anos'=>$anos,'all_categories'=>$all_categories];
         }
     }
 }

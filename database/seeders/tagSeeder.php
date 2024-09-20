@@ -17,6 +17,7 @@ class tagSeeder extends Seeder
         $arr = [
             ['nome'=>'SECRETARIAS NO SIC','obs'=>'Secretarias de uma prefeitura'],
             ['nome'=>'CATEGORIA DO SIC','obs'=>'Todas a categorias de assuntos do E-sic de acordo com a secretaria.'],
+            ['nome'=>'CATEGORIA DE ARQUIVOS','obs'=>'Todas as categorias de arquivos do sistema',"value"=>"archives_category",],
             [
                 'nome'=>'Assessoria de Planejamento Urbanístico',
                 'pai'=>1,
@@ -374,7 +375,7 @@ class tagSeeder extends Seeder
         Tag::truncate();
         foreach ($arr as $key => $value) {
             $d = $value;
-            $d['value']=uniqid();
+            $d['value']= isset($value['value']) ? $value['value'] :  uniqid();
             Tag::create($d);
         }
     }
