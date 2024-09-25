@@ -142,15 +142,15 @@
             <textarea name="{{$config['campo']}}" {{$config['event']}} class="form-control @error($config['campo']) is-invalid @enderror {{$config['class']}}" rows="{{@$config['rows']}}" cols="{{@$config['cols']}}">@if(isset($config['value'])){{$config['value']}}@elseif($config['ac']=='cad'){{old($config['campo'])}}@endif</textarea>
             </div>
         </div>
-    @elseif ($config['type']=='html')
+        @elseif ($config['type']=='html')
         @php
-            $config['script'] = isset($config['script'])?$config['script']:false;
+           $config['script'] = isset($config['script'])?$config['script']:false;
+
         @endphp
         <div class="col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
             @if ($config['script'])
-                @if(isset($config['text_html']) && !empt($config['text_html']))
-                    {!!$config['text_html']!!}
-                @elseif(isset($config['dados']))
+                @if(isset($config['dados']))
+                    {{-- {{dd($config['script'])}} --}}
                     @include($config['script'],['dados'=>$config['dados']])
                 @else
                     @include($config['script'])

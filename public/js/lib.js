@@ -558,7 +558,7 @@ function listFiles(arquivos,token_produto,painel){
             }else if(painel=='biddings'){
                 var tema1 = '<form id="files"><table class="table"><thead><tr><th title="'+__translate('Visualizar')+'">Ver</th><th>Nome</th><th>Ação</th></tr></thead><tbody class="sortable">{li}</tbody></table></form>';
                 var tema2 = '<tr class="" id="item-{id}">'+
-                '<td class=""> <i class="fas fa-arrows-alt-v mr-2" style="cursor:pointer" title="'+__translate('Arraste e solte para mudar a ordem')+'"></i> <a href="{href}" title="'+__translate('Ver o arquivo')+'" target="_blank">{icon}</a></td>'+
+                '<td class="pl-0 pr-0"> <i class="fas fa-arrows-alt-v mr-2" style="cursor:pointer" title="'+__translate('Arraste e solte para mudar a ordem')+'"></i> <a href="{href}" title="'+__translate('Ver o arquivo')+'" target="_blank">{icon}</a></td>'+
                 '<td style=""><input type="hidden" name="order[]" value="{id}" /><input title="'+__translate('Editar o nome do arquivo')+'" type="text" value="{nome}" name="file[{id}][title]" class="form-control" /></td>'+
                 '<td style="" class="text-right"><button {event_edit} type="button" title="'+__translate('Gravar o nome do arquivo')+'" class="btn btn-outline-secondary mr-1"><i class="fa fa-check"></i></button><button  title="'+__translate('Excluir o arquivo')+'" type="button" {event} class="btn btn-outline-danger" title="Excluir"><i class="fas fa-trash "></i></button></td>'+
                 '</tr>';
@@ -569,7 +569,7 @@ function listFiles(arquivos,token_produto,painel){
                 // '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button></li>';
                 var tema1 = '<form id="files"><table class="table"><thead><tr><th title="'+__translate('Visualizar')+'">Ver</th><th>Nome</th><th>Ação</th></tr></thead><tbody class="sortable">{li}</tbody></table></form>';
                 var tema2 = '<tr class="" id="item-{id}">'+
-                '<td class=""> <i class="fas fa-arrows-alt-v mr-2" style="cursor:pointer" title="'+__translate('Arraste e solte para mudar a ordem')+'"></i> <a href="{href}" title="'+__translate('Ver o arquivo')+'" target="_blank">{icon}</a></td>'+
+                '<td class="pl-0 pr-0"> <i class="fas fa-arrows-alt-v mr-2" style="cursor:pointer" title="'+__translate('Arraste e solte para mudar a ordem')+'"></i> <a href="{href}" title="'+__translate('Ver o arquivo')+'" target="_blank">{icon}</a></td>'+
                 '<td style=""><input type="hidden" name="ordem[]" value="{id}" /><input title="'+__translate('Editar o nome do arquivo')+'" type="text" value="{nome}" name="file[{id}][title]" class="form-control" /></td>'+
                 '<td style="" class="text-right"><button {event_edit} type="button" title="'+__translate('Gravar o nome do arquivo')+'" class="btn btn-outline-secondary mr-1"><i class="fa fa-check"></i></button><button  title="'+__translate('Excluir o arquivo')+'" type="button" {event} class="btn btn-outline-danger" title="Excluir"><i class="fas fa-trash "></i></button></td>'+
                 '</tr>';
@@ -840,6 +840,9 @@ function getAjax(config,funCall,funError){
     if(typeof config.type == 'undefined'){
         config.type = 'GET';
     }
+    if(typeof config.dataType == 'undefined'){
+        config.dataType = 'json';
+    }
     if(typeof config.data == 'undefined'){
         config.data = {ajax:'s'};
     }
@@ -854,11 +857,21 @@ function getAjax(config,funCall,funError){
             lib_funError(res);
         }
     }
+    if(typeof config.csrf == 'undefined'){
+        config.csrf = '';
+    }
+    if(config.csrf){
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    }
     $.ajax({
         type: config.type,
         url: config.url,
         data: config.data,
-        dataType: 'json',
+        dataType: config.dataType,
         beforeSend: function(){
             $('#preload').fadeIn();
         },
@@ -2009,4 +2022,50 @@ function selectTipoUser(tipo){
     window.history.pushState("object", "Title", url);
     $('[for="nome"]').html(lab_nome);
     $('[for="cpf"]').html(lab_cpf);
+}
+function checkTodosAnos() {
+    let urlAtual = lib_trataRemoveUrl('ano','');
+    window.location=urlAtual;
+    $('#preload').show();
+}
+function lib_autocompleteGeral(cl,funCall){
+    var urlAuto = $(cl).attr('url');
+    if(typeof funCall=='undefined'){
+        $( cl ).autocomplete({
+            source: urlAuto,
+            select: function (event, ui) {
+                lib_listarCadastro(ui.item,$(this));
+            },
+        });
+    }else{
+        $( cl ).autocomplete({
+            source: urlAuto,
+            select: function (event, ui) {
+                funCall(ui.item,$(this));
+            },
+        });
+    }
+}
+function update_status_post(obj){
+    let id = obj.getAttribute('data-id');
+    let status = obj.checked;
+    let tab = obj.getAttribute('data-tab');
+    getAjax({
+        url:'/admin/ajax/chage_status',
+        type: 'POST',
+        dataType: 'json',
+        csrf: true,
+        data:{
+            id: id,
+            status: status,
+            tab: tab,
+        }
+    },function(res){
+        $('#preload').fadeOut("fast");
+        lib_formatMensagem('.mens',res.mens,res.color);
+
+    },function(err){
+        $('#preload').fadeOut("fast");
+        console.log(err);
+    });
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\UploadController;
 use App\Http\Controllers\wp\ApiWpController;
 use App\Http\Requests\StorePostRequest;
 use Illuminate\Http\Request;
@@ -12,9 +13,10 @@ use App\Qlib\Qlib;
 use App\Models\User;
 use App\Models\_upload;
 use App\Models\Documento;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Str;
 class PostsController extends Controller
 {
     protected $user;
@@ -24,24 +26,32 @@ class PostsController extends Controller
     public $post_type;
     public $sec;
     public $tab;
+    public $ac; //acao da requsição $ac = 'cad' para create $ac = 'alt' para edit
     public $i_wp;//integração com wp
     public $wp_api;//integração com wp
     public $d_pagina;//integração com wp
-    public function __construct(User $user)
+    public function __construct()
     {
         $this->middleware('auth');
         $seg1 = request()->segment(2);
+        $seg2 = request()->segment(3);
         $type = false;
         if($seg1){
             // $type = substr($seg1,0,-1);
             $type = $seg1;
         }
+        $user = Auth::user();
         $this->post_type = $type;
         $this->sec = $seg1;
         $this->user = $user;
+        if($seg2=='create'){
+            $this->ac = 'cad';
+        }elseif(request()->segment(4)){
+            $this->ac = 'alt';
+        }
         $this->routa = $this->sec;
         $this->label = 'Posts';
-        if($this->sec=='pages'){
+        if($this->sec=='pages' || $this->sec=='posts'){
             $this->view = 'posts';
         }else{
             $this->view = 'admin.padrao';
@@ -132,11 +142,15 @@ class PostsController extends Controller
         ];
         return $ret;
     }
-    public function campos($sec=false){
-        $sec = $sec?$sec:$this->sec;
+    public function campos($id=false){
+        $sec = $this->sec;
         $hidden_editor = '';
         if(Qlib::qoption('editor_padrao')=='laraberg'){
             $hidden_editor = 'hidden';
+        }
+        $d = [];
+        if($id){
+            $d = Post::find($id);
         }
         $d_pagina = $this->pagina();
         if(isset($d_pagina['config']) && !empty($d_pagina['config'])){
@@ -146,6 +160,9 @@ class PostsController extends Controller
                 $archives_category = new DefaultController(['route'=>$route_category]);
                 $id_pai = Qlib::buscaValorDb0('tags','value',$route_category,'id');
                 if(isset($ret['guid'])){
+                    if($this->ac=='alt'){
+                        $ret['html1']=['label'=>'titulo','active'=>false,'type'=>'html_script','script'=>'<h6 class="text-right"><b title="codigo de inserção deste arquivo em um post">Código:</b> <span style="" id="short_code">*|posts-'.$id.'|*</span></h6>'];
+                    }
                     $ret['guid'] = [
                         'label'=>'Categoria',
                         'active'=>true,
@@ -171,15 +188,31 @@ class PostsController extends Controller
                 'ID'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                 'post_type'=>['label'=>'tipo de post','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=>$this->post_type],
                 'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'html1'=>['label'=>'titulo','active'=>false,'type'=>'html_script','script'=>''],
                 'post_title'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Nome do post','type'=>'text','exibe_busca'=>'d-block','event'=>'onkeyup=lib_typeSlug(this)','tam'=>'12'],
-                //'post_name'=>['label'=>'Slug','active'=>true,'placeholder'=>'Ex.: nome-do-post','type'=>'url','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+                'post_name'=>['label'=>'Slug','active'=>false,'placeholder'=>'Ex.: nome-do-post','type'=>'hidden','exibe_busca'=>'d-block','event'=>'type_slug=true','tam'=>'12'],
                 'post_excerpt'=>['label'=>'Resumo (Opcional)','active'=>true,'placeholder'=>'Uma síntese do um post','type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-                //'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-                'post_status'=>['label'=>'Publicar','active'=>true,'type'=>'chave_checkbox','value'=>'publish','valor_padrao'=>'publish','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['publish'=>'Publicado','pending'=>'Pendente']],
-                'post_content'=>['label'=>'Conteudo','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>$hidden_editor,'tam'=>'12','class_div'=>'','class'=>'editor-padrao','placeholder'=>__('Escreva seu conteúdo aqui..')],
+                // 'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+                'post_content'=>['label'=>'Conteudo','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>$hidden_editor,'tam'=>'12','class_div'=>'','class'=>'summernote','placeholder'=>__('Escreva seu conteúdo aqui..')],
+                'post_status'=>['label'=>'Publicar','active'=>true,'type'=>'chave_checkbox','value'=>'publish','valor_padrao'=>'publish','exibe_busca'=>'d-block','event'=>'','tam'=>'6','arr_opc'=>['publish'=>'Publicado','pending'=>'Pendente'],'tab'=>'posts'],
             ];
+            if($this->post_type=='posts'){
+                if($this->ac=='alt'){
+                    $ret['html1']['script'] = '<div class="col-12 text-right">Id: '.@$d['ID'].' Data: '. Qlib::dataExibe( @$d['post_date']).'</div>';
+                    $ret['html1']['script'] .= '<div class="col-12"><a class="underline" target="_BLANK" href="'.$this->lib_preview($d['post_name']).'">Visualizar Conteúdo púbilco</a></div>';
+                }
+                $ret['config[capa_artigo]']=['label'=>'Capa no artigo','cp_busca'=>'config][capa_artigo','active'=>false,'','type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não'],'title'=>'Função para exibir imagem de capa dentro do artigo.'];
+                // $ret['post_name']['type'] = 'text';
+            }
         }
         return $ret;
+    }
+    /**
+     * Metodo para gerar um lino de preview de posts
+     * @param string $post_id
+     */
+    public function lib_preview($post_id){
+        return url('/preview/posts/' . $post_id);
     }
     /**
      * Metodo para montar um array que configura a página de acordo com a tabela documentos dessa forma essa area será dinamica
@@ -244,6 +277,7 @@ class PostsController extends Controller
             'ac'=>'cad',
             'frm_id'=>'frm-posts',
             'route'=>$this->routa,
+            'view'=>$this->view,
             'arquivos'=>false,
         ];
         $value = [
@@ -263,23 +297,47 @@ class PostsController extends Controller
         $post_id = isset($config['post_id'])?$config['post_id']:false;
         $meta_key = isset($config['meta_key'])?$config['meta_key']:false;
         $meta_value = isset($config['meta_value'])?$config['meta_value']:false;
+        $tab = isset($config['tab'])?$config['tab']:'postmeta';
         $ret = false;
         if($post_id&&$meta_key&&$meta_value){
-            $verf = Qlib::totalReg('wp_postmeta',"WHERE post_id='$post_id' AND meta_key='$meta_key'");
+            $verf = Qlib::totalReg($tab,"WHERE post_id='$post_id' AND meta_key='$meta_key'");
             if($verf){
-                $ret=DB::table('wp_postmeta')->where('post_id',$post_id)->where('meta_key',$meta_key)->update([
+                $ret=DB::table($tab)->where('post_id',$post_id)->where('meta_key',$meta_key)->update([
                     'meta_value'=>$meta_value,
                 ]);
             }else{
-                $ret=DB::table('wp_postmeta')->insert([
+                $ret=DB::table($tab)->insert([
                     'post_id'=>$post_id,
                     'meta_value'=>$meta_value,
                     'meta_key'=>$meta_key,
                 ]);
             }
-            //$ret = DB::table('wp_postmeta')->storeOrUpdate();
+            //$ret = DB::table($tab)->storeOrUpdate();
         }
         return $ret;
+    }
+    /**Metodo para criar e verificar se um slug ja está cadastrdo
+     * @params string $title é o titulo do post, $id é id da postagem
+     * @ret é o post valido para ser salvo
+     * uso $slug = (new PostController)->str_slug($title,$id=false);
+     *
+    */
+    public function str_slug($title,$id=false){
+        $slug = Str::slug($title, '-');
+        if($id){
+            $verifica = Post::where('post_name', 'LIKE','%'.$slug.'%')->where('ID','!=',$id)->get();
+        }else{
+            $verifica = Post::where('post_name', 'LIKE','%'.$slug.'%')->get();
+        }
+        if($tot=$verifica->count()){
+            if($tot>1){
+                $tot++;
+            }
+            $ret=$slug.'-'.$tot;
+            return $ret;
+        }else{
+            return $slug;
+        }
     }
     public function store(StorePostRequest $request)
     {
@@ -317,6 +375,10 @@ class PostsController extends Controller
             }
         }else{
             $dados['post_author'] = isset($dados['post_author']) ? $dados['post_author'] : Auth::id();
+            if(($this->post_type == 'posts' || $this->post_type == 'pages') && isset($dados['post_title'])){
+                // $dados['post_name'] = isset($dados['post_name']) ? $dados['post_name'] : $this->str_slug($dados['post_title']);
+                $dados['post_name'] = $this->str_slug($dados['post_title']);
+            }
             $salvar = Post::create($dados);
             if(isset($salvar->id) && $salvar->id){
                 $mens = $this->label.' cadastrado com sucesso!';
@@ -463,8 +525,12 @@ class PostsController extends Controller
                 'tam_col2'=>'col-md-6',
 
             ];
+            if($this->post_type =='posts'){
+                $config['tam_col1'] = 'col-md-7';
+                $config['tam_col2'] = 'col-md-5';
+            }
             $config['media'] = [
-                'files'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg',
+                'files'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg,JPG',
                 'select_files'=>'unique',
                 'field_media'=>'post_parent',
                 'post_parent'=>$id,
@@ -489,7 +555,7 @@ class PostsController extends Controller
                 $imgd = Post::where('ID', '=', $dados[0]['post_parent'])->where('post_status','=','publish')->get();
                 if( $imgd->count() > 0 ){
                     // dd($imgd[0]['guid']);
-                    $dados[0]['imagem_destacada'] = Qlib::qoption('storage_path'). '/'.$imgd[0]['guid'];
+                    $dados[0]['imagem_destacada'] = tenant_asset($imgd[0]['guid']);
                 }
             }
             //REGISTRAR EVENTOS
@@ -538,6 +604,7 @@ class PostsController extends Controller
         $data = [];
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
+        $dados['post_status'] = isset($dados['post_status'])?$dados['post_status']:'pending';
         $d_meta = false;
         if(isset($dados['d_meta'])){
             $d_meta = $dados['d_meta'];
@@ -570,6 +637,11 @@ class PostsController extends Controller
         $d_ordem = isset($data['ordem'])?$data['ordem']:false;
         unset($data['file'],$data['ordem']);
         if(!empty($data)){
+            if(($this->post_type == 'posts' || $this->post_type == 'pages') && isset($data['post_title'])){
+                // $data['post_name'] = isset($data['post_name']) ? $data['post_name'] : $this->str_slug($data['post_title']);
+                $data['post_name'] = $this->str_slug($data['post_title']);
+                $data['config']['capa_artigo'] = isset($data['config']['capa_artigo']) ? $data['config']['capa_artigo'] : 'n';
+            }
             if($this->i_wp=='s' && isset($dados['post_type'])){
                 $endPoint = 'post/'.$id;
                 $arr_parm = [
@@ -690,6 +762,132 @@ class PostsController extends Controller
             $ret = response()->json(['mens'=>__($mens),'color'=>$color,'return'=>route($this->routa.'.index')]);
         }else{
             $ret = redirect()->route($routa.'.index',['mens'=>$mens,'color'=>$color]);
+        }
+        return $ret;
+    }
+    /**
+     * Metodo para exibir os dados de um post
+     */
+    public function get_post($post_id){
+        $d=Post::find($post_id);
+        if($d->count()>0){
+            $dimd = Post::where('ID', '=', $d['post_parent'])->where('post_status','=','publish')->get();
+            if($dimd->count()>0){
+                $d['imagem_destacada'] = tenant_asset($dimd[0]['guid']);
+            }else{
+                $d['imagem_destacada'] = '';
+            }
+        }
+        return $d;
+    }
+    /**
+     * Metodo para exibir a imagem destacada
+     */
+    public function get_imgd($post_id,$type=false){
+        $d=$this->get_post($post_id);
+        $imgd=false;
+        if(isset($d['imagem_destacada']) && ($imgd = $d['imagem_destacada'])){
+            if($type == 'html'){
+                $imgd = str_replace('{img}',$imgd,'<div class="row"><div class="col-md-12 imagem-destacada mb-3"><img src="{img}" class="w-100"/></div></div>');
+            }
+        }
+        return $imgd;
+    }
+    /**
+     * Metodo para rederisar um contedo de uma postagem atraves de um codigo de $code=[posts+_+ID]
+     * @return string $ret
+     */
+    public function short_code($code){
+        $ret = '';
+        $dcod = explode('-', $code);
+        $tab = isset($dcod[0])?$dcod[0]:false;
+        $id = isset($dcod[1])?$dcod[1]:false;
+        if($tab && $id){
+
+            $d = DB::table($tab)->find($id);
+            if($d->ID > 0){
+                // dump($d);
+                $h1 = '<h1 class="h1-cms">{conteudo}</h1>';
+                $dconf = Qlib::lib_json_array($d->config);
+                $imgd = false;
+                if(isset($dconf['capa_artigo']) && $dconf['capa_artigo']=='s'){
+                    //Opção para exibir a imagem destacado no topo da noticia
+                    $imgd = $this->get_imgd($id,'html');
+                    // dd($imgd);
+                }
+                $style_video = '<style>
+                                    .note-editor iframe, .note-video-clip iframe {
+                                        width: 100% !important;
+                                        height: auto !important;
+                                    }
+                                </style>';
+                $page = '{style_video}{ret}';
+                $h2 = '<h2 class="h2-cms">{conteudo}</h2>';
+                $p = '<p class="p-cms">{conteudo}</p>';
+                $row = '<div class="row">{conteudo}</div>';
+                $col12 = '<div class="col-md-12">{conteudo}</div>';
+                $ret = str_replace('{conteudo}',$d->post_title,$h1);
+                $ret .= $imgd;
+                if($d->post_excerpt)
+                    $ret .= str_replace('{conteudo}',str_replace('{conteudo}',$d->post_excerpt,$col12),$row);
+                $ret .= str_replace('{conteudo}',str_replace('{conteudo}',$d->post_content,$col12),$row);
+                $galeria = $this->list_galeria($d->token);
+                $ret .= $galeria;
+                $ret = str_replace('{ret}',$ret,$page);
+                $ret = str_replace('{style_video}',$style_video,$ret);
+            }
+
+        }
+        return $ret;
+    }
+    /**
+     * Metodoa para listar uma galeria
+     * @param string $token é o tokem do post
+     * @return string $ret retorna uma html da galeria montado
+     */
+    public function list_galeria($token){
+        $ret = false;
+        if(!$token){
+            return $ret;
+        }
+        $list_files = (new UploadController)->list_files($token);
+        if(is_array($list_files)){
+            $tema_gal1 = '<div class="row">{gal}</div>';
+            $tema_gal2 = '<div class="col-md-{tam_file} text-center"><a class="venobox" href="{link}" {target}><img src="{link_img}" class="w-100"/></a><br>{name}</div>';
+            $gal = false;
+            $tam_file = 2;
+            foreach ($list_files as $kf => $vf) {
+                $ex = isset($vf['extension']) ? $vf['extension'] : '';
+                $target = 'target="_BLANK"';
+                if($ex == 'jpeg' || $ex == 'png' || $ex == 'PNG' || $ex == 'jpg'){
+                    $link_img = tenant_asset($vf['link']);
+                    $target = '';
+                }elseif($ex == 'xls' || $ex == 'xlsx'){
+                    $link_img = asset('/images/excel.png');
+                }elseif($ex == 'doc' || $ex == 'docx'){
+                    $link_img = asset('/images/word.png');
+                }elseif($ex == 'pdf' || $ex == 'PDF'){
+                    $link_img = asset('/images/pdf.png');
+                }else{
+                    $link_img = asset('/images/file.png');
+                }
+                $gal .= str_replace('{link}',tenant_asset($vf['link']),$tema_gal2);
+                $gal = str_replace('{name}',$vf['name'],$gal);
+                $gal = str_replace('{link_img}',$link_img,$gal);
+                $gal = str_replace('{tam_file}',$tam_file,$gal);
+                $gal = str_replace('{target}',$target,$gal);
+            }
+            $ret = str_replace('{gal}',$gal,$tema_gal1);
+        }
+
+        return $ret;
+    }
+    public function get_id_by_slug($slug){
+        $post = Post::where('post_name',$slug)->select('id')->first();
+        if($post){
+            $ret = $post['id'];
+        }else{
+            $ret = 0;
         }
         return $ret;
     }

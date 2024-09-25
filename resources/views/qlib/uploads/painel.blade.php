@@ -47,6 +47,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="container-fluid">
+                            <p>Tipos de arquivos suportados: <b>{{$config['arquivos']}}</b></p>
                             <form id="file-upload" action="{{route('uploads.store')}}" method="post" class="dropzone" enctype="multipart/form-data">
                                 @csrf
                                 <input type="hidden" name="token_produto" value="{{$config['token_produto']}}" />

@@ -20,6 +20,7 @@ class TagsController extends Controller
     public $label;
     public $view;
     public $url;
+    public $tab;
     public function __construct(User $user)
     {
         $this->middleware('auth');
@@ -27,6 +28,7 @@ class TagsController extends Controller
         $this->routa = 'tags';
         $this->label = 'Tag';
         $this->url = 'tags';
+        $this->tab = 'tags';
         $this->view = 'padrao';
     }
     public function queryTag($get=false,$config=false)
@@ -123,7 +125,7 @@ class TagsController extends Controller
             'ordem'=>['label'=>'ordem','active'=>true,'type'=>'number','placeholder'=>'','exibe_busca'=>'d-block','event'=>'','tam'=>'2','class'=>''],
             'nome'=>['label'=>'Nome da opção','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12','class'=>''],
-            'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'ativo'=>['label'=>'Liberar','tab'=>$this->tab,'active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
         ];
     }
 

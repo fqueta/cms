@@ -5,15 +5,18 @@
     'botao'=>false,
     'botao_fechar'=>true,
     'tam'=>'modal-lg',
-    ]])
-{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script> --}}
-<script src="{{url('/')}}/js/jquery.maskMoney.min.js"></script>
-<script src="{{url('/')}}/js/jquery.validate.min.js"></script>
-<script src="{{url('/')}}/js/jquery.inputmask.bundle.min.js"></script>
-<script src="{{url('/')}}/summernote/summernote.min.js"></script>
-<script src="{{url('/')}}/vendor/venobox/venobox.min.js"></script>
-<script src="{{url('/')}}/js/jquery-ui.min.js"></script>
-<script src=" {{url('/')}}/js/lib.js"></script>
+]])
+@if (isset($config['media']))
+    @include('admin.media.painel_select_media')
+@endif
+@include('qlib.modal_pesquisa')
+<script src="{{url('/js/jquery-ui.min.js')}}"></script>
+<script src="{{url('/js/jquery.maskMoney.min.js')}}"></script>
+<script src="{{url('/js/jquery.inputmask.bundle.min.js')}}"></script>
+<script src="{{url('/summernote/summernote.min.js')}}"></script>
+<script src="{{url('/vendor/venobox/venobox.min.js')}}"></script>
+<script src="{{url('/js/jquery.validate.min.js')}}"></script>
+<script src=" {{url('/js/lib.js')}}?ver={{config('app.version')}}"></script>
 <script>
     $(function(){
         $('.dataTable').DataTable({
@@ -21,45 +24,77 @@
                 stateSave: true,
                 language: {
                     url: '/DataTables/datatable-pt-br.json'
-                }
+                },
+                order:[]
         });
         carregaMascaraMoeda(".moeda");
         $('[selector-event]').on('change',function(){
             initSelector($(this));
         });
-        $('[vinculo-event]').on('click',function(){
-            var funCall = function(res){};
-            initSelector($(this));
-        });
 
-        $('.select2').select2();
-        $(document).on('select2:open', () => {
-            document.querySelector('.select2-search__field').focus();
-        });
-        var urlAuto = $('.autocomplete').attr('url');
-        $( ".autocomplete" ).autocomplete({
-            source: urlAuto,
-            select: function (event, ui) {
-                //var sec = $(this).attr('sec');
-                lib_listarCadastro(ui.item,$(this));
-            },
-        });
-        // var path = urlAuto;
-        // $('input.autocomplete').typeahead({
-        //     source:  function (query, process) {
-        //     return $.get(path, { query: query }, function (data) {
-        //             return process(data);
-        //         });
-        //     }
-        // });
-        $('.summernote').summernote({
-            height: 300,
-            placeholder: 'Digite o conteudo',
-        });
-        $('[type_slug="true"]').on('keyup',function(e){
-            let text = lib_urlAmigavel($(this).val());
-            $(this).val(text);
-        });
+        @if (App\Qlib\Qlib::is_frontend())
+            $('.summernote').summernote({
+                height: 250,
+                placeholder: 'Digite o conteudo',
+                toolbar:[
+                    ['style', ['bold', 'italic']],
+                    ['para', ['ul', 'ol', 'paragraph']]
+                ]
+            });
+            $('[data-dismiss="modal"]').on('click', function(){
+                $('.modal').modal('hide');
+            });
+        @else
+            $('[vinculo-event]').on('click',function(){
+                var funCall = function(res){};
+                initSelector($(this));
+            });
+
+            $('.select2').select2();
+            $('[fachar-alerta-fatura="true"]').on('click',function(){
+                fecharAlertaFatura('{{route('alerta.cobranca.fechar')}}');
+            });
+
+            $(document).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus();
+            });
+
+            lib_autocompleteGeral('.autocomplete');
+            lib_autocompleteGeral('.autocomplete-pesq',function(ui,el){
+                console.log(ui);
+                try {
+                    if(ui.id){
+                        let ur = '/beneficiarios/'+ui.id+'?redirect='+window.location.href;
+                        window.location = ur;
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            });
+            $('.summernote').summernote({
+                height: 250,
+                placeholder: 'Digite o conteudo',
+                toolbar:[
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    // ['fontname', ['fontname']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'video']],
+                    // ['insert', ['link', 'picture', 'video']],
+                    ['view', ['codeview', 'help']],
+                    // ['view', ['fullscreen', 'codeview', 'help']],
+                ],
+                callbacks: {
+                    onVideoInsert: function(url) {
+                    // Após o vídeo ser inserido, encontrar o iframe e modificar suas dimensões
+                        alert('insert video');
+                        $('iframe').attr('width', '100%').attr('height', '360');
+                    }
+                }
+            });
+        @endif
         new VenoBox({
             selector: ".venobox",
             numeration: true,
@@ -67,42 +102,12 @@
             share: false,
             spinner: 'rotating-plane'
         });
-        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="tooltip"]').tooltip({html:true});
+        $('[data-toggle="popover"]').popover({html:true,container: 'body'});
+        $('[data-widget="navbar-search"]').on('click', function(){
+            $('.navbar-search-block').hide();
+            $('#pesquisar').modal('show');
+            // $('[type="button"][data-widget="navbar-search"]').click();
+        });
     });
 </script>
-@if (App\Qlib\Qlib::qoption('editor_padrao')=='tinymce')
-    @php
-        $BASE = '/';
-    @endphp
-    <script>
-        var BASE = '{{$BASE}}';
-    </script>
-    <script src="{{$BASE}}vendor/tinymce/tinymce.min.js"></script>
-    <script>
-        $(function(){
-            tinymce.init({
-                selector: ".editor-padrao",theme: "modern",height: 400,
-                language: 'pt_BR',
-                setup: function (editor) {
-                    editor.on('change', function () {
-                        editor.save();
-                    });
-                },
-                relative_urls: false,
-                remove_script_host : false,
-                plugins: [
-                        "advlist autolink link image lists charmap print preview hr anchor pagebreak",
-                        "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
-                        "table contextmenu directionality emoticons paste textcolor responsivefilemanager code"
-                ],
-                toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect",
-                toolbar2: "| responsivefilemanager | link unlink anchor | image media | forecolor backcolor  | print preview code ",
-                image_advtab: true ,
-
-                external_filemanager_path:"/vendor/filemanager/",
-                filemanager_title:"Responsive Filemanager" ,
-                external_plugins: { "filemanager" : "/vendor/filemanager/plugin.min.js"}
-            });
-        });
-    </script>
-@endif

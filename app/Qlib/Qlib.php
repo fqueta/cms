@@ -1,6 +1,7 @@
 <?php
 namespace App\Qlib;
 
+use App\Http\Controllers\admin\PostsController;
 use App\Models\Documento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -1016,10 +1017,31 @@ class Qlib
         }
         return $ret;
     }
+    /**
+     * Verifica se o usuario logado tem permissao de admin ou alguma expessífica
+     */
+    static function dataLocal(){
+        $dataLocal = date('d/m/Y H:i:s', time());
+        return $dataLocal;
+    }
+    static function dataLocalDb(){
+        $dtBanco = date('Y-m-d H:i:s', time());
+        return $dtBanco;
+    }
     static function dataBanco(){
         global $dtBanco;
         $dtBanco = date('Y-m-d H:i:s', time());
         return $dtBanco;
+    }
+    static function isAdmin($perm_admin = 2)
+    {
+        $user = Auth::user();
+
+        if(isset($user->id_permission) && $user->id_permission<=$perm_admin){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     static function get_client_ip() {
@@ -1103,5 +1125,35 @@ class Qlib
             }
         }
         return $ret;
+    }
+    static function explodeReturnPrimeiro($separador,$string){
+        $dados = explode($separador,$string);
+        if(is_array($dados)){
+            return $dados[0];
+        }
+    }
+    static function select_text_em_html($string,$start,$end){
+        $ret = false;
+        $dados = explode($start,$string);
+        if(is_array($dados)){
+            foreach($dados As $key=>$valor){
+                if($key>0)
+                    $ret[$key] = self::explodeReturnPrimeiro($end,$valor);
+                //$str2 = substr(substr($string, stripos($string, $start)), strlen($start));
+                //$b = stripos($str2, $end);
+
+            }
+        }
+        return $ret;
+        //return trim(substr($str2, 0, $b));
+    }
+    static function shortCode_html($string){
+        $arr_texto = self::select_text_em_html($string,'*|','|*');
+        if(is_array($arr_texto)){
+            foreach($arr_texto As $key=>$val){
+                $string = str_replace('*|'.$val.'|*',(new PostsController)->short_code($val),$string);
+            }
+        }
+        return $string;
     }
 }

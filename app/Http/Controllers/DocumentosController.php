@@ -17,6 +17,7 @@ class DocumentosController extends Controller
     public $routa;
     public $label;
     public $view;
+    public $tab;
     public function __construct(User $user)
     {
         $this->middleware('auth');
@@ -24,6 +25,7 @@ class DocumentosController extends Controller
         $this->routa = 'documentos';
         $this->label = 'Documento';
         $this->view = 'padrao';
+        $this->tab = 'documentos';
     }
     public function queryDocumento($get=false,$config=false)
     {
@@ -120,7 +122,7 @@ class DocumentosController extends Controller
             'nome'=>['label'=>'Nome do documento','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
             'url'=>['label'=>'Apelido','active'=>true,'placeholder'=>'Sem espaços o acentos','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
             'conteudo'=>['label'=>'Conteudo','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12','class'=>'summernote'],
-            'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'ativo'=>['label'=>'Liberar','tab'=>$this->tab,'active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
         ];
     }
 

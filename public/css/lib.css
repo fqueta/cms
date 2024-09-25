@@ -122,6 +122,9 @@ label.error{
 .valid{
     border: 1px green solid !important;
 }
+.underline{
+    text-decoration: underline;
+}
   @keyframes lds-dual-ring {
     0% {
       transform: rotate(0deg);

@@ -11,13 +11,7 @@
     <div class="title m-b-md">
         Laravel
     </div>
-    <form action="{{ route('tinymce.store') }}" method="POST">
-        @csrf
-        <textarea class="form-control" name="content" id="description-textarea" rows="8"></textarea>
-        <br/>
-        <br/>
-        <button type="submit">Save</button>
-    </form>
+    <form><textarea class="js-st-instance"></textarea></form>
 
 </div>
 @stop
@@ -65,6 +59,15 @@
 @stop
 
 @section('js')
+    <script>
+        import SirTrevor from "sir-trevor";
+
+        const editor = new SirTrevor.Editor({
+        el: document.querySelector(".js-st-instance"),
+        defaultType: "Text",
+        iconUrl: "build/sir-trevor-icons.svg"
+        });
+    </script>
     <script src=" {{url('/')}}/js/lib.js"></script>
-    
+
 @stop

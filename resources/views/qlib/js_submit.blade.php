@@ -5,11 +5,6 @@
     $(function(){
         $("#{{$config['frm_id']}}").validate({
             submitHandler: function(form) {
-                // some other code
-                // maybe disabling submit button
-                // then:
-                //sub(form);
-                //alert('exetua');
                 submitFormulario($("#{{$config['frm_id']}}"),function(res){
 
                     let btn_press = $('#btn-press-salv').html();

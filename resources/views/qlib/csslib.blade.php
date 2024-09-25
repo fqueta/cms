@@ -10,8 +10,11 @@
     .content-wrapper{
         margin-left:0px !important;
     }
-
-</style>
+    .note-editor iframe {
+      width: 100% !important;
+      height: auto !important;
+    }
+  </style>
 @endif
 <div id="preload">
     <div class="lds-dual-ring"></div>

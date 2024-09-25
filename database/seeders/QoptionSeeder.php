@@ -20,7 +20,7 @@ class QoptionSeeder extends Seeder
             [
                 'nome'=>'Integração com o wordpress',
                 'url'=>'i_wp',
-                'valor'=>'s',
+                'valor'=>'n',
                 'obs'=>'',
             ],
             [

@@ -19,11 +19,13 @@ class QoptionsController extends Controller
     public $routa;
     public $label;
     public $view;
+    public $tab;
     public function __construct(User $user)
     {
         $this->middleware('auth');
         $this->user = $user;
         $this->routa = 'qoptions';
+        $this->tab = 'qoptions';
         $this->label = 'Qoption';
         $this->view = 'padrao';
     }
@@ -112,7 +114,7 @@ class QoptionsController extends Controller
             'url'=>['label'=>'Valor da opçao','active'=>true,'placeholder'=>'Ex.: server_nome','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
             'valor'=>['label'=>'Conteudo da configuração','active'=>false,'type'=>'textarea','placeholder'=>'aceitar json','exibe_busca'=>'d-block','event'=>'','tam'=>'12','class'=>''],
             'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12','class'=>''],
-            'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'ativo'=>['label'=>'Liberar','tab'=>$this->tab,'active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
         ];
     }
 

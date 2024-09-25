@@ -110,7 +110,7 @@ class BiddingsController extends Controller
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'indentifier'=>['label'=>'Número do processo','active'=>true,'placeholder'=>'Processo','type'=>'number','exibe_busca'=>'d-block','event'=>'required','tam'=>6,'validate'=>['required']],
-            'year'=>['label'=>'Ano','active'=>true,'placeholder'=>'Ex: 2024','type'=>'number','exibe_busca'=>'d-block','event'=>'required','tam'=>6,'validate'=>['required']],
+            'year'=>['label'=>'Ano','active'=>true,'placeholder'=>'Ex: '.date('Y'),'type'=>'number','exibe_busca'=>'d-block','event'=>'required','tam'=>6,'validate'=>['required']],
             'title'=>['label'=>'Título','active'=>true,'placeholder'=>'Título','type'=>'text','exibe_busca'=>'d-block','event'=>'required','tam'=>$tambcampos,'validate'=>['required','string', Rule::unique($this->tab)->ignore($id)]],
             'subtitle'=>['label'=>'Subtítulo (opcional)','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>$tambcampos],
             'bidding_category_id'=>[
@@ -169,7 +169,7 @@ class BiddingsController extends Controller
             ],
             'type_id'=>[
                 'label'=>'Tipo',
-                'active'=>true,
+                'active'=>false,
                 'type'=>'selector',
                 'data_selector'=>[
                     'campos'=>$biddings_types->campos(),
@@ -187,7 +187,7 @@ class BiddingsController extends Controller
             ],
             'opening'=>['label'=>'Data de abertura','active'=>true,'placeholder'=>'','type'=>'datetime-local','exibe_busca'=>'d-block','event'=>'','tam'=>$tambcampos,'validate'=>['required']],
             'object'=>['label'=>'Objeto','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>$tambcampos1],
-            'active'=>['label'=>'publicado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'active'=>['label'=>'publicado','tab'=>'biddings','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
         ];
     }
     public function index()

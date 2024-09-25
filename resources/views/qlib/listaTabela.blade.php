@@ -182,7 +182,19 @@
                                 @endphp
                                 <td class="{{str_replace('[]','',$kd)}}" title="{{@$td}}">{{@$td}}</td>
                             @elseif (isset($vd['type']) && $vd['type']=='chave_checkbox' && isset($vd['arr_opc'][$val->$kd]))
-                                <td class="{{str_replace('[]','',$kd)}}" title="{{$vd['arr_opc'][$val->$kd]}}">{{$vd['arr_opc'][$val->$kd]}}</td>
+                                <td class="{{str_replace('[]','',$kd)}}" title="{{$vd['arr_opc'][$val->$kd]}}">
+                                    <div class="d-none d-print-table">
+                                        {{$vd['arr_opc'][$val->$kd]}}
+                                    </div>
+                                    @php
+                                        // $vd['checked'] = $vd['arr_opc'][$val->$kd];
+                                        $vd['checked'] = $val->$kd;
+                                    @endphp
+                                    <div class="d-print-none custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                        <input type="checkbox" onchange="update_status_post(this)" data-id="{{$val->id}}" data-tab="{{@$vd['tab']}}" class="custom-control-input" @if(isset($vd['checked']) && $vd['checked'] == $vd['value']) checked @endif  value="{{$vd['value']}}"  name="{{$kd}}" id="{{$kd}}-{{$val->id}}">
+                                        <label class="custom-control-label" for="{{$kd}}-{{$val->id}}">{{$vd['label']}}</label>
+                                    </div>
+                                </td>
                             @elseif(isset($vd['cp_busca']) && !empty($vd['cp_busca']))
                                 @php
                                     $cp = explode('][',$vd['cp_busca']);

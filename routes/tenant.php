@@ -3,14 +3,17 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\admin\AttachmentsController;
+use App\Http\Controllers\admin\ConfigController;
 use App\Http\Controllers\admin\HomeController;
 use App\Http\Controllers\admin\PostsController;
 use App\Http\Controllers\EtapaController;
 use App\Http\Controllers\portal\sicController;
 use App\Http\Controllers\portalController;
+use App\Http\Controllers\preview\PreviewController;
 use App\Http\Controllers\TesteController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
+use App\Qlib\Qlib;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -35,7 +38,11 @@ Route::middleware([
 ])->group(function () {
     Auth::routes();
     Route::fallback(function () {
-        return view('erro404');
+        if(Auth::check()){
+            return view('erro404');
+        }else{
+            return view('erro404_site');
+        }
     });
     $prefixo_admin = config('app.prefixo_admin');
     $prefixo_site = config('app.prefixo_site');
@@ -119,11 +126,22 @@ Route::middleware([
         });
         Route::prefix('ajax')->group(function(){
             Route::post('/attachments/{id}',[AttachmentsController::class,'update'])->where('id', '[0-9]+')->name('attachments.update-ajax');
+            Route::post('/chage_status',[ConfigController::class,'chage_status'])->name('chage_status');
             // Route::post('/attachments/{id}',[AttachmentsController::class,'update'])->where('id', '[0-9]+')->name('attachments.destroy-ajax');
         });
         Route::fallback(function () {
             return view('erro404');
         });
+        Route::resource('media','\App\Http\Controllers\admin\mediaController',['parameters' => [
+            'media' => 'id'
+        ]]);
+        Route::prefix('media')->group(function(){
+            Route::post('/store-parent',['\App\Http\Controllers\admin\mediaController','storeParent'])->name('store.parent.media');
+            Route::post('/trash',['\App\Http\Controllers\admin\mediaController','trash'])->name('trash.media');
+            // Route::get('/ajax',[App\Http\Controllers\TesteController::class,'ajax'])->name('teste.ajax');
+        });
+
+
         // Route::resource('/users', 'UsersController', ['except' => ['show']]);
         // Route::resource('/players', 'PlayersController', ['except' => ['show']]);
         // Route::resource('/players/order', 'PlayersController@postSort');
@@ -208,6 +226,16 @@ Route::middleware([
 
     });
 
+    Route::get('/suspenso',[UserController::class,'suspenso'])->name('cobranca.suspenso');
+    Route::prefix('preview')->group(function(){
+        Route::get('/posts/{id}',[PreviewController::class,'posts'])->name('preview.posts');
+        Route::get('/noticias',[PreviewController::class,'noticias'])->name('preview.noticias');
+    });
+    Route::prefix('cobranca')->group(function(){
+        Route::get('/fechar',[UserController::class,'pararAlertaFaturaVencida'])->name('alerta.cobranca.fechar');
+    });
+
+
 });
 
 Route::name('api.')->prefix('api/v1')->middleware([
@@ -218,7 +246,9 @@ Route::name('api.')->prefix('api/v1')->middleware([
 ])->group(function () {
 
     // Route::redirect('/', 'api.login');
-
+    Route::fallback(function () {
+        return view('erro404_site');
+    });
     // Auth::routes();
     //  Route::group(['prefix' => '/api', 'namespace' => 'Api'], function () {
         // Route::resource('/pages', 'PostsController', ['only' => ['index', 'show']]);
@@ -228,7 +258,7 @@ Route::name('api.')->prefix('api/v1')->middleware([
         // Route::resource('/banners', 'BannersController', ['only' => ['index']]);
         // Route::resource('/floaters', 'FloatersController', ['only' => ['index']]);
         Route::resource('/biddings', '\App\Http\Controllers\api\BiddingsController', ['only' => ['index']]);
-        Route::resource('/documents', '\App\Http\Controllers\api\PostController', ['only' => ['index']]);
+        Route::resource('/documents', '\App\Http\Controllers\api\PostController', ['only' => ['index','show']]);
         // Route::resource('/btrimestrals', 'BtrimestralsController', ['only' => ['index']]);
         // Route::resource('/sections', 'SectionsController', ['only' => ['index']]);
         // Route::resource('/newsletters', 'NewslettersController', ['only' => ['store']]);

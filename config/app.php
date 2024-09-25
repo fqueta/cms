@@ -13,8 +13,13 @@ return [
     |
     */
 
-    'version' => '1.0.0.0',
     'name' => env('APP_NAME', 'CMSP'),
+    'dominio' => 'https://amsloja.com.br/',
+    'version' => '1.0.1',
+    'version' => '1.0.0.0',
+    'id_app' => env('ID_APP', 'cmspf'),
+    'last_update' => '20/09/2024',
+
 
 
     /*

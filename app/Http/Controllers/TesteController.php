@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\admin\AttachmentsController;
+use App\Http\Controllers\admin\PostsController;
 use App\Http\Controllers\portal\sicController;
 use App\Models\Familia;
 use App\Models\User;
@@ -52,9 +53,18 @@ class TesteController extends Controller
     //     $config = [
     //         //'docs'=>$doc->fichaOcupante($lote,$oc),
     //     ];
-        $ret = (new AttachmentsController)->update_attachmeta(4,'pa','josequeta');
+        // $ret = (new AttachmentsController)->update_attachmeta(4,'pa','josequeta');
+        // dd($ret);
+        $config=[];
+        // $ret = (new PostsController)->short_code('posts-26');
+        // $ret = (new PostsController)->get_post(32);
+        // dd($ret);
+
+        $ret = (new PostsController)->get_id_by_slug('meu-primeiro-post-3');
         dd($ret);
-        // return view('teste',$config);
+        // $slug = (new PostsController)->str_slug('meu primeiro post',$id=false);;
+        // dd($slug);
+        return view('teste',$config);
     }
     public function ajax(){
         $limit = isset($_GET['limit']) ?$_GET['limit'] : 50;
