@@ -816,9 +816,9 @@ class PostsController extends Controller
                     // dd($imgd);
                 }
                 $style_video = '<style>
-                                    .note-editor iframe, .note-video-clip iframe {
-                                        width: 100% !important;
-                                        height: auto !important;
+                                    iframe.note-video-clip {
+                                        width: 100%;
+                                        /*height: auto;*/
                                     }
                                 </style>';
                 $page = '{style_video}{ret}';

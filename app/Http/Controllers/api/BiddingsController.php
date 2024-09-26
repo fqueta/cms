@@ -50,7 +50,7 @@ class BiddingsController extends Controller
 
         $biddings = $biddings->where(['active' => 's'])
             ->orderBy('opening', 'desc')
-            ->select(['id', 'title', 'opening', 'indentifier', 'object', 'genre_id', 'phase_id', 'bidding_category_id', 'created_at','active'])
+            ->select(['id', 'title','subtitle', 'opening', 'indentifier', 'object', 'genre_id', 'phase_id', 'bidding_category_id', 'created_at','active'])
             ->with('genre')
             ->with('phase')
             ->with('category')
