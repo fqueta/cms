@@ -276,7 +276,14 @@ class PermissionSeeder extends Seeder
                 'id_menu'=>json_encode([]),
             ],
             [
-                'name'=>'Escritório',
+                'name'=>'Escritório1',
+                'redirect_login'=>'/admin/home',
+                'description'=>'Pessoas do escritório',
+                'active'=>'s',
+                'id_menu'=>json_encode([]),
+            ],
+            [
+                'name'=>'Escritório2',
                 'redirect_login'=>'/admin/home',
                 'description'=>'Pessoas do escritório',
                 'active'=>'s',

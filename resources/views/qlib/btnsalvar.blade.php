@@ -52,6 +52,9 @@
                     }
                     echo $btnAlt;
                 }
+                if($config['route']=='admin.sic'){
+                    $config['route'] = @$config['url'];
+                }
             @endphp
             @can('create',$config['route'])
                 <a href="{{$r_novo_cadastro}}" class="btn btn-default"> <i class="fas fa-plus"></i> Novo cadastro</a>

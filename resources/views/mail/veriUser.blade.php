@@ -1,6 +1,6 @@
 @component('mail::message')
 
-<p>Prezado(a) - {{ $user['nome'] }},</p>
+<p>Prezado(a) - {{ $user['name'] }},</p>
 <p>
     Seja bem vindo(a) à {{ $empresa }}<br>
     Com esse cadastro você poderá ter acesso a vários serviços de nosso portal, bem como gerenciar os seus consentimentos e preferências.<br>

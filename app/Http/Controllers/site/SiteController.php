@@ -12,7 +12,7 @@ class SiteController extends Controller
 
     }
     public function home(){
-        return 'SiteController';
+        return view('portal.sic_front.index');
     }
 
 }

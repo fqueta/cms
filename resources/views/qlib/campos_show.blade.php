@@ -313,8 +313,8 @@
         @else
             @if(!empty($config['value']))
                 @php
-                    $href = '/storage/'.$config['value'];
-                    $arquivo = explode('.',$href);
+                    $href = tenant_asset($config['value']);
+                    $arquivo = explode('.',$config['value']);
                     $mime = false;
                     if(isset($arquivo[1])){
                         $mime = ' '.strtoupper($arquivo[1]);

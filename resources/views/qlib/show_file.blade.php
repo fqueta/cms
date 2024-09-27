@@ -10,7 +10,8 @@
             @php
                 if(isset($file->config)){
                     $file->config = App\Qlib\Qlib::lib_json_array($file->config);
-                    $dominio_arquivo=App\Qlib\Qlib::qoption('dominio_arquivos').'/';
+                    // $dominio_arquivo=App\Qlib\Qlib::qoption('dominio_arquivos').'/';
+                    $dominio_arquivo=tenant_asset('/');
                     if(isset($file->config['extenssao']) && !empty($file->config['extenssao']))
                     {
                         if($file->config['extenssao'] == 'jpg' || $file->config['extenssao']=='png' || $file->config['extenssao'] == 'jpeg'){

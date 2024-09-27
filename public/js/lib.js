@@ -2069,3 +2069,19 @@ function update_status_post(obj){
         console.log(err);
     });
 }
+function resend_email_sic() {
+    getAjax({
+        url:'/internautas/send-verific-user',
+        type: 'GET',
+        dataType: 'json',
+        csrf: true
+    },function(res){
+        $('#preload').fadeOut("fast");
+
+        lib_formatMensagem('.mens',res.mens,res.color,9000);
+
+    },function(err){
+        $('#preload').fadeOut("fast");
+        console.log(err);
+    });
+}

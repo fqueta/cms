@@ -23,7 +23,7 @@
             </div>
             <div class="card-body">
                 @php
-                    //dd($value);
+                    // dd($campos_solicitacao);
                 @endphp
                 @if (isset($campos_solicitacao) && is_array($campos_solicitacao))
                     @foreach ($campos_solicitacao as $kc=>$vc)

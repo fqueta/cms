@@ -19,8 +19,9 @@ class UserPermissions extends Controller
     public $label;
     public $view;
     public $tab;
-    public function __construct(User $user)
+    public function __construct()
     {
+        $user = Auth::user();
         $this->middleware('auth');
         $this->user = $user;
         $this->routa = 'permissions';
@@ -349,5 +350,11 @@ class UserPermissions extends Controller
             $ret = redirect()->route($routa.'.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
         }
         return $ret;
+    }
+    /**
+     * Retorna a permissão do usuario logado
+     */
+    public function my_permission(){
+        return (int)Auth::user()['id_permission'];
     }
 }

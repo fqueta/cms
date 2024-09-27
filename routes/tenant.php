@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\admin\AttachmentsController;
 use App\Http\Controllers\admin\ConfigController;
 use App\Http\Controllers\admin\HomeController;
-use App\Http\Controllers\admin\PostsController;
+use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\EtapaController;
 use App\Http\Controllers\portal\sicController;
 use App\Http\Controllers\portalController;
@@ -14,10 +14,12 @@ use App\Http\Controllers\TesteController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
 use App\Qlib\Qlib;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,7 +55,9 @@ Route::middleware([
         Route::post('/cadastrar',[portalController::class,'storeInternautas'])->name('internautas.store');
         Route::get('/cadastrar/ac/{tipo}/{id}',[portalController::class,'acaoInternautas'])->name('internautas.acao.get');
         Route::get('/login',[portalController::class,'loginInternautas'])->name('internautas.login');
+        Route::get('/quick-login',[portalController::class,'quick_login'])->name('internautas.quick_login');
         Route::get('/logout',[portalController::class,'logoutInternautas'])->name('internautas.logout');
+        Route::get('/send-verific-user',[portalController::class,'send_verific_user'])->name('send_verific_user');
         Route::resource('sic','\App\Http\Controllers\portal\sicController',['parameters' => [
             'sic' => 'id'
         ]])->middleware('auth');
@@ -235,7 +239,23 @@ Route::middleware([
         Route::get('/fechar',[UserController::class,'pararAlertaFaturaVencida'])->name('alerta.cobranca.fechar');
     });
 
+        //inicio Rotas de verificação
+    Route::get('/email/verify', function () {
+        // return view('auth.verify');
+        return view('site.index');
+    })->middleware('auth')->name('verification.notice');
 
+
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+
+        return redirect('/');
+    })->middleware(['auth', 'signed'])->name('verification.verify');
+
+    Route::post('/email/verification-notification', function ( Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('message-very', 'enviado');
+    })->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
 });
 
 Route::name('api.')->prefix('api/v1')->middleware([
@@ -249,22 +269,22 @@ Route::name('api.')->prefix('api/v1')->middleware([
     Route::fallback(function () {
         return view('erro404_site');
     });
-    // Auth::routes();
-    //  Route::group(['prefix' => '/api', 'namespace' => 'Api'], function () {
-        // Route::resource('/pages', 'PostsController', ['only' => ['index', 'show']]);
-        // Route::resource('/posts', 'PostsController', ['only' => ['index', 'show', 'update']]);
-        // Route::resource('/notices', 'NoticesController', ['only' => ['index']]);
-        // Route::resource('/players', 'PlayersController', ['only' => ['index']]);
-        // Route::resource('/banners', 'BannersController', ['only' => ['index']]);
-        // Route::resource('/floaters', 'FloatersController', ['only' => ['index']]);
-        Route::resource('/biddings', '\App\Http\Controllers\api\BiddingsController', ['only' => ['index']]);
-        Route::resource('/documents', '\App\Http\Controllers\api\PostController', ['only' => ['index','show']]);
-        // Route::resource('/btrimestrals', 'BtrimestralsController', ['only' => ['index']]);
-        // Route::resource('/sections', 'SectionsController', ['only' => ['index']]);
-        // Route::resource('/newsletters', 'NewslettersController', ['only' => ['store']]);
-        // Route::resource('/contacts', 'ContactsController', ['only' => ['store']]);
-        // Route::resource('/uploads', 'UploadsController', ['only' => ['show']]);
-        // Route::resource('/search', 'SearchController', ['only' => ['index']]);
-        // Route::resource('/diaries', 'DiariesController', ['only' => ['index']]);
-    // });
+
+    Route::post('/login',[ '\App\Http\Controllers\api\AuthController','login']);
+    // Route::resource('/pages', 'PostsController', ['only' => ['index', 'show']]);
+    // Route::resource('/posts', 'PostsController', ['only' => ['index', 'show', 'update']]);
+    // Route::resource('/notices', 'NoticesController', ['only' => ['index']]);
+    // Route::resource('/players', 'PlayersController', ['only' => ['index']]);
+    // Route::resource('/banners', 'BannersController', ['only' => ['index']]);
+    // Route::resource('/floaters', 'FloatersController', ['only' => ['index']]);
+    // Route::resource('/biddings', '\App\Http\Controllers\api\BiddingsController', ['only' => ['index']])->middleware('auth:sanctum');
+    Route::resource('/biddings', '\App\Http\Controllers\api\BiddingsController', ['only' => ['index']]);
+    Route::resource('/documents', '\App\Http\Controllers\api\PostController', ['only' => ['index','show']]);
+    // Route::resource('/btrimestrals', 'BtrimestralsController', ['only' => ['index']]);
+    // Route::resource('/sections', 'SectionsController', ['only' => ['index']]);
+    // Route::resource('/newsletters', 'NewslettersController', ['only' => ['store']]);
+    // Route::resource('/contacts', 'ContactsController', ['only' => ['store']]);
+    // Route::resource('/uploads', 'UploadsController', ['only' => ['show']]);
+    // Route::resource('/search', 'SearchController', ['only' => ['index']]);
+    // Route::resource('/diaries', 'DiariesController', ['only' => ['index']]);
 });

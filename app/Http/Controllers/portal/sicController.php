@@ -128,7 +128,7 @@ class sicController extends Controller
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'type'=>['label'=>'type','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2','value'=>'solicitacao'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar sua solicitação de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
+            'info'=>['label'=>'Info1','active'=>false,'type'=>'html_script','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar sua solicitação de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
             'config[secretaria]'=>[
                 'label'=>'Secretaria*',
                 'active'=>true,
@@ -165,8 +165,8 @@ class sicController extends Controller
             //'ativo'=>['label'=>'Ativado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'mensagem'=>['label'=>'Mensagem*','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
             'anexo'=>['label'=>'Anexos','active'=>false,'placeholder'=>'Anexar arquivos','type'=>'file','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            'info1'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
-            'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" value="s" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
+            'info1'=>['label'=>'Info1','active'=>false,'type'=>'html_script','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
+            'info2'=>['label'=>'Info1','active'=>false,'type'=>'html_script','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" value="s" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
         ];
     }
     /**ARRAY CONTENDO INFORMAÇÕES PARA MOTAR A TELA DE REPOSTA DO SIC PARO O INTERNAUTA
@@ -179,7 +179,7 @@ class sicController extends Controller
         $dados = isset($config['dados'])?$config['dados']:false;
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar uma resposta a solicitação acima de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
+            'info'=>['label'=>'Info1','active'=>false,'type'=>'html_script','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar uma resposta a solicitação acima de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'id_requerente'=>['label'=>'id_requerente','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             //'protocolo'=>['label'=>'Protocolo','active'=>true,'placeholder'=>'','type'=>'hidden_text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
@@ -278,7 +278,7 @@ class sicController extends Controller
             'mensagem'=>['label'=>'Mensagem Inicial','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
             'resposta'=>['label'=>'Resposta','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12','class'=>'summernote'],
             'anexo'=>['label'=>'Anexos','active'=>false,'placeholder'=>'Anexar arquivos','type'=>'file','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],            'show_file_front'=>['label'=>'Info1','active'=>false,'type'=>'show_file_front','script'=>'portal.sic_front.show_files','tam'=>'12','value'=>$dados],
-            //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
+            //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html_script','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
         ];
     }
     public function index()
@@ -399,7 +399,6 @@ class sicController extends Controller
         $userLogadon = Auth::id();
         $dados['autor'] = $userLogadon;
         $dados['id_requerente'] = isset($dados['id_requerente'])?$dados['id_requerente']:$userLogadon;
-        //dd($dados);
         $salvar = Sic::create($dados);
         $email = false;
         if(isset($salvar->id)){
@@ -433,7 +432,7 @@ class sicController extends Controller
                 $mensagem .= '<li>Assunto: <b>'.$dados['config']['assunto'].'</b></li>';
             $mensagem .= '</ul>';
             $mensagem .= '<h4>Mensagem:</h4>';
-            $mensagem .= $dados['mensagem'];
+            $mensagem .= __('Seu protocolo é: ').'<b>'.$data['protocolo'].'</b><br>'.$dados['mensagem'];
             //$mensagem .= '<p>Observação: A confirmação do seu e-mail é obrigatória.</p>';
             $mensagem = str_replace('Foi enviado um e-mail para sua caixa postal contendo os dados da solicitação.','',$mensagem);
 
@@ -453,12 +452,14 @@ class sicController extends Controller
             'idCad'=>$salvar->id,
             'email'=>$email,
             'exec'=>true,
+            // 'mensagem'=>@$mensagem,
             'dados'=>$dados
         ];
 
         if($ajax=='s'){
             $ret['return'] = route($route).'?idCad='.$salvar->id;
-            $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
+            // $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
+            $ret['redirect'] = route('sic.internautas.relatorios');
             return response()->json($ret);
         }else{
             return redirect()->route($route,$ret);
@@ -490,11 +491,16 @@ class sicController extends Controller
                 'assunto_supervisor'=>$assunto_supervisor,
                 'mensagem_supervisor'=>$mensagem_supervisor,
             ]);
-
-            Mail::send($info);
-            if(count(Mail::failures())==0){
+            try {
+                Mail::send($info);
                 $ret = true;
+            } catch (\Throwable $th) {
+                $ret = false;
+                //throw $th;
             }
+
+            // if(count(Mail::failures())==0){
+            // }
         }
         return $ret;
     }

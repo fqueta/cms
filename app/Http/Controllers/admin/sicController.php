@@ -24,6 +24,7 @@ class sicController extends Controller
     public $ambiente;
     public $pai_motivo;
     public $pai_status;
+    public $view;
 
     public function __construct()
     {
@@ -66,7 +67,7 @@ class sicController extends Controller
         $internauta = new UserController($user);
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar sua solicitação de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
+            'info'=>['label'=>'Info1','active'=>false,'type'=>'html_script','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar sua solicitação de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'id_permission'=>['label'=>'id_permission','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2','value'=>Qlib::qoption('id_permission_front')],
             //'protocolo'=>['label'=>'Protocolo','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
@@ -164,15 +165,15 @@ class sicController extends Controller
             //'ativo'=>['label'=>'Ativado','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'mensagem'=>['label'=>'Mensagem*','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
             'arquivo'=>['label'=>'Anexos','active'=>false,'placeholder'=>'Anexar arquivos','type'=>'file','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            'info1'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
-            //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
+            'info1'=>['label'=>'Info1','active'=>false,'type'=>'html_script','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
+            //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html_script','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
         ];
     }
     public function campos_status($pai=false){
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>''],
             'pai'=>['label'=>'pai','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'3','value'=>$pai],
-            'nome'=>['label'=>'Nome','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12','placeholder'=>'','class_div'=>''],
+            'name'=>['label'=>'Nome','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12','placeholder'=>'','class_div'=>''],
             'obs'=>['label'=>'Descrição','active'=>true,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12','placeholder'=>''],
             'ativo'=>['label'=>'ativo','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'12','value'=>'s'],
         ];
@@ -182,7 +183,7 @@ class sicController extends Controller
         $pai_motivo = $this->pai_motivo;
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'info'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar uma resposta a solicitação acima de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
+            'info'=>['label'=>'Info1','active'=>false,'type'=>'html_script','script'=>Qlib::formatMensagemInfo('Preencha os campos abaixo para enviar uma resposta a solicitação acima de informação. Serviço disponibilizado conforme Art. 10, da Lei 12.527/11.','info'),'tam'=>'12'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'id_requerente'=>['label'=>'id_requerente','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'protocolo'=>['label'=>'Protocolo','active'=>true,'placeholder'=>'','type'=>'hidden_text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
@@ -283,8 +284,8 @@ class sicController extends Controller
             'resposta'=>['label'=>'Resposta*','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>'12','class'=>'summernote'],
             'meta[enviar_email]'=>['label'=>'Enviar resposta por e-mail','active'=>false,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não'],'cp_busca'=>'meta][enviar_email'],
 
-            //'info1'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
-            //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
+            //'info1'=>['label'=>'Info1','active'=>false,'type'=>'html_script','script'=>'<p>* Formatos de arquivo aceitos: PDF, JPG, JPEG, GIF, PNG, MP4, RAR e ZIP. Tamanho máximo permitido: 10 MB.</p>','tam'=>'12'],
+            //'info2'=>['label'=>'Info1','active'=>false,'type'=>'html_script','script'=>Qlib::formatMensagemInfo('<label for="preservarIdentidade"><input name="config[preservarIdentidade]" type="checkbox" id="preservarIdentidade"> Gostaria de ter a minha identidade preservada neste pedido, em atendimento ao princípio constitucional da impessoalidade e, ainda, conforme o disposto no art. 10, § 7º da Lei nº 13.460/2017.</label>','warning'),'tam'=>'12'],
         ];
     }
     /** MONTA UM ARRAY BASEADO NA TABELA TAG
@@ -364,7 +365,7 @@ class sicController extends Controller
         $userLogadon = Auth::id();
         $dados['autor'] = $userLogadon;
         $dados['id_requerente'] = isset($dados['id_requerente'])?$dados['id_requerente']:$userLogadon;
-        //dd($dados);
+        // dd($dados);
         $salvar = Sic::create($dados);
         $email = false;
         if(isset($salvar->id)){
@@ -479,6 +480,7 @@ class sicController extends Controller
                 'routa'=>$this->routa,
                 'exec'=>true,
             ];
+            // dd($ret);
             return view($this->routa.'.show',$ret);
         }else{
             $ret = [
@@ -492,7 +494,7 @@ class sicController extends Controller
         $id = $sic;
         $dados = Sic::where('id',$id)->get();
         $routa = 'sics';
-        $this->authorize('ler', $this->routa);
+        $this->authorize('update', $this->url);
 
         if(!empty($dados)){
             $title = 'Responder cadastro de sic';
@@ -628,7 +630,7 @@ class sicController extends Controller
                             }
                         }
                     }
-
+                    // dd($mensagem);
                     $email = (new PortalSicController)->enviarEmail([
                         'para_email'=>$d_requerente['email'],
                         'para_nome'=>$d_requerente['nome'],
@@ -736,7 +738,7 @@ class sicController extends Controller
                 'value'=>@$_GET['origem'],
                 //'cp_busca'=>'config][secretaria',
             ],
-            'btn'=>['label'=>'btn_buscar','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'3','class'=>'','script'=>'<button type="submit" class="btn btn-secondary btn-block  mt-4">Buscar</button>'],
+            'btn'=>['label'=>'btn_buscar','active'=>false,'type'=>'html_script','exibe_busca'=>'d-none','event'=>'','tam'=>'3','class'=>'','script'=>'<button type="submit" class="btn btn-secondary btn-block  mt-4">Buscar</button>'],
 
         ];
         $solicitantes = Sic::where('sics.excluido','=','n')
@@ -982,14 +984,20 @@ class sicController extends Controller
 
 
         //dd($d_rel);
-        $totais_gerais = [
-            ['label'=>__('Total de Solicitantes'),'value'=>$totalSolicitantes],
-            ['label'=>__('Total de Pedidos'),'value'=>$totalPedidos],
-            ['label'=>__('Pedidos em Aberto'),'value'=>$res[0]['y']],
-            ['label'=>__('Pedidos Respondidos'),'value'=>$res[1]['y']],
-            ['label'=>__('Pedidos Ideferidos'),'value'=>$res[2]['y']],
-            ['label'=>__('Pedidos Resolvidos'),'value'=>$res[3]['y']],
-        ];
+        if(is_array($res)){
+
+            $totais_gerais = [
+                ['label'=>__('Total de Solicitantes'),'value'=>$totalSolicitantes],
+                ['label'=>__('Total de Pedidos'),'value'=>$totalPedidos],
+                ['label'=>__('Pedidos em Aberto'),'value'=>$res[0]['y']],
+                ['label'=>__('Pedidos Respondidos'),'value'=>$res[1]['y']],
+                ['label'=>__('Pedidos Ideferidos'),'value'=>$res[2]['y']],
+                ['label'=>__('Pedidos Resolvidos'),'value'=>$res[3]['y']],
+            ];
+        }
+        else{
+            $totais_gerais = [];
+        }
         $ret = [
             'title'=>$title,
             'titulo'=>$titulo,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\admin\AttachmentsController;
 use App\Http\Controllers\admin\PostsController;
+use App\Http\Controllers\admin\UserPermissions;
 use App\Http\Controllers\portal\sicController;
 use App\Models\Familia;
 use App\Models\User;
@@ -60,8 +61,8 @@ class TesteController extends Controller
         // $ret = (new PostsController)->get_post(32);
         // dd($ret);
 
-        $ret = (new PostsController)->get_id_by_slug('meu-primeiro-post-3');
-        dd($ret);
+        // $ret = (new UserPermissions)->my_permission();
+        dd(storage_path());
         // $slug = (new PostsController)->str_slug('meu primeiro post',$id=false);;
         // dd($slug);
         return view('teste',$config);

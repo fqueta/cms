@@ -37,7 +37,7 @@
                     @php
                         $nk = str_replace('[]','',$k);
                         $value[$k] = isset($value[$nk])?$value[$nk]:false;
-                        //dd($value[$k])
+                        // dd($value[$k])
                     @endphp
                 @endif
 

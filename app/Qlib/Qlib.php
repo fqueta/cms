@@ -817,7 +817,6 @@ class Qlib
     static public function show_files(Array $config = null)
     {
         $ret = Qlib::formatMensagemInfo('Nenhum Arquivo','info');
-
         if($config['token']){
             $files = DB::table('_uploads')->where('token_produto',$config['token'])->get();
             if($files){

@@ -18,12 +18,23 @@ class infoSolicitacao extends Mailable
      *
      * @return void
      */
+    public $user;
+    public $para_email;
+    public $para_nome;
+    public $assunto;
+    public $mensagem;
+    public $arquivos;
+    public $arquivos_supervisor;
+    public $mensagem_supervisor;
+    public $assunto_supervisor;
+    public $email_supervisor;
+    public $nome_supervisor;
     public function __construct($config)
     {
         $user = Auth::user();
         $this->user = $user;
         $this->para_email = !empty($config['para_email'])?$config['para_email']:$user->email;
-        $this->para_nome = !empty($config['para_nome'])?$config['para_nome']:$user->nome;
+        $this->para_nome = !empty($config['para_nome'])?$config['para_nome']:$user->name;
         $this->assunto = !empty($config['assunto'])?$config['assunto']:Qlib::documento('email-info-sic','nome');
         $this->mensagem = isset($config['mensagem'])?$config['mensagem']:false;
         $this->arquivos = isset($config['arquivos'])?$config['arquivos']:false;
@@ -44,17 +55,17 @@ class infoSolicitacao extends Mailable
         $this->to($this->para_email,$this->para_nome);
         if($this->email_supervisor && $this->nome_supervisor)
             $this->to($this->email_supervisor,$this->nome_supervisor);
-        $mens = Qlib::documento('email-info-sic');
+        $mens = Qlib::qoption('email-info-sic');
         $mens = str_replace('{nome_internauta}',$this->user['nome'],$mens);
         $mens = str_replace('{email}',$this->user['email'],$mens);
         $mens = str_replace('{mensagem}',$this->mensagem,$mens);
         if(isset($this->arquivos) && $this->arquivos){
             if(is_array($this->arquivos)){
                 foreach ($this->arquivos as $k => $v) {
-                    $this->attach(base_path().'/public/storage/'.$v);
+                    $this->attach(storage_path().'/app/public/'.$v);
                 }
             }else{
-                $this->attach(base_path().'/public/storage/'.$this->arquivos);
+                $this->attach(storage_path().'/app/public/'.$this->arquivos);
             }
         }
         return $this->markdown('mail.sic.info',[

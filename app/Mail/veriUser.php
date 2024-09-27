@@ -19,6 +19,7 @@ class veriUser extends Mailable
      *
      * @return void
      */
+    public $user;
     public function __construct($user)
     {
         $this->user = $user;
@@ -31,7 +32,6 @@ class veriUser extends Mailable
      */
     public function build()
     {
-        //dd($this->user);
         $this->subject('Confirmar seu cadastro');
         $this->to($this->user['email'],$this->user['name']);
         return $this->markdown('mail.veriUser',[
