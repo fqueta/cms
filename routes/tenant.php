@@ -171,7 +171,7 @@ Route::middleware([
         // ]]);
         // Route::resource('biddings.notifications', '\App\Http\Controllers\admin\NotificationsController', ['except' => ['show']]);
         // Route::resource('biddings.newsletters', '\App\Http\Controllers\admin\BiddingNewslettersController', ['except' => ['show']]);
-        Route::resource('/biddings/{parent_id}/attachments/order', '\App\Http\Controllers\admin\AttachmentsController@postSort');
+        Route::resource('/biddings/{parent_id}/attachments/order','\App\Http\Controllers\admin\AttachmentsController@postSort');
 
         // Route::resource('/b_trimestrals', 'B_trimestralsController', ['except' => ['show']]);
         // Route::resource('/attachments', 'A_trimestralsController', ['except' => ['show']]);

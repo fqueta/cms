@@ -24,8 +24,8 @@ class BiddingsController extends Controller
         }else{
             $biddings = Biddings::orderBy('opening', 'DESC');
         }
-        if($request->has('genre') && trim($request->get('genre')) !== "")
-            $biddings = $biddings->where(['genre_id' => $request->get('genre')]);
+        if($request->has('year') && trim($request->get('year')) !== "")
+            $biddings = $biddings->where(['year' => $request->get('year')]);
         if($request->has('genre') && trim($request->get('genre')) !== "")
             $biddings = $biddings->where(['genre_id' => $request->get('genre')]);
         if($request->has('phase') && trim($request->get('phase')) !== "")

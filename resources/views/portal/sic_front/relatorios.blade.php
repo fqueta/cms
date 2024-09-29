@@ -1,15 +1,17 @@
 @extends('layouts.principal')
-
 @section('nav')
     @include('portal.nav')
 @endsection
 
 @section('content')
-@include('portal.sic_front.painel')
-<div class="row">
-    @include('admin.sic.exibe_relatorios')
-</div>
-
+<section class="services">
+    <div class="container">
+        @include('portal.sic_front.painel')
+        <div class="row">
+            @include('admin.sic.exibe_relatorios')
+        </div>
+    </div>
+</section>
 @endsection
 
 @section('css')

@@ -22,23 +22,23 @@
             @else
 
             <div class="col-md-{{$tamBtn}} pl-0">
-                <a href="{{route('login')}}" class="btn btn-outline-primary btn-block"><i cl
+                <a href="{{route('login')}}" class="btn btn-outline-primary w-100"><i cl
                     ass="fas fa-sign-in-alt"></i>  {!!__('Cadastre-se')!!} / {!!__('Login')!!}
                 </a>
             </div>
             @endif
             <div class="col-md-{{$tamBtn}}">
-                <a href="{{route('sic.create')}}" class="btn btn-outline-primary btn-block">
+                <a href="{{route('sic.create')}}" class="btn btn-outline-primary w-100">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i> {!!__('Nova Solicitação')!!}
                 </a>
             </div>
             <div class="col-md-{{$tamBtn}}">
-                <a href="{{route('sic.index')}}" class="btn btn-outline-primary btn-block {{$activeLista}}">
+                <a href="{{route('sic.index')}}" class="btn btn-outline-primary w-100 {{$activeLista}}">
                     <i class="fa fa-search" aria-hidden="true"></i> {!!__('Minhas Solicitações')!!}
                 </a>
             </div>
             <div class="col-md-{{$tamBtn}} pr-0">
-               <a href="{{route('sic.internautas.relatorios')}}#titulo-relatorio" class="btn btn-outline-primary btn-block {{$activeRelatorio}}">
+               <a href="{{route('sic.internautas.relatorios')}}#titulo-relatorio" class="btn btn-outline-primary w-100 {{$activeRelatorio}}">
                     <i class="fas fa-chart-area" aria-hidden="true"></i> {!!__('Relatórios Estatísticos')!!}
                 </a>
 

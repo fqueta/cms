@@ -66,7 +66,14 @@ class AuthServiceProvider extends ServiceProvider
                 return Response::deny('Você deve ser um internauta com cadastro.');
             }
         });
-
+        Gate::define('is_logado', function ($user) {
+            $log = Auth::check();
+            if($log){
+                return Response::allow();
+            }else{
+                return Response::deny('Você deve estar logado como cliente.');
+            }
+        });
         Gate::define('ler', function($user,$pagina=false){
             $ret = false;
             if($user->ativo=='s'){

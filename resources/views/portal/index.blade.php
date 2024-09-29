@@ -1,5 +1,4 @@
 @extends('layouts.principal')
-
 @section('nav')
     @include('portal.nav')
 @endsection

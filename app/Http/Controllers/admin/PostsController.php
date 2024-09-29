@@ -50,7 +50,13 @@ class PostsController extends Controller
             $this->ac = 'alt';
         }
         $this->routa = $this->sec;
-        $this->label = 'Posts';
+        if($this->sec=='posts'){
+            $this->label = 'Notícias';
+
+        }elseif($this->sec=='pages'){
+            $this->label = 'Páginas';
+
+        }
         if($this->sec=='pages' || $this->sec=='posts'){
             $this->view = 'posts';
         }else{
@@ -240,7 +246,7 @@ class PostsController extends Controller
         $d_pagina = $this->pagina();
         if(!$d_pagina){
             if($this->sec=='posts'){
-                $title = 'Cadastro de postagens';
+                $title = 'Cadastro de '.$this->label;
             }elseif($this->sec=='pages'){
                 $title = 'Cadastro de paginas';
             }
@@ -464,7 +470,7 @@ class PostsController extends Controller
             $d_pagina = $this->pagina();
             if(!$d_pagina){
                 if($this->sec=='posts'){
-                    $title = 'Cadastro de postagens';
+                    $title = 'Cadastro de '.$this->label;
                 }elseif($this->sec=='pages'){
                     $title = 'Cadastro de paginas';
                 }else{

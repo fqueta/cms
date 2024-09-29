@@ -215,7 +215,7 @@ class BiddingsController extends Controller
     public function create(User $user)
     {
         $this->authorize('create', $this->routa);
-        $title = 'Cadastrar Biddings';
+        $title = 'Cadastrar '.$this->label;
         $titulo = $title;
         $config = [
             'ac'=>'cad',

@@ -1,9 +1,7 @@
 @extends('adminlte::page')
-
-@section('title', 'Dashboard')
-
+@include('admin.title')
 @section('content_header')
-    <h3>{{$titulo}}</h3>
+<h3>{!!$titulo!!}</h3>
 @stop
 @php
     $tam_col1 = isset($config['tam_col1'])?$config['tam_col1'] : 'col-md-8';

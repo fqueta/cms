@@ -1,11 +1,3 @@
-@php
-    $nome = '';
-    if(Gate::allows('is_logado')){
-        // $n = explode(' ',Auth::user()['name']);
-        // $nome = $n[0];
-        $nome = Auth::user()['email'];
-    }
-@endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 
@@ -45,11 +37,9 @@
 </head>
 
 <body>
-    <div id="preload" class="d-print-none">
-        <div class="lds-dual-ring"></div>
-    </div>
+
   <!-- ======= Header ======= -->
-  <header id="header" class="fixed-top d-flex align-items-center header-transparent d-print-none">
+  <header id="header" class="fixed-top d-flex align-items-center header-transparent">
     <div class="container d-flex justify-content-between align-items-center">
 
       <div class="logo">
@@ -60,11 +50,13 @@
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="active " href="{{url('/')}}">Home</a></li>
-          <li><a href="{{route('sic.internautas.relatorios')}}">E-sic</a></li>
-          <li><a href="{{route('cad.internautas',['tipo'=>'pf'])}}">Cadastrar P.F</a></li>
-          <li><a href="{{route('cad.internautas',['tipo'=>'pj'])}}">Cadastrar P.J</a></li>
-          {{-- <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
+          <li><a class="active " href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="portfolio.html">Portfolio</a></li>
+          <li><a href="team.html">Team</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="#">Drop Down 1</a></li>
               <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
@@ -80,110 +72,17 @@
               <li><a href="#">Drop Down 3</a></li>
               <li><a href="#">Drop Down 4</a></li>
             </ul>
-          </li> --}}
-
-          @can('is_logado')
-            {{-- <li class="nav-item me-3 me-lg-0">
-                <div class="dropdown">
-                    <a class="me-3 dropdown-toggle hidden-arrow" href="#" id="notification"
-                    role="button" data-mdb-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-bell text-white"></i>
-                        @if(isset($notification['total']) && $notification['total']>0)
-                            <span class="badge rounded-pill badge-notification bg-danger" id="total-notifications">
-                                {{$notification['total']}}
-                            </span>
-                        @endif
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end1" style="width: 450px" aria-labelledby="notification">
-                        <li class="w-100 cx-notification">
-                            @include('site.layout.top_notification')
-                        </li>
-                    </ul>
-                </div>
-            </li> --}}
-
-            @if (Gate::allows('is_user_front') || Gate::allows('is_user_back'))
-                <li class="dropdown dropdown-menu-right"><a href="#" style="padding-left: 8px"><span><i class="fas fa-user-circle fa-2x"></i> {{@$nome}}</span> <i class="bi bi-chevron-down"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end1">
-                    @can('is_user_back')
-                        <li><a href="/admin">Painel Admin</a></li>
-                    @endcan
-                    {{-- <li class="dropdown"><a href="#"> <span>Gerenciar leilões</span> <i class="bi bi-chevron-right"></i> </a>
-                        <ul>
-                            <li><a href="{{url('/')}}/{{App\Qlib\Qlib::get_slug_post_by_id(2)}}">{{__('Cadastrar Sic')}}</a></li>
-                            <li><a href="{{url('/')}}/{{App\Qlib\Qlib::get_slug_post_by_id(12)}}">{{__('Minhas solicitações')}}</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li> --}}
-                    <li><a href="{{url('/internautas/sic/create')}}">Cadastrar E-SIC</a></li>
-                    <li><a href="{{url('/meu-cadastro')}}">Meu Cadastro</a></li>
-                    {{-- <li><a href="#">Meus pacotes</a></li> --}}
-                    {{-- <li><a href="#">Drop Down 3</a></li>
-                    <li><a href="#">Drop Down 4</a></li> --}}
-                    <li class="user-footer">
-                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            {{__('Sair')}}
-                        </a>
-                        <form id="logout-form" action="/logout" method="POST" style="display: none;">
-                            @csrf
-                        </form>
-                    </li>
-                    </ul>
-                </li>
-            @else
-                {{-- <li>
-
-                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        {{__('Usuario bloquedo clique para sair')}}
-                    </a>
-                    <form id="logout-form" action="/logout" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </li> --}}
-            @endif
-            {{-- <li><a href="/cart"><i class="fas fa-cart-arrow-down"></i></a></li> --}}
-
-            @else
-            <li class="nav-item dropdown ms-3">
-                <a class="nav-link dropdown-toggle show" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="true">
-                    Minha conta
-                </a>
-                <ul class="dropdown-menu border-0 show" data-bs-popper="static">
-                    <li>
-                        <a class="dropdown-item" href="{{route('login')}}">
-                            <small><i class="fa fa-user"></i> Login</small>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="{{url('/user/create')}}">
-                            <small><i class="fa fa-address-card"></i> Cadastro</small>
-                        </a>
-                    </li>
-                    {{-- <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item text-danger" href="#">
-                            <small><i class="fa-solid fa-right-from-bracket"></i> Sair</small>
-                        </a></li> --}}
-                </ul>
-            </li>
-            {{-- <li><a class="btn btn-default btn-flat float-right" href="{{route('login')}}"><i class="fas fa-user"></i>&nbsp;Login</a></li>
-            <li><a class="btn btn-default btn-flat float-right" href="{{url('/user/create')}}"><i class="fas fa-user"></i>&nbsp;Cadastrar</a></li> --}}
-            @endcan
-          {{-- <li><a href="contact.html">Contact Us</a></li> --}}
+          </li>
+          <li><a href="contact.html">Contact Us</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav>
-
-      <!-- .navbar -->
+      </nav><!-- .navbar -->
 
     </div>
   </header><!-- End Header -->
 
   <!-- ======= Hero Section ======= -->
-  <section id="hero" class="d-flex justify-cntent-center align-items-center d-print-none">
+  <section id="hero" class="d-flex justify-cntent-center align-items-center">
     {{-- <div id="heroCarousel" class="container carousel carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
 
       <!-- Slide 1 -->
@@ -225,6 +124,9 @@
   </section><!-- End Hero -->
 
   <main id="main">
+    <div id="preload">
+        <div class="lds-dual-ring"></div>
+    </div>
 
     <!-- ======= Services Section ======= -->
     {{-- <section class="services">
@@ -274,7 +176,7 @@
   <!-- End #main -->
 
   <!-- ======= Footer ======= -->
-  <footer id="footer" data-aos="fade-up" class="d-print-none" data-aos-easing="ease-in-out" data-aos-duration="500">
+  <footer id="footer" data-aos="fade-up" data-aos-easing="ease-in-out" data-aos-duration="500">
 
     <div class="footer-newsletter">
       <div class="container">
@@ -292,7 +194,7 @@
       </div>
     </div>
 
-    <div class="footer-top ">
+    <div class="footer-top">
       <div class="container">
         <div class="row">
 
