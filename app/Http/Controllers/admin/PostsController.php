@@ -469,10 +469,8 @@ class PostsController extends Controller
             // }
             $d_pagina = $this->pagina();
             if(!$d_pagina){
-                if($this->sec=='posts'){
+                if($this->sec=='posts' || $this->sec=='pages'){
                     $title = 'Cadastro de '.$this->label;
-                }elseif($this->sec=='pages'){
-                    $title = 'Cadastro de paginas';
                 }else{
                     $title = __('Sem titulo');
                 }

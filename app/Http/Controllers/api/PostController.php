@@ -51,8 +51,11 @@ class PostController extends Controller
             if($request->has('description'))
                 $files = $posts->where('post_content', 'LIKE', '%'.$request->get("description").'%');
 
-            if($request->has('code'))
+            if($request->has('code')){
                 $files = $posts->where('guid', '=', $request->get("code"));
+            }elseif($request->has('category')){
+                $files = $posts->where('guid', '=', $request->get("category"));
+            }
 
             if($request->has('date_begin'))
                 $files = $posts->whereDate('post_date_gmt', '>=', Carbon::createFromFormat('Y-m-d', $request->get("date_begin"))->toDateString() );
