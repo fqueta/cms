@@ -6,6 +6,7 @@ use App\Http\Controllers\admin\AttachmentsController;
 use App\Http\Controllers\admin\PostsController;
 use App\Http\Controllers\admin\UserPermissions;
 use App\Http\Controllers\portal\sicController;
+use App\Http\Controllers\system\TenantController;
 use App\Models\Familia;
 use App\Models\User;
 use App\Qlib\Qlib;
@@ -65,7 +66,12 @@ class TesteController extends Controller
         // dd(storage_path());
         // $tenant = tenant();
         // dump($tenant);
-        dd(Qlib::get_midias_site());
+        $ret = (new TenantController)->add_all([
+            ['id' =>'pratapolis','domain' =>'pratapolis.amsloja.com.br','name' =>'Prefeitura Municipal de Pratápolis'],
+            ['id' =>'pf5','domain' =>'pf5.localhost','name' =>'Prefeitura5'],
+            ['id' =>'pf5','domain' =>'pf5.localhost','name' =>'Prefeitura5'],
+        ]);
+        dd($ret);
         // dd(config('app.get_link_logo'));
         // $slug = (new PostsController)->str_slug('meu primeiro post',$id=false);;
         // dd($slug);
