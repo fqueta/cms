@@ -314,7 +314,7 @@
                             </li>
                             <li class="icon-list-item">
                                 <span class="icon-list-icon"> <i aria-hidden="true" class="fas fa-phone-alt"></i> </span>
-                                <span class="icon-list-text">{{$tenant['config']['telefone']}}</span>
+                                <span class="icon-list-text">{{@$tenant['config']['telefone']}}</span>
                             </li>
                         </ul>
                     </div>
