@@ -66,12 +66,12 @@ class TesteController extends Controller
         // dd(storage_path());
         // $tenant = tenant();
         // dump($tenant);
-        $ret = (new TenantController)->add_all([
-            ['id' =>'pratapolis','domain' =>'pratapolis.amsloja.com.br','name' =>'Prefeitura Municipal de Pratápolis'],
-            ['id' =>'pf5','domain' =>'pf5.localhost','name' =>'Prefeitura5'],
-            ['id' =>'pf5','domain' =>'pf5.localhost','name' =>'Prefeitura5'],
-        ]);
-        dd($ret);
+        // $ret = (new TenantController)->add_all([
+        //     ['id' =>'pratapolis','domain' =>'pratapolis.amsloja.com.br','name' =>'Prefeitura Municipal de Pratápolis'],
+        //     ['id' =>'pf5','domain' =>'pf5.localhost','name' =>'Prefeitura5'],
+        //     ['id' =>'pf5','domain' =>'pf5.localhost','name' =>'Prefeitura5'],
+        // ]);
+        // dd($ret);
         // dd(config('app.get_link_logo'));
         // $slug = (new PostsController)->str_slug('meu primeiro post',$id=false);;
         // dd($slug);
