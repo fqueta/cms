@@ -2,6 +2,7 @@
 namespace App\Qlib;
 
 use App\Http\Controllers\admin\PostsController;
+use App\Models\_upload;
 use App\Models\Documento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -1154,5 +1155,42 @@ class Qlib
             }
         }
         return $string;
+    }
+    /**
+     * Retorna um link da logo1 do site
+     */
+    static function get_link_logo($val=0){
+        $tenant = tenant();
+        $ret = false;
+        if($tenant){
+            $logo = _upload::select('id', 'nome as name','pasta as link' , 'ordem as ordenar', 'config')->where('token_produto','=',$tenant['id'])->orderBy('ordem','asc')->get();
+            if(isset($logo[$val]['link']) && !empty($logo[$val]['link'])){
+                $ret = tenant_asset($logo[$val]['link']);
+            }
+        }
+        return $ret;
+    }
+    /**
+     * retorna um array de todas as midias gravadas no cadastro da empresa
+     */
+    static function get_midias_site($val=null){
+        $tenant = tenant();
+        $ret = false;
+        if($tenant){
+            $midias = _upload::select('id', 'nome as name','pasta as link' , 'ordem as ordenar', 'config')->where('token_produto','=',$tenant['id'])->orderBy('ordem','asc')->get();
+            if($val!=null){
+                if(isset($midias[$val]['link']) && !empty($midias[$val]['link'])){
+                    $ret = tenant_asset($midias[$val]['link']);
+                }
+            }else{
+                if($midias->count()>0){
+                    $midias = $midias->toArray();
+                    foreach ($midias as $k => $value) {
+                        $ret[$k] = tenant_asset($value['link']);
+                    }
+                }
+            }
+        }
+        return $ret;
     }
 }

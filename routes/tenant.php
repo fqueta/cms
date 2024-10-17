@@ -49,6 +49,7 @@ Route::middleware([
     $prefixo_admin = config('app.prefixo_admin');
     $prefixo_site = config('app.prefixo_site');
     Route::get('/', [App\Http\Controllers\site\SiteController::class, 'home'])->name('home');
+    Route::get('/test', [App\Http\Controllers\site\SiteController::class, 'test_portal'])->name('teste.site');
     Route::prefix($prefixo_site.'internautas')->group(function(){
         Route::get('/',[App\Http\Controllers\portalController::class, 'index'])->name('internautas.index');
         Route::get('/cadastrar/{tipo}',[portalController::class, 'cadInternautas'])->name('cad.internautas');
@@ -220,6 +221,9 @@ Route::middleware([
         ]]);
         Route::resource('/archives_category', '\App\Http\Controllers\admin\DefaultController',['parameters' => [
             'archives_category' => 'id'
+        ]]);
+        Route::resource('/enterprise', '\App\Http\Controllers\admin\ConfigController',['parameters' => [
+            'enterprise' => 'id'
         ]]);
         Route::get('/pefil',[EtapaController::class,'index'])->name('sistema.perfil');
         Route::get('/pefil',[UserController::class,'perfilShow'])->name('perfil.show');

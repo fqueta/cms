@@ -14,5 +14,8 @@ class SiteController extends Controller
     public function home(){
         return view('portal.sic_front.index');
     }
-
+    public function test_portal(Request $request){
+        $title = 'Pagina de teste do site';
+        return view('portal.testes.index',['title' => $title]);
+    }
 }

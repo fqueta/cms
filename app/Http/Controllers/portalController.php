@@ -56,12 +56,15 @@ class portalController extends Controller
         $this->wp_api = new ApiWpController();
         //$this->routeIndex = route('internautas.index');
     }
-    public function index($config = null)
+    public function index(Request $request)
     {
         //if($this->pg==NULL){
-            $user = Auth::user();
-            //dd($user);
-            return view('portal.index',['prefixo_site'=>$this->prefixo_site,'prefixo_admin'=>$this->prefixo_admin]);
+            // $user = Auth::user();
+            if($request->get('exec')==1){
+                return redirect()->route('home');
+            }else{
+                return view('portal.index',['prefixo_site'=>$this->prefixo_site,'prefixo_admin'=>$this->prefixo_admin]);
+            }
         //}
     }
     public function cadInternautas($tipo = null)

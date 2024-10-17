@@ -1,5 +1,7 @@
 @php
     $nome = '';
+    $midias = App\Qlib\Qlib::get_midias_site(); //midias do site cadastradas no menu empresa
+    $tenant = tenant();
     if(Gate::allows('is_logado')){
         // $n = explode(' ',Auth::user()['name']);
         // $nome = $n[0];
@@ -18,7 +20,7 @@
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+  <link href="{{@$midias[1]}}" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -53,9 +55,10 @@
     <div class="container d-flex justify-content-between align-items-center">
 
       <div class="logo">
-        <h1 class="text-light"><a href="index.html"><span>Moderna</span></a></h1>
+        {{-- <h1 class="text-light"><a href="index.html"><span>Moderna</span></a></h1> --}}
         <!-- Uncomment below if you prefer to use an image logo -->
-        <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+        <a href="{{url('/')}}"><img src="{{@$midias[0]}}" alt="" class="img-fluid"></a>
+
       </div>
 
       <nav id="navbar" class="navbar">
@@ -183,7 +186,7 @@
   </header><!-- End Header -->
 
   <!-- ======= Hero Section ======= -->
-  <section id="hero" class="d-flex justify-cntent-center align-items-center d-print-none">
+  <section id="hero_" class="d-flex justify-cntent-center align-items-center d-print-none">
     {{-- <div id="heroCarousel" class="container carousel carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
 
       <!-- Slide 1 -->
@@ -226,57 +229,40 @@
 
   <main id="main">
 
-    <!-- ======= Services Section ======= -->
-    {{-- <section class="services">
-      <div class="container">
 
-        <div class="row">
-          <div class="col-md-6 col-lg-3 d-flex align-items-stretch" data-aos="fade-up">
-            <div class="icon-box icon-box-pink">
-              <div class="icon"><i class="bx bxl-dribbble"></i></div>
-              <h4 class="title"><a href="">Lorem Ipsum</a></h4>
-              <p class="description">Voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident</p>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-3 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
-            <div class="icon-box icon-box-cyan">
-              <div class="icon"><i class="bx bx-file"></i></div>
-              <h4 class="title"><a href="">Sed ut perspiciatis</a></h4>
-              <p class="description">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur</p>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-3 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
-            <div class="icon-box icon-box-green">
-              <div class="icon"><i class="bx bx-tachometer"></i></div>
-              <h4 class="title"><a href="">Magni Dolores</a></h4>
-              <p class="description">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</p>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-3 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
-            <div class="icon-box icon-box-blue">
-              <div class="icon"><i class="bx bx-world"></i></div>
-              <h4 class="title"><a href="">Nemo Enim</a></h4>
-              <p class="description">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque</p>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section> --}}
-    <!-- End Services Section -->
     @yield('content')
+    <button type="button" class="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#modal-mensagem">
+        Modal
+    </button>
+    {{-- <button type="button" class="btn btn-primary" onclick="abrirModal()">Abrir modal</button> --}}
 
+    <!-- Modal -->
+    <div class="modal fade modal-mensagem" id="modal-mensagem" tabindex="-1" aria-labelledby="modal-ms-title" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="modal-ms-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                ...
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{__('Fechar')}}</button>
+                {{-- <button type="button" class="btn btn-primary">Save changes</button> --}}
+                </div>
+            </div>
+        </div>
+    </div>
   </main>
   <!-- End #main -->
 
   <!-- ======= Footer ======= -->
-  <footer id="footer" data-aos="fade-up" class="d-print-none" data-aos-easing="ease-in-out" data-aos-duration="500">
+  <footer id="footer" data-aos="fade-up" class="d-print-none mt-3" data-aos-easing="ease-in-out" data-aos-duration="500">
+    <!-- End Services Section -->
 
-    <div class="footer-newsletter">
+
+    {{-- <div class="footer-newsletter">
       <div class="container">
         <div class="row">
           <div class="col-lg-6">
@@ -290,66 +276,62 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> --}}
 
     <div class="footer-top ">
       <div class="container">
         <div class="row">
+            <div class="col">
 
-          <div class="col-lg-3 col-md-6 footer-links">
-            <h4>Useful Links</h4>
-            <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Home</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">About us</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Terms of service</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Privacy policy</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-links">
-            <h4>Our Services</h4>
-            <ul>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Web Design</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Web Development</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Product Management</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Marketing</a></li>
-              <li><i class="bx bx-chevron-right"></i> <a href="#">Graphic Design</a></li>
-            </ul>
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-contact">
-            <h4>Contact Us</h4>
-            <p>
-              A108 Adam Street <br>
-              New York, NY 535022<br>
-              United States <br><br>
-              <strong>Phone:</strong> +1 5589 55488 55<br>
-              <strong>Email:</strong> info@example.com<br>
-            </p>
-
-          </div>
-
-          <div class="col-lg-3 col-md-6 footer-info">
-            <h3>About Moderna</h3>
-            <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita valies darta donna mare fermentum iaculis eu non diam phasellus.</p>
-            <div class="social-links mt-3">
-              <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
-              <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
-              <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
-              <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
             </div>
-          </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 footer-contact">
+                <div class="row">
+                    <div class="col-12" data-id="497d4082" data-element_type="widget" data-widget_type="image.default">
+                        <div class="widget-container">
+                            <a href="/">
+                                <img
+                                    src="{{@$midias[2]}}"
+                                    title="Pratápolis"
+                                    alt="Pratápolis"
+                                />
+                                <noscript><img src="{{@$midias[2]}}" title="Pratápolis" alt="Pratápolis" loading="lazy" data-eio="l" /></noscript>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="widget-container">
+                            <h4 class="heading-title size-default">{{$tenant['name']}}</h4>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <ul class="icon-list-items pl-0" style="list-style: none">
+                            <li class="icon-list-item">
+                                <span class="icon-list-icon"> <i aria-hidden="true" class="fas fa-map-marker-alt"></i> </span>
+                                <span class="icon-list-text">{{@$tenant['config']['endereco']}}, {{@$tenant['config']['numero']}} - {{@$tenant['config']['bairro']}}, {{@$tenant['config']['cidade']}} - {{@$tenant['config']['uf']}}, {{@$tenant['config']['cep']}}</span>
+                            </li>
+                            <li class="icon-list-item">
+                                <span class="icon-list-icon"> <i aria-hidden="true" class="fas fa-phone-alt"></i> </span>
+                                <span class="icon-list-text">{{$tenant['config']['telefone']}}</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
       </div>
     </div>
 
-    <div class="container">
+    <div class="container ">
       <div class="copyright">
-        &copy; Copyright <strong><span>Moderna</span></strong>. All Rights Reserved
+        &copy; Copyright <strong><span>{{config('app.name')}}</span></strong>.
       </div>
-      <div class="credits">
+      <div class="credits d-none">
         <!-- All the links in the footer should remain intact. -->
         <!-- You can delete the links only if you purchased the pro version. -->
         <!-- Licensing information: https://bootstrapmade.com/license/ -->

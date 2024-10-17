@@ -17,6 +17,15 @@ class CreateTenantsTable extends Migration
     {
         Schema::create('tenants', function (Blueprint $table) {
             $table->string('id')->primary();
+            $table->string('name', 255)->nullable();
+            $table->json('config')->nullable();
+
+            $table->enum('ativo',['s','n']);
+            $table->integer('autor')->nullable();
+            $table->enum('excluido',['n','s']);
+            $table->text('reg_excluido')->nullable();
+            $table->enum('deletado',['n','s']);
+            $table->text('reg_deletado')->nullable();
 
             // your custom columns may go here
 

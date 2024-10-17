@@ -45,7 +45,8 @@ class PermissionSeeder extends Seeder
                       "users" => "s",
                       "permissions" => "s",
                       "tags" => "s",
-                      "qoptions" => "s"
+                      "qoptions" => "s",
+                      "enterprise" => "s"
                    ],
                 "create" => [
                          "posts" => "s",
@@ -67,7 +68,8 @@ class PermissionSeeder extends Seeder
                          "users" => "s",
                          "permissions" => "s",
                          "tags" => "s",
-                         "qoptions" => "s"
+                         "qoptions" => "s",
+                         "enterprise" => "s"
                       ],
                 "update" => [
                             "posts" => "s",
@@ -89,7 +91,8 @@ class PermissionSeeder extends Seeder
                             "users" => "s",
                             "permissions" => "s",
                             "tags" => "s",
-                            "qoptions" => "s"
+                            "qoptions" => "s",
+                            "enterprise" => "s"
                          ],
                 "delete" => [
                                "posts" => "s",
@@ -111,7 +114,8 @@ class PermissionSeeder extends Seeder
                                "users" => "s",
                                "permissions" => "s",
                                "tags" => "s",
-                               "qoptions" => "s"
+                               "qoptions" => "s",
+                               "enterprise" => "s"
                             ],
                 "ler_arquivos" => [
                                   "posts" => "s",
@@ -133,7 +137,8 @@ class PermissionSeeder extends Seeder
                                   "users" => "s",
                                   "permissions" => "s",
                                   "tags" => "s",
-                                  "qoptions" => "s"
+                                  "qoptions" => "s",
+                                  "enterprise" => "s"
                                ]
             ],
             "admin"=>

@@ -55,6 +55,9 @@ function goToByScroll2(seletor) {
         scrollTop: $(seletor).offset().top
     }, 'slow');
 }
+function redirect(url) {
+  window.location = url;
+}
 function redirect_blank(url) {
   var a = document.createElement('a');
   a.target="_blank";
@@ -247,6 +250,60 @@ function alerta(msg,id,title,tam,fechar,time,fecha){
 	  $("#"+id).modal({backdrop: 'static'});
 	if(fecha == true)
 	setTimeout(function(){$("#"+id).modal("hide")}, time);
+}
+function alerta5(msg,id,title,tam,fechar,time,fecha){
+    if(typeof(fechar) == 'undefined')
+        fechar = true;
+    if(typeof(title) == 'undefined')
+    title = 'Janela modal';
+    if(typeof(fecha) != 'undefined')
+        fecha = fecha;
+    else
+        fecha = '';
+	if(typeof(id) == 'undefined')
+    id = 'meuModal';
+	if(typeof(tam) == 'undefined')
+    tam = '';
+	if(typeof(time) == 'undefined')
+        time = 2000;
+    if(fechar)
+        fechar = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>';
+        var html = '<div class="modal fade" id="'+id+'" tabindex="-1" data-bs-backdrop="static">'+
+        '<div class="modal-dialog '+tam+'">'+
+            '<div class="modal-content">'+
+                '<div class="modal-header">'+
+                '<h5 class="modal-title">'+title+'</h5>'+
+                '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'+
+                '</div>'+
+                '<div class="modal-body">'+
+                msg+
+                '</div>'+
+                '<div class="modal-footer">'+
+                fechar+
+                '</div>'+
+            '</div>'+
+            '</div>'+
+        '</div>';
+    // var myInput = document.getElementById('myInput')
+    $('#'+id).remove();
+    $(html).insertAfter('header');
+    // let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById(id)) // Returns a Bootstrap modal instance
+    // // Show or hide:
+    // modal.show();
+    // modal.hide()
+}
+function alerta52(msg,title,funCall){
+    if(typeof(fechar) == 'undefined')
+        fechar = true;
+    if(typeof funCall == 'undefined'){
+        funCall = function(ev){
+            console.log(ev);
+        }
+    }// var sel = document.querySelector();
+    document.querySelector('#modal-ms-title').innerHTML = title;
+    document.querySelector('#modal-mensagem').querySelector('.modal-body').innerHTML = msg;
+    document.querySelector('[data-bs-target="#modal-mensagem"]').click();
+    funCall();
 }
 function editarAssistencia(obj){
     var sele = obj.attr('sele');
@@ -1783,12 +1840,12 @@ function buscaCep1_0(cep_code){
        function(result){
            console.log(result);
           if( result.cep =='' ){
-             alerta(result.message || "Cep nÃ£o encontrado!");
+             alerta(result.message || "Cep não encontrado!");
              return;
           }
           if( result.erro){
               $('#Cep,#Cep,[q-inp="Cep"],[name="edit_cliente[Cep]"]').select();
-             lib_formatMensagem('.mens,.mensa',"O cep <b>"+cep_code+"</b> nÃ£o foi encontrado! <button type=\"button\" onclick='abrirjanelaPadraoConsulta(\"https://buscacepinter.correios.com.br/app/endereco/index.php?t\");' class='btn btn-primary'>"+__translate('NÃ£o sei o cep')+"</button>",'danger',9000);
+             lib_formatMensagem('.mens,.mensa',"O cep <b>"+cep_code+"</b> não foi encontrado! <button type=\"button\" onclick='abrirjanelaPadraoConsulta(\"https://buscacepinter.correios.com.br/app/endereco/index.php?t\");' class='btn btn-primary'>"+__translate('Não sei o cep')+"</button>",'danger',9000);
               $('input#Cep,[name="cep"],[q-inp="cep"],[name="edit_cliente[Cep]"]').val('');
              return;
           }

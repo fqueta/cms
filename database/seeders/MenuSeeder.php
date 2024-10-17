@@ -296,6 +296,15 @@ class MenuSeeder extends Seeder
                 'route'=>'qoptions.index',
                 'pai'=>'config'
             ],
+            [
+                'categoria'=>'',
+                'description'=>'Dados da Empresa',
+                'icon'=>'fas fa-industry',
+                'actived'=>true,
+                'url'=>'enterprise',
+                'route'=>'enterprise.index',
+                'pai'=>'config'
+            ],
         ]);
     }
 }

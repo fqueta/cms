@@ -1,3 +1,4 @@
+<button type="button" class="btn btn-primary" onclick="alerta5('aqui','modal-mens','');">teste</button>
 <script>
     $(function(){
         $("#{{$config['frm_id']}}").validate({
@@ -6,14 +7,26 @@
                     let btn_press = $('#btn-press-salv').html();
                     if(res.exec){
                         //lib_formatMensagem('.mens',res.mens,res.color);
-                        alerta(res.mens+'<div class="col-md-12 mt-3 text-center"><i class="fa fa-check text-'+res.color+' fa-2x" aria-hidden="true"></i></div>','modal-mens','');
-                        var redirect = res.redirect?res.redirect : $('[btn-volter="true"]').attr('redirect');
-                        if(typeof redirect=='undefined'){
-                            redirect = '/';
+                        // console.log(res);
+                        try {
+                            // alerta(res.mens+'<div class="col-md-12 mt-3 text-center"><i class="fa fa-check text-'+res.color+' fa-2x" aria-hidden="true"></i></div>','modal-mens','');
+                            // $('[data-dismiss="modal"]').on('click',function(){
+                            //     window.location = redirect;
+                            // });
+                            // console.log(res);
+
+                            alerta52(res.mens +'<div class="col-md-12 mt-3 text-center"><i class="fa fa-check text-'+res.color+' fa-2x" aria-hidden="true"></i></div>',title='',function(e){
+                                var redirect = res.redirect?res.redirect : $('[btn-volter="true"]').attr('redirect');
+                                if(typeof redirect=='undefined'){
+                                    redirect = '/';
+                                }
+                                var btn = '<button type="button" onclick="redirect(\''+redirect+'\')" data-bs-dismiss="modal" class="btn btn-primary">Fechar</button>';
+                                $('#modal-mensagem .modal-footer').html(btn);
+
+                            });
+                        } catch (error) {
+                            console.log(error);
                         }
-                        $('[data-dismiss="modal"]').on('click',function(){
-                            window.location = redirect;
-                        });
 
                     }else{
                         lib_formatMensagem('.mens',res.mens,res.color);

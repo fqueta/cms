@@ -62,7 +62,11 @@ class TesteController extends Controller
         // dd($ret);
 
         // $ret = (new UserPermissions)->my_permission();
-        dd(storage_path());
+        // dd(storage_path());
+        // $tenant = tenant();
+        // dump($tenant);
+        dd(Qlib::get_midias_site());
+        // dd(config('app.get_link_logo'));
         // $slug = (new PostsController)->str_slug('meu primeiro post',$id=false);;
         // dd($slug);
         return view('teste',$config);
