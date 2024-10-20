@@ -11,6 +11,9 @@ class Biddings extends Model
     // protected $guarded  = ['id'];
     // protected $dates    = ['opening'];
     protected $table    = 'biddings';
+    protected $casts = [
+        'config' => 'array',
+    ];
     protected $fillable = [
         'token',
         'genre_id',

@@ -105,11 +105,11 @@ class BiddingsController extends Controller
         $biddings_types = new DefaultController(['route'=>'biddings_types']);
         $tambcampos = 12; //6
         $tambcampos1 = 12;
-
-        return [
+        $ret = [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'indentifier'=>['label'=>'Número do processo','active'=>true,'placeholder'=>'Processo','type'=>'number','exibe_busca'=>'d-block','event'=>'required','tam'=>6,'validate'=>['required']],
+            // 'config[NumLicitacao]'=>['label'=>'Número da licitação','cp_busca'=>'config][NumLicitacao','active'=>true,'type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>4,'placeholder'=>''],
+            'indentifier'=>['label'=>'Número do processo','active'=>true,'placeholder'=>'Processo','type'=>'tel','exibe_busca'=>'d-block','event'=>'required','tam'=>6,'validate'=>['required']],
             'year'=>['label'=>'Ano','active'=>true,'placeholder'=>'Ex: '.date('Y'),'type'=>'number','exibe_busca'=>'d-block','event'=>'required','tam'=>6,'validate'=>['required']],
             'title'=>['label'=>'Título','active'=>true,'placeholder'=>'Título','type'=>'text','exibe_busca'=>'d-block','event'=>'required','tam'=>$tambcampos,'validate'=>['required','string', Rule::unique($this->tab)->ignore($id)]],
             'subtitle'=>['label'=>'Subtítulo (opcional)','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>$tambcampos],
@@ -187,8 +187,19 @@ class BiddingsController extends Controller
             ],
             'opening'=>['label'=>'Data de abertura','active'=>true,'placeholder'=>'','type'=>'datetime-local','exibe_busca'=>'d-block','event'=>'','tam'=>$tambcampos,'validate'=>['required']],
             'object'=>['label'=>'Objeto','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'required','tam'=>$tambcampos1],
-            'active'=>['label'=>'publicado','tab'=>'biddings','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
         ];
+        //Pode ser usado para personalizar campos exstras de cada prefeitura....
+        $campos_extras = [
+            'config[DtHabilitacao]'=>['label'=>'Data de habilitação da licitação','cp_busca'=>'config][DtHabilitacao','active'=>true,'type'=>'datetime-local','exibe_busca'=>'d-block','event'=>'','tam'=>'6','placeholder'=>''],
+            'config[NuValorEstimado]'=>['label'=>'Data de habilitação da licitação','cp_busca'=>'config][NuValorEstimado','active'=>true,'type'=>'moeda','exibe_busca'=>'d-block','event'=>'','tam'=>'6','placeholder'=>''],
+        ];
+        //Fim campos extras para prefeituras
+        $ret2 = array_merge($ret,$campos_extras);
+        $arra_active = [
+            'active'=>['label'=>'publicado','tab'=>'biddings','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'4','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+        ];
+        $ret3 = array_merge($ret2,$arra_active);
+        return $ret3;
     }
     public function index()
     {

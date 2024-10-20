@@ -32,5 +32,7 @@ class AddAllTenants extends Command
             ['id' =>'demo','domain' =>'demo.maisaqui.com.br','name' =>'Prefeitura Municipal de Demostração'],
         ]);
         $this->info('Tanants adicionados!');
+        $this->call('tenants:seed');
+        // $this->info('Tanants adicionados!');
     }
 }
