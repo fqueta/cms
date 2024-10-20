@@ -2,8 +2,6 @@
 @php
     $redirect_base = false;
     $btn_continuar = isset($_GET['bc']) ? $_GET['bc'] : 'true';
-    $label_btn_permanecer = isset($_GET['lbp']) ? $_GET['lbp']:__('Salvar e permanecer');
-    $label_btn_sair = isset($_GET['lbs']) ? $_GET['lbs']:__('Salvar e prosseguir');
     $btn_sair = isset($_GET['bs']) ? $_GET['bs'] : 'true';
     if(isset($config['ac']) && $config['ac']=='cad'){
         $redirect_base = isset($config['redirect'])?$config['redirect']:$redirect_base;
@@ -18,6 +16,12 @@
             $redirect_base .= '&idCad='.$value['id'];
             //echo $redirect_base;
         }
+    }
+    $label_btn_sair = isset($_GET['lbs']) ? $_GET['lbs']:__('Salvar e sair');
+    if(@$config['ac']=='cad'){
+        $label_btn_permanecer = isset($_GET['lbp']) ? $_GET['lbp']:__('Salvar e continuar');
+    }else{
+        $label_btn_permanecer = isset($_GET['lbp']) ? $_GET['lbp']:__('Salvar e permanecer');
     }
     $frontend = App\Qlib\Qlib::is_frontend();
     if($frontend){
