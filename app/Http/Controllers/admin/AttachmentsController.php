@@ -87,6 +87,10 @@ class AttachmentsController extends Controller
                 unset($d['local']);
                 $salv = _upload::where('id', $d['id'])->update($d);
             }else{
+                if(!isset($d['title']) && isset($d['nome'])){
+                    $d['title'] = $d['nome'];
+                    unset($d['nome']);
+                }
                 $salv = attachment::where('id', $d['id'])->update($d);
             }
             if($salv){
