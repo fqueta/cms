@@ -49,7 +49,7 @@ class UserSeeder extends Seeder
         //Aproveitando para incluir dados padroes para os processos de licitações
         $arr_t = [
             'bidding_categories'=>[
-                ['name' => 'Saúde'], ['name' => 'Contrução'], ['name' => 'Geral'],
+                ['name' => 'Saúde'], ['name' => 'Construção'], ['name' => 'Geral'],
                 ['name' => 'Transporte'], ['name' => 'Informatica'], ['name' => 'Equipamentos Hospitalares'],
                 ['name' => 'Outros'],
             ],
