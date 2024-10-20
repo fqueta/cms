@@ -190,8 +190,8 @@ class BiddingsController extends Controller
         ];
         //Pode ser usado para personalizar campos exstras de cada prefeitura....
         $campos_extras = [
-            'config[DtHabilitacao]'=>['label'=>'Data de habilitação da licitação','cp_busca'=>'config][DtHabilitacao','active'=>true,'type'=>'datetime-local','exibe_busca'=>'d-block','event'=>'','tam'=>'6','placeholder'=>''],
-            'config[NuValorEstimado]'=>['label'=>'Data de habilitação da licitação','cp_busca'=>'config][NuValorEstimado','active'=>true,'type'=>'moeda','exibe_busca'=>'d-block','event'=>'','tam'=>'6','placeholder'=>''],
+            'config[dtPublicacao]'=>['label'=>'	Data da publicação da licitação','cp_busca'=>'config][dtPublicacao','active'=>true,'type'=>'date','exibe_busca'=>'d-block','event'=>'','tam'=>'6','placeholder'=>''],
+            'config[NuValorEstimado]'=>['label'=>'Valor estimado da licitação','cp_busca'=>'config][NuValorEstimado','active'=>true,'type'=>'moeda','exibe_busca'=>'d-block','event'=>'','tam'=>'6','placeholder'=>''],
         ];
         //Fim campos extras para prefeituras
         $ret2 = array_merge($ret,$campos_extras);
