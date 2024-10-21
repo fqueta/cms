@@ -71,6 +71,7 @@ class PostController extends Controller
             if($limit)
                 $files = $posts->take($limit)->skip($limit * $page);
             $doc = $posts->get();
+            // dd($doc);
             if($doc->count() > 0){
                 $doc=$doc->toArray();
                 $fi = new UploadController;
