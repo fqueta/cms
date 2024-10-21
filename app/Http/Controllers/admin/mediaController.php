@@ -116,6 +116,9 @@ class mediaController extends Controller
         }else{
             $fileNameToStore= $filename.'.'.$extension;
         }
+        $fileNameToStore = strip_tags($fileNameToStore);
+        $fileNameToStore = str_replace('{', '', $fileNameToStore);
+        $fileNameToStore = str_replace('}', '', $fileNameToStore);
         $arquivos = isset($request->arquivos) ? $request->arquivos : 'jpg,jpeg,png,zip,pdf,PDF,JPG';
         if($arquivos){
             $arr_extension = explode(',',$arquivos);
