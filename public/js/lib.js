@@ -2142,3 +2142,13 @@ function resend_email_sic() {
         console.log(err);
     });
 }
+function exibeTpc(val){
+    if(val=='p'){
+        $('.tpc-p').show();
+        $('.tpc-a').hide();
+    }
+    if(val=='a'){
+        $('.tpc-p').hide();
+        $('.tpc-a').show();
+    }
+}

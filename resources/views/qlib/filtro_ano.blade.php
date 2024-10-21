@@ -75,7 +75,7 @@
                 {{__('Todos Anos')}}
             </label>
         </div>
-        <button type="button" onclick="exibeTpc('p')" class="btn btn-default tpc-a" {!!$displaytpc_p!!} title="{{__('Exibir consulta periódica')}}">{{__('Consulta Periódica')}}</button>
+        <button type="button" onclick="exibeTpc('p')" class="btn btn-default tpc-a d-none" {!!$displaytpc_p!!} title="{{__('Exibir consulta periódica')}}">{{__('Consulta Periódica')}}</button>
     @if($form)
     </form>
     @endif

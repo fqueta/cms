@@ -40,21 +40,47 @@ class BiddingsController extends Controller
             'limit'=>isset($get['limit']) ? $get['limit']: 50,
             'order'=>isset($get['order']) ? $get['order']: 'desc',
         ];
-        $biddings = Biddings::where('excluido','=','n')->orderBy('id',$config['order']);
+        $tpc = 'a';
+        if(isset($get['dataI'],$get['dataF']) && !empty($get['dataI']) && !empty($get['dataF']) && $get['dataI']!='0000-00-00' && $get['dataF']!='0000-00-00'){
+            $tpc = 'p';unset($get['ano']);
+        }else{
+            $tpc = isset($_GET['tpc']) ? $_GET['tpc'] : 'a';
+        }
+
+        if(isset($get['ano']) && !empty($get['ano'])){
+            $biddings = Biddings::where('excluido','=','n')->where('year',$get['ano'])->orderBy('id',$config['order']);
+        }elseif($tpc=='p' && isset($get['dataI'],$get['dataF']) && !empty($get['dataI']) && !empty($get['dataF'])){
+            $biddings = Biddings::where('excluido','=','n')->orderBy('id',$config['order']);
+        }else{
+            $biddings = Biddings::where('excluido','=','n')->orderBy('id',$config['order']);
+        }
+
         //$biddings =  DB::table('biddings')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
         $biddings_totais = new stdClass;
         $campos = $this->campos();
         $tituloTabela = 'Lista de todos cadastros';
         $arr_titulo = false;
+        unset($get['ano']);
         if(isset($get['filter'])){
                 $titulo_tab = false;
                 $i = 0;
+                $campoJoin = '';
                 foreach ($get['filter'] as $key => $value) {
                     if(!empty($value)){
                         if($key=='id'){
                             $biddings->where($key,'LIKE', $value);
                             $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
                             $arr_titulo[$campos[$key]['label']] = $value;
+                        }elseif(is_array($value)){
+                            foreach ($value as $kb => $vb) {
+                                if(!empty($vb)){
+                                    if($key=='tags'){
+                                        $biddings->where($campoJoin.$key,'LIKE', '%"'.$vb.'"%' );
+                                    }else{
+                                        $biddings->where($campoJoin.$key,'LIKE', '%"'.$kb.'":"'.$vb.'"%' );
+                                    }
+                                }
+                            }
                         }else{
                             $biddings->where($key,'LIKE','%'. $value. '%');
                             if($campos[$key]['type']=='select'){
@@ -209,10 +235,12 @@ class BiddingsController extends Controller
         $queryBiddings = $this->queryBiddings($_GET);
         $queryBiddings['config']['exibe'] = 'html';
         $routa = $this->routa;
-        return view($this->view.'.index',[
+        $anos = Qlib::sql_distinct();
+        $ret = [
             'dados'=>$queryBiddings['Biddings'],
             'title'=>$title,
             'titulo'=>$titulo,
+            'anos'=>$anos,
             'campos_tabela'=>$queryBiddings['campos'],
             'biddings_totais'=>$queryBiddings['biddings_totais'],
             'titulo_tabela'=>$queryBiddings['tituloTabela'],
@@ -221,7 +249,9 @@ class BiddingsController extends Controller
             'routa'=>$routa,
             'view'=>$this->view,
             'i'=>0,
-        ]);
+        ];
+        // dd($ret);
+        return view($this->view.'.index',$ret);
     }
     public function create(User $user)
     {
@@ -266,6 +296,7 @@ class BiddingsController extends Controller
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['active'] = isset($dados['active'])?$dados['active']:0;
         $dados['excluido'] = isset($dados['excluido'])?$dados['excluido']:'n';
+        // dd($dados);
         $salvar = Biddings::create($dados);
         $route = $this->routa.'.index';
         $ret = [
