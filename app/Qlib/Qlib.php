@@ -1197,8 +1197,8 @@ class Qlib
      * retornar listas de anos de determinada consulta por padrao traz anos das licitações
      * @param string $tab='biddings',$campo='YEAR(`data_exec`)',$order='ORDER BY data_exec ASC'
      */
-    static function sql_distinct($tab='biddings',$campo='year',$order='ORDER BY year ASC',$debug=false){
-        $sql = "SELECT DISTINCT $campo As vl  FROM $tab $order";
+    static function sql_distinct($tab='biddings',$campo='year',$valor='vl',$order='ORDER BY year ASC',$debug=false){
+        $sql = "SELECT DISTINCT $campo As $valor  FROM $tab $order";
         if($debug){
             echo $sql;
         }

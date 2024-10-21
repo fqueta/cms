@@ -8,6 +8,7 @@ use App\Models\admin\bidding_categorie;
 use App\Models\admin\Biddings;
 use App\Models\admin\bidding_genres;
 use App\Models\admin\bidding_phase;
+use App\Qlib\Qlib;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -47,7 +48,8 @@ class BiddingsController extends Controller
         $phases =  bidding_phase::select(['id', 'name'])->orderBy('name', 'asc')->get();
         $genres =  bidding_genres::select(['id', 'name'])->orderBy('name', 'asc')->get();
         $bidding_categories = bidding_categorie::select(['id', 'name'])->orderBy('name', 'asc')->get();
-
+        $anos = Qlib::sql_distinct('biddings','year','ano');
+        // dd($anos);
         $biddings = $biddings->where(['active' => 's'])
             ->orderBy('opening', 'desc')
             ->select(['id', 'title','subtitle', 'opening', 'indentifier','year', 'object', 'genre_id', 'phase_id', 'bidding_category_id', 'created_at','active'])
@@ -56,6 +58,6 @@ class BiddingsController extends Controller
             ->with('category')
             ->with('attachments')
             ->get();
-        return [ "amount" => $count, 'biddings' => $biddings, 'phases' => $phases, 'genres' => $genres, 'bidding_categories' => $bidding_categories];
+        return [ "amount" => $count, 'biddings' => $biddings, 'phases' => $phases, 'genres' => $genres, 'bidding_categories' => $bidding_categories,'anos'=>$anos];
     }
 }
