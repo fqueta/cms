@@ -31,6 +31,7 @@ class PostController extends Controller
                 'post_type as type',
                 'post_title as name',
                 'post_name as slug',
+                'post_excerpt as short_description',
                 'post_content as description',
                 'post_date_gmt as date',
                 'token',
@@ -76,6 +77,9 @@ class PostController extends Controller
                 $doc=$doc->toArray();
                 $fi = new UploadController;
                 foreach($doc as $key => $value){
+                    $doc[$key]['title'] = $value['name'];
+                    $doc[$key]['image_preview_file_name'] = (new PostsController)->get_imgd($value['id']);
+
                     if(isset($value['category_id'])){
                         $doc[$key]['category'] = @$all_categories[$value['category_id']];
                     }
