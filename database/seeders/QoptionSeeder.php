@@ -24,9 +24,15 @@ class QoptionSeeder extends Seeder
                 'obs'=>'',
             ],
             [
+                'nome'=>'Permissão padrão Fornecedor',
+                'url'=>'id_permission_fornecedores',
+                'valor'=>'6',
+                'obs'=>'',
+            ],
+            [
                 'nome'=>'Permissão padrão FrontEnd',
                 'url'=>'id_permission_front',
-                'valor'=>'6',
+                'valor'=>'7',
                 'obs'=>'',
             ],
             [

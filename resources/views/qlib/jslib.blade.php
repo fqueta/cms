@@ -16,6 +16,7 @@
 <script src="{{url('/summernote/summernote.min.js')}}"></script>
 <script src="{{url('/vendor/venobox/venobox.min.js')}}"></script>
 <script src="{{url('/js/jquery.validate.min.js')}}"></script>
+<script src="{{url('/js/jscolor/jscolor.js')}}"></script>
 <script src=" {{url('/js/lib.js')}}?ver={{config('app.version')}}"></script>
 <script>
     $(function(){
@@ -60,17 +61,17 @@
             });
 
             lib_autocompleteGeral('.autocomplete');
-            lib_autocompleteGeral('.autocomplete-pesq',function(ui,el){
-                console.log(ui);
-                try {
-                    if(ui.id){
-                        let ur = '/beneficiarios/'+ui.id+'?redirect='+window.location.href;
-                        window.location = ur;
-                    }
-                } catch (error) {
-                    console.log(error);
-                }
-            });
+            // lib_autocompleteGeral('.autocomplete-pesq',function(ui,el){
+            //     console.log(ui);
+            //     try {
+            //         if(ui.id){
+            //             let ur = '/beneficiarios/'+ui.id+'?redirect='+window.location.href;
+            //             window.location = ur;
+            //         }
+            //     } catch (error) {
+            //         console.log(error);
+            //     }
+            // });
             $('.summernote').summernote({
                 height: 250,
                 placeholder: 'Digite o conteudo',
@@ -109,5 +110,11 @@
             $('#pesquisar').modal('show');
             // $('[type="button"][data-widget="navbar-search"]').click();
         });
+        jscolor.presets.default = {
+            value: '#88DD20',
+            position: 'right',
+            backgroundColor: '#333',
+            palette: '#fff #000 #808080 #996e36 #f55525 #ffe438 #88dd20 #22e0cd #269aff #bb1cd4',
+        };
     });
 </script>

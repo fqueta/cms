@@ -26,15 +26,29 @@ class UserController extends Controller
     public $view;
     public $url;
     public $tab;
-    public function __construct(User $user)
+    public $id_permission;
+    public $title;
+    public function __construct($config=[])
     {
         $this->middleware('auth');
+        $user = Auth::user();
+        $routeName = isset($config['route']) ? $config['route'] : false;
+        $sec2 = request()->segment(2);
+        $routeName = $routeName ? $routeName : $sec2;
         $this->user = $user;
-        $this->routa = 'users';
+        $this->routa = $routeName;
         $this->url = 'users';
         $this->label = 'Usuários';
         $this->view = 'padrao';
         $this->tab = 'users';
+        $this->title = __('Cadastro de usuário');
+        if($routeName == 'fornecedores'){
+            $this->title = __('Cadastro de fornecedores');
+        }
+    }
+    /**gera um id de pemissão automatico para o caso de fornecedores */
+    public function id_permission_fornecedores(){
+        return Qlib::qoption('id_permission_fornecedores');
     }
     public function queryUsers($get=false,$config=false)
     {
@@ -49,15 +63,17 @@ class UserController extends Controller
         $logado = Auth::user();
         if(isset($get['term'])){
             //Autocomplete
-            if(isset($get['bairro']) && !empty($get['bairro']) && isset($get['quadra']) && !empty($get['quadra'])){
-               $sql = "SELECT * FROM users WHERE (nome LIKE '%".$get['term']."%') AND bairro=".$get['bairro']." AND quadra=".$get['quadra']." AND ".Qlib::compleDelete();
-            }elseif(isset($get['id_permission']) && !empty($get['id_permission'])){
-                $sql = "SELECT * FROM users WHERE (nome LIKE '%".$get['term']."%') AND id_permission=".$get['id_permission']." AND ".Qlib::compleDelete();
+            if(isset($get['id_permission']) && !empty($get['id_permission'])){
+                $sql = "SELECT * FROM users WHERE (name LIKE '%".$get['term']."%') AND id_permission=".$get['id_permission']." AND ".Qlib::compleDelete();
             }else{
-                // $sql = "SELECT l.*,q.nome quadra_valor FROM users as l
+                // $sql = "SELECT l.*,q.name quadra_valor FROM users as l
                 // JOIN quadras as q ON q.id=l.quadra
-                // WHERE (l.nome LIKE '%".$get['term']."%' OR q.nome LIKE '%".$get['term']."%' ) AND ".Qlib::compleDelete('l');
-                $sql = "SELECT * FROM users WHERE nome LIKE '%".$get['term']."%' AND ".Qlib::compleDelete();
+                // WHERE (l.name LIKE '%".$get['term']."%' OR q.name LIKE '%".$get['term']."%' ) AND ".Qlib::compleDelete('l');
+                $compleSql = false;
+                if($this->routa == 'fornecedores'){
+                    $compleSql = "AND id_permission = '".$this->id_permission_fornecedores() ."'";
+                }
+                $sql = "SELECT * FROM users WHERE name LIKE '%".$get['term']."%' $compleSql AND ".Qlib::compleDelete();
 
             }
             $user = DB::select($sql);
@@ -73,7 +89,11 @@ class UserController extends Controller
             //dd($ret);
             return $ret;
         }else{
-            $user =  User::where('id_permission','>=',$logado->id_permission)->orderBy('id',$config['order']);
+            if($this->routa == 'fornecedores'){
+                $user =  User::where('id_permission','=',Qlib::qoption('id_permission_fornecedores'))->orderBy('id',$config['order']);
+            }else{
+                $user =  User::where('id_permission','>=',$logado->id_permission)->orderBy('id',$config['order']);
+            }
             //$user =  DB::table('users')->where('ativo','s')->orderBy('id',$config['order']);
         }
         $users = new stdClass;
@@ -138,8 +158,11 @@ class UserController extends Controller
     public function campos($dados=false,$local='index'){
         $user = Auth::user();
         $permission = new admin\UserPermissions($user);
-        if(isset($dados['tipo_pessoa']) && $dados['tipo_pessoa']){
+        if(isset($dados['tipo_pessoa']) && $dados['tipo_pessoa'] && !isset($_GET['tipo'])){
             $_GET['tipo'] = $dados['tipo_pessoa'];
+        }
+        if($this->routa=='fornecedores'){
+            $_GET['tipo'] = isset($_GET['tipo'])?$_GET['tipo']:'pj';
         }
         $sec = isset($_GET['tipo'])?$_GET['tipo']:'pf';
         if($sec=='pf'){
@@ -161,10 +184,11 @@ class UserController extends Controller
         $hidden_editor = '';
         $info_obs = '<div class="alert alert-info alert-dismissable" role="alert"><button class="close" type="button" data-dismiss="alert" aria-hidden="true">×</button><i class="fa fa-info-circle"></i>&nbsp;<span class="sw_lato_black">Obs</span>: campos com asterisco (<i class="swfa fas fa-asterisk cad_asterisco" aria-hidden="true"></i>) são obrigatórios.</div>';
         $ret = [
-            'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'id'=>['label'=>'Id','js'=>true,'active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'tipo_pessoa'=>[
                 'label'=>'Tipo de Pessoa',
                 'active'=>true,
+                'js'=>true,
                 'type'=>'radio_btn',
                 'arr_opc'=>['pf'=>'Pessoa Física','pj'=>'Pessoa Jurídica'],
                 'exibe_busca'=>'d-block',
@@ -174,10 +198,11 @@ class UserController extends Controller
                 'class'=>'btn btn-outline-secondary',
             ],
             'sep0'=>['label'=>'informações','active'=>false,'type'=>'html_script','exibe_busca'=>'d-none','event'=>'','tam'=>'12','text_html'=>'<h4 class="text-center">'.__('Informe os dados').'</h4><hr>','script_show'=>''],
-            'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'token'=>['label'=>'token','js'=>true,'active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'id_permission'=>[
                 'label'=>'Permissão*',
                 'active'=>true,
+                'js'=>true,
                 'type'=>'select',
                 'data_selector'=>[
                     'campos'=>$permission->campos(),
@@ -193,15 +218,15 @@ class UserController extends Controller
                 'tam'=>'3',
                 'value'=>@$_GET['id_permission'],
             ],
-            'email'=>['label'=>'E-mail *','active'=>true,'type'=>'email','exibe_busca'=>'d-none','event'=>'required','tam'=>'6','placeholder'=>''],
+            'email'=>['label'=>'E-mail *','js'=>true,'active'=>true,'type'=>'email','exibe_busca'=>'d-none','event'=>'required','tam'=>'6','placeholder'=>''],
             'password'=>['label'=>'Senha','active'=>false,'type'=>'password','exibe_busca'=>'d-none','event'=>'','tam'=>'3','placeholder'=>'','value'=>''],
             //'password_confirmation'=>['label'=>'Confirmar Senha *','active'=>false,'type'=>'password','exibe_busca'=>'d-none','event'=>'required','tam'=>'3','placeholder'=>''],
             // 'nome'=>['label'=>$lab_nome,'active'=>true,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'9','placeholder'=>''],
-            'name'=>['label'=>$lab_nome,'active'=>true,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'9','placeholder'=>''],
-            'cpf'=>['label'=>$lab_cpf,'active'=>false,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cpf','tam'=>'3'],
-            'cnpj'=>['label'=>'CNPJ *','active'=>false,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cnpj required','tam'=>'4','class_div'=>'div-pj '.$displayPj],
-            'razao'=>['label'=>'Razão social *','active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'4','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
-            'config[nome_fantasia]'=>['label'=>'Nome fantasia','active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'4','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
+            'name'=>['label'=>$lab_nome,'js'=>true,'active'=>true,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'9','placeholder'=>''],
+            'cpf'=>['label'=>$lab_cpf,'active'=>false,'js'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cpf','tam'=>'3'],
+            'cnpj'=>['label'=>'CNPJ *','active'=>false,'js'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'mask-cnpj required','tam'=>'4','class_div'=>'div-pj '.$displayPj],
+            'razao'=>['label'=>'Razão social *','js'=>true,'active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'required','tam'=>'4','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
+            'config[nome_fantasia]'=>['label'=>'Nome fantasia','js'=>true,'active'=>false,'type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'4','placeholder'=>'','class_div'=>'div-pj '.$displayPj],
             'config[celular]'=>['label'=>'Telefone celular','active'=>true,'type'=>'tel','tam'=>'4','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','cp_busca'=>'config][celular'],
             'config[telefone_residencial]'=>['label'=>'Telefone residencial','active'=>false,'type'=>'tel','tam'=>'4','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','class_div'=>'div-pf '.$displayPf,'cp_busca'=>'config][telefone_residencial'],
             'config[telefone_comercial]'=>['label'=>'Telefone comercial','active'=>false,'type'=>'tel','tam'=>'4','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','cp_busca'=>'config][telefone_comercial'],
@@ -259,10 +284,15 @@ class UserController extends Controller
             'config[uf]'=>['label'=>'UF','active'=>false,'js'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-none','event'=>'','tam'=>'2','cp_busca'=>'config][uf'],
             //'foto_perfil'=>['label'=>'Foto','active'=>false,'js'=>false,'placeholder'=>'','type'=>'file','exibe_busca'=>'d-none','event'=>'','tam'=>'12'],
             'sep2'=>['label'=>'Preferencias','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','text_html'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>','script_show'=>'<h4 class="text-center">'.__('Preferências').'</h4><hr>'],
-            'ativo'=>['label'=>'Liberado para uso','tab'=>$this->tab,'active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'ativo'=>['label'=>'Liberado para uso','js'=>true,'tab'=>$this->tab,'active'=>true,'type'=>'chave_checkbox','value'=>'s','checked'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'preferencias[newslatter]'=>['label'=>'Deseja receber e-mails com as novidades','active'=>false,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'12','arr_opc'=>['s'=>'Sim','n'=>'Não'],'cp_busca'=>'preferencias][newslatter'],
 
         ];
+        if($this->routa == 'fornecedores'){
+            $ret['email']['tam'] = 9;
+            $ret['id_permission'] = ['label'=>'id_permission','js'=>true,'value'=>$this->id_permission_fornecedores() ,'active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'];
+
+        }
         if($local=='create' || $local=='show' || $local=='edit'){
             //Importante para exibição das preferencias.
             if(isset($dados['preferencias'])){
@@ -349,15 +379,12 @@ class UserController extends Controller
         if(isset($_GET['term'])){
             $ret = false;
             $ajax = 's';
-            $campos = $this->campos();
+            // $campos = $this->campos();
             if($queryUsers['user']){
                //$ret = $queryUsers['user'];
                 if(isset($_GET['id_permission']) && empty($_GET['id_permission'])){
                     $ret[0]['value'] = 'Por favor selecione a Permissão! ';
                     $ret[0]['id'] = '';
-                }elseif(isset($_GET['quadra']) && empty($_GET['quadra'])){
-                    $ret[0]['value'] = 'Por favor selecione a Quadra! ';
-                    $ret[0]['id'] = 'cad';
                 }else{
                     foreach ($queryUsers['user'] as $key => $v) {
                         $bairro = false;
@@ -377,18 +404,10 @@ class UserController extends Controller
                             $ret[$key]['dados'] = $v;
                         }
                         $nome_quadra = false;
-                        // if($id_quadra = $v->quadra){
-
-                        //     $nome_quadra = Qlib::buscaValorDb([
-                        //         'tab'=>'quadras',
-                        //         'campo_bus'=>'id',
-                        //         'valor'=>$id_quadra,
-                        //         'select'=>'nome',
-                        //     ]);
-                        //     $ret[$key]['dados'] = $v;
-                        //     $ret[$key]['dados']->quadra_valor = $nome_quadra;
-                        // }
-                        $ret[$key]['value'] = ' Usuario: '.$v->nome.' | E-mail: '.$v->email;
+                        $ret[$key]['value'] = ' Usuario: '.$v->name.' | E-mail: '.$v->email;
+                        if($this->routa=='fornecedores'){
+                            $ret[$key]['value'] .= ' CNPJ: '.$v->cnpj;
+                        }
                     }
                 }
             }else{
@@ -420,7 +439,7 @@ class UserController extends Controller
     public function create(User $user)
     {
         $this->authorize('is_admin', $user);
-        $title = __('Cadastrar usuário');
+        $title = $this->title;
         $titulo = $title;
         $config = [
             'ac'=>'cad',
@@ -432,7 +451,7 @@ class UserController extends Controller
             'token'=>uniqid(),
         ];
         $campos = $this->campos(false,'create');
-        return view($this->routa.'.createedit',[
+        return view($this->view.'.createedit',[
             'config'=>$config,
             'title'=>$title,
             'titulo'=>$titulo,
@@ -443,18 +462,23 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'nome' => ['required','string',new FullName],
+            'name' => ['required','string',new FullName],
             'email' => ['required','string','unique:users'],
             'cpf'   =>[new RightCpf]
             ],[
-                'nome.required'=>__('O nome é obrigatório'),
-                'nome.string'=>__('É necessário conter letras no nome'),
+                'name.required'=>__('O nome é obrigatório'),
+                'name.string'=>__('É necessário conter letras no nome'),
                 'email.unique'=>__('E-mail já cadastrado'),
             ]);
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
         //$dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
+        //inicio gerenciar a pemissão automatica
+        if($this->routa == 'fornecedores' && is_null($dados['id_permission'])){
+            $dados['id_permission'] =  $this->id_permission_fornecedores();
+        }
+        //fim gerenciar a pemissão automatica
         if(isset($dados['password']) && !empty($dados['password'])){
             $dados['password'] = Hash::make($dados['password']);
         }else{
@@ -462,7 +486,6 @@ class UserController extends Controller
                 unset($dados['password']);
             }
         }
-        //dd($dados);
         $salvar = User::create($dados);
         $dados['id'] = $salvar->id;
         $route = $this->routa.'.index';
@@ -581,6 +604,7 @@ class UserController extends Controller
         $id = $user;
         $dados = User::where('id',$id)->get();
         $routa = $this->routa;//'users';
+        $view = $this->view;//'users';
         $this->authorize('is_admin', $user);
 
         if(!empty($dados)){
@@ -613,7 +637,7 @@ class UserController extends Controller
                 'exec'=>true,
             ];
 
-            return view($routa.'.createedit',$ret);
+            return view($view.'.createedit',$ret);
             // return view('admin.padrao.createedit',$ret);
         }else{
             $ret = [

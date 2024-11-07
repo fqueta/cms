@@ -26,7 +26,11 @@ class DefaultController extends Controller
         $this->middleware('auth');
         $this->user = $user;
         $routeName = isset($config['route']) ? $config['route'] : false;
-        $routeName = $routeName ? $routeName : explode('.',request()->route()->getName())[0];
+        $getName = '';
+        if(function_exists('getName')){
+            $getName = request()->route()->getName();
+        }
+        $routeName = $routeName ? $routeName : explode('.',$getName)[0];
         // $routeName = $routeName ? $routeName : '';
         $this->routa = $routeName;
         $arr_cf = [
@@ -123,8 +127,29 @@ class DefaultController extends Controller
     public function sanitizeDados($dados){
         $ret = array();
         if(is_array($dados)){
-            unset($dados['_token'],$dados['ajax']);
-            $ret = $dados;
+            $arr_val = ['valor'];
+            // foreach ($arr_val as $k => $v) {
+            //     if(isset($dados[$v])){
+            //         $dados[$v] = str_replace( 'R$','', $dados[$v]);
+            //         $dados[$v] = (double)trim($dados[$v]);
+            //     }
+            // }
+            // unset($dados['_token'],$dados['ajax'],$dados['_method']);
+            foreach ($dados as $key => $value) {
+                if($key!='_method'&&$key!='_token'&&$key!='ac'&&$key!='ajax'){
+                    if($key == 'valor' || $key == 'valor_pago') {
+                        if(empty($value)){
+                            $value = (double)0;
+                        }else{
+                            $value = str_replace('R$','',$value);
+                        }
+                        $data[$key] = Qlib::precoBanco(trim($value));
+                    }else{
+                        $data[$key] = $value;
+                    }
+                }
+            }
+            $ret = $data;
         }
         return $ret;
     }

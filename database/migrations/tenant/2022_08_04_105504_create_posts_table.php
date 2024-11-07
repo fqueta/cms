@@ -26,7 +26,7 @@ class CreatePostsTable extends Migration
             $table->string('ping_status',20)->nullable();
             $table->string('post_password',255)->nullable();
             $table->string('post_name',200)->nullable();
-            $table->text('to_ping')->nullable();
+            $table->text('to_ping')->nullable()->comment("para não aparecer nas pesquisas valor 'n' para não, 's' para sim"); ////para não aparecer nas pesquisas valor 'n' para não, 's' para sim
             $table->text('pinged')->nullable();
             $table->dateTime('post_modified')->useCurrent();
             $table->dateTime('post_modified_gmt')->useCurrent();

@@ -30,19 +30,19 @@ class PostsController extends Controller
     public $i_wp;//integração com wp
     public $wp_api;//integração com wp
     public $d_pagina;//integração com wp
-    public function __construct()
+    public function __construct($config=[])
     {
         $this->middleware('auth');
         $seg1 = request()->segment(2);
         $seg2 = request()->segment(3);
-        $type = false;
-        if($seg1){
+        $type = isset($config['post_type']) ? $config['post_type'] : false;
+        if($seg1 && !$type){
             // $type = substr($seg1,0,-1);
             $type = $seg1;
         }
         $user = Auth::user();
         $this->post_type = $type;
-        $this->sec = $seg1;
+        $this->sec = $this->post_type;
         $this->user = $user;
         if($seg2=='create'){
             $this->ac = 'cad';
@@ -188,6 +188,10 @@ class PostsController extends Controller
                         'value'=>@$_GET['archives_category'],
                     ];
                 }
+            }elseif($this->post_type =='cat_receitas' || $this->post_type =='cat_despesas'){
+                $ret['guid']['arr_opc'] = Qlib::sql_array("SELECT ID,post_title FROM posts WHERE post_status='publish' AND post_type='".$this->post_type."'",'post_title','ID');
+            }elseif($this->post_type =='tipo_receitas' || $this->post_type =='tipo_despesas'){
+                $ret['guid']['arr_opc'] = Qlib::sql_array("SELECT ID,post_title FROM posts WHERE post_status='publish' AND post_type='".$this->post_type."'",'post_title','ID');
             }
         }else{
             $ret = [
@@ -211,6 +215,7 @@ class PostsController extends Controller
                 // $ret['post_name']['type'] = 'text';
             }
         }
+        // dump($ret);
         return $ret;
     }
     /**
@@ -224,11 +229,11 @@ class PostsController extends Controller
      * Metodo para montar um array que configura a página de acordo com a tabela documentos dessa forma essa area será dinamica
      */
     public function pagina($sec=false){
-        $sec = $this->sec ? $this->sec : false;
+        $sec = $this->post_type ? $this->post_type : false;
         if(!$sec){
             return false;
         }
-        $d = Documento::where('token', '=', $this->sec)->get();
+        $d = Documento::where('token', '=', $sec)->get();
         if($d->count()){
             $d = $d[0];
             if(isset($d['config'])){
@@ -249,6 +254,8 @@ class PostsController extends Controller
                 $title = 'Cadastro de '.$this->label;
             }elseif($this->sec=='pages'){
                 $title = 'Cadastro de paginas';
+            }else{
+                $title = 'Cadastro';
             }
         }else{
             $title = 'Cadastro de '.$d_pagina['nome'];
@@ -331,6 +338,17 @@ class PostsController extends Controller
     public function str_slug($title,$id=false){
         $slug = Str::slug($title, '-');
         if($id){
+            $verifica = Post::where('ID', '=',$id)->get();
+            if($verifica->count() > 0){
+                //verifica se o titulo atual e diferente deste titulo
+                if($verifica[0]['post_title'] == $title){
+                    //se for igual returna o mesmo slug
+                    if(!empty($verifica[0]['post_name'])){
+                        $ret = $verifica[0]['post_name'];
+                        return $ret;
+                    }
+                }
+            }
             $verifica = Post::where('post_name', 'LIKE','%'.$slug.'%')->where('ID','!=',$id)->get();
         }else{
             $verifica = Post::where('post_name', 'LIKE','%'.$slug.'%')->get();
@@ -350,8 +368,8 @@ class PostsController extends Controller
         $this->authorize('create', $this->routa);
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
-        //$dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
         $dados['token'] = !empty($dados['token'])?$dados['token']:uniqid();
+        $dados['post_status'] = isset($dados['post_status'])?$dados['post_status']:'pending';
         if($this->i_wp=='s' && isset($dados['post_type'])){
             //$endPoint = isset($dados['endPoint'])?$dados['endPoint']:$dados['post_type'].'s';
             $endPoint = 'post';
@@ -385,6 +403,7 @@ class PostsController extends Controller
                 // $dados['post_name'] = isset($dados['post_name']) ? $dados['post_name'] : $this->str_slug($dados['post_title']);
                 $dados['post_name'] = $this->str_slug($dados['post_title']);
             }
+            // dd($dados);
             $salvar = Post::create($dados);
             if(isset($salvar->id) && $salvar->id){
                 $mens = $this->label.' cadastrado com sucesso!';
@@ -532,6 +551,11 @@ class PostsController extends Controller
             if($this->post_type =='posts'){
                 $config['tam_col1'] = 'col-md-7';
                 $config['tam_col2'] = 'col-md-5';
+            }elseif($this->post_type =='cat_receitas' || $this->post_type =='cat_despesas' || $this->post_type =='contas' || $this->post_type =='f_pagamento'){
+                //cadastros do financeiro
+                $config['tam_col1'] = 'col-md-10';
+                $config['tam_col2'] = 'col-md-2';
+                unset($config['arquivos']);
             }
             $config['media'] = [
                 'files'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg,JPG',
@@ -643,7 +667,7 @@ class PostsController extends Controller
         if(!empty($data)){
             if(($this->post_type == 'posts' || $this->post_type == 'pages') && isset($data['post_title'])){
                 // $data['post_name'] = isset($data['post_name']) ? $data['post_name'] : $this->str_slug($data['post_title']);
-                $data['post_name'] = $this->str_slug($data['post_title']);
+                $data['post_name'] = $this->str_slug($data['post_title'],$id);
                 $data['config']['capa_artigo'] = isset($data['config']['capa_artigo']) ? $data['config']['capa_artigo'] : 'n';
             }
             if($this->i_wp=='s' && isset($dados['post_type'])){

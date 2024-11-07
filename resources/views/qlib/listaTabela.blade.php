@@ -158,8 +158,11 @@
 
                                         $td = @$vd['arr_opc'][$val->$kd];
                                     }
+                                    if(is_array($td) ){
+                                        $td = @$td['option'];
+                                    }
                                 @endphp
-                                <td class="{{str_replace('[]','',$kd)}}" title="{{@$vd['arr_opc'][$val->$kd]}}">{{$td}}</td>
+                                <td class="{{str_replace('[]','',$kd)}}" title="{{$td}}">{{$td}}</td>
                             @elseif (isset($vd['type']) && ($vd['type']=='select_multiple'))
                                 @php
                                 // echo $kd;
@@ -191,7 +194,7 @@
                                         $vd['checked'] = $val->$kd;
                                     @endphp
                                     <div class="d-print-none custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                                        <input type="checkbox" onchange="update_status_post(this)" data-id="{{$val->id}}" data-tab="{{@$vd['tab']}}" class="custom-control-input" @if(isset($vd['checked']) && $vd['checked'] == $vd['value']) checked @endif  value="{{$vd['value']}}"  name="{{$kd}}" id="{{$kd}}-{{$val->id}}">
+                                        <input type="checkbox" onchange="update_status_post(this)" data-campo="{{@$vd['campo']}}" data-id="{{$val->id}}" data-tab="{{@$vd['tab']}}" class="custom-control-input" @if(isset($vd['checked']) && $vd['checked'] == $vd['value']) checked @endif  value="{{$vd['value']}}"  name="{{$kd}}" id="{{$kd}}-{{$val->id}}">
                                         <label class="custom-control-label" for="{{$kd}}-{{$val->id}}">{{$vd['label']}}</label>
                                     </div>
                                 </td>

@@ -27,10 +27,15 @@ class AddAllTenants extends Command
     public function handle()
     {
         $ret = (new TenantController)->add_all([
-            ['id' =>'pratapolis','domain' =>'pratapolis.amsloja.com.br','name' =>'Prefeitura Municipal de Pratápolis'],
-            ['id' =>'pintopolis','domain' =>'pintopolis.amsloja.com.br','name' =>'Prefeitura Municipal de Pintopolis'],
+            ['id' =>'pratapolis','domain' =>'pratapolis.localhost','name' =>'Prefeitura Municipal de Pratápolis'],
+            ['id' =>'pintopolis','domain' =>'pintopolis.localhost','name' =>'Prefeitura Municipal de Pintopolis'],
             ['id' =>'demo','domain' =>'demo.maisaqui.com.br','name' =>'Prefeitura Municipal de Demostração'],
         ]);
+        // $ret = (new TenantController)->add_all([
+        //     ['id' =>'pratapolis','domain' =>'pratapolis.amsloja.com.br','name' =>'Prefeitura Municipal de Pratápolis'],
+        //     ['id' =>'pintopolis','domain' =>'pintopolis.amsloja.com.br','name' =>'Prefeitura Municipal de Pintopolis'],
+        //     ['id' =>'demo','domain' =>'demo.maisaqui.com.br','name' =>'Prefeitura Municipal de Demostração'],
+        // ]);
         $this->info('Tanants adicionados!');
         $this->call('tenants:seed');
         // $this->info('Tanants adicionados!');

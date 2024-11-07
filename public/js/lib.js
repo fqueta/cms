@@ -1020,6 +1020,8 @@ function renderForm(config,alvo,funCall){
         return ;
     }
     var d = config;
+
+    console.log(d);
     if(d.campos){
         var f = qFormCampos(d.campos);
         if(f){
@@ -1034,6 +1036,7 @@ function renderForm(config,alvo,funCall){
             $(b).insertAfter(m+' .modal-footer button');
             try {
                 $('[mask-cpf]').inputmask('999.999.999-99');
+                $('[mask-cnpj]').inputmask('99.999.999/9999-99');
                 $('[mask-data]').inputmask('99/99/9999');
                 $('[mask-cep]').inputmask('99.999-999');
                 if(n=d.value_transport){
@@ -1137,10 +1140,14 @@ function qFormCampos(config){
     const tl = '<label for="{campo}">{label}</label>';
     var tema = {
         text : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
+        color : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
+        email : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         tel : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         date : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         number : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
+        moeda : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         hidden : '<div class="form-group col-{col}-{tam} {class_div} d-none" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
+        hidden_text : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" ><b>{label}</b>: {value_text}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         textarea : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<textarea name="{campo}" class="form-control {class}" rows="{rows}" cols="{cols}">{value}</textarea></div>',
         chave_checkbox : '<div class="form-group col-{col}-{tam}"><div class="custom-control custom-switch  {class}"><input type="checkbox" class="custom-control-input" {checked} value="{value}"  name="{campo}" id="{campo}"><label class="custom-control-label" for="{campo}">{label}</label></div></div>',
         select : {
@@ -1183,16 +1190,21 @@ function qFormCampos(config){
                 }else{
                     try {
 
-                        var type = v.type;
-                        var checked = '';
-                        if(type == 'chave_checkbox'){
+                        var checked = '',type = v.type,value_text=v.value_text?v.value_text:v.value,label = tl.replaceAll('{campo}',key);
+                        label.replaceAll('{label}',);
+
+                        if(type == 'moeda'){
+                            v.type = 'tel';
+                            v.class += ' moeda';
+                        }else if(type == 'hidden_text'){
+                            v.type = 'hidden';
+                            v.event = '';
+                        }else if(type == 'chave_checkbox'){
                             if(v.valor_padrao==v.value){
                                 checked = 'checked';
                             }
                         }
                         r += tema[type].replaceAll('{type}',v.type);
-                        var label = tl.replaceAll('{campo}',key);
-                        label.replaceAll('{label}',);
                         var value = v.value?v.value:'';
                         var classe = v.class?v.class:'';
                         var class_div = v.class_div?v.class_div:'';
@@ -1200,6 +1212,7 @@ function qFormCampos(config){
                         r = r.replaceAll('{campo}',key);
                         r = r.replaceAll('{label}',v.label);
                         r = r.replaceAll('{value}',value);
+                        r = r.replaceAll('{value_text}',value_text);
                         r = r.replaceAll('{tam}',v.tam);
                         r = r.replaceAll('{event}',v.event);
                         r = r.replaceAll('{class_div}',class_div);
@@ -1351,6 +1364,8 @@ function lib_htmlVinculo(ac,campos,lin){
         }
     }
     if(ac=='alt'){
+
+
         if(Object.entries(arr).length>0){
             Object.entries(arr).forEach(([k, v]) => {
                 if(tipo=='array'){
@@ -1392,7 +1407,6 @@ function lib_htmlVinculo(ac,campos,lin){
                     }
                 }
             });
-
             renderForm(c,campos,function(res){
                 if(res.mens){
                     lib_formatMensagem('.mens',res.mens,res.color);
@@ -1576,7 +1590,7 @@ function calculaLinCad(seleTr){
 }
 function lib_listDadosHtmlVinculo(res,campos,ac,lin){
     //lin é o numero da linha para o caso do tipo array
-    //alert(lin);
+    // alert(campos);
     if(typeof ac=='undefined'){
         ac = 'alt';
     }
@@ -1593,15 +1607,18 @@ function lib_listDadosHtmlVinculo(res,campos,ac,lin){
     if(typeof tipo =='undefined'){
         var tipo='int';
     }
+
     if((d=res.dados) && ac =='cad'){
         var table = $('#table-html_vinculo-'+dt.campo);
         lin = calculaLinCad('#table-html_vinculo-'+dt.campo+' tbody tr');
-       // alert(lin);
         var tm = $('tm').html();
         var tm0 = '<tr id="tr-{id}">{td}</tr>';
         var tm = '<td id="td-{k}" class="{class}">{v}</td>';
         var data_list = encodeArray(d);
+        console.log(d);
+
         if(t = dt.table){
+            console.log(t);
             var td = '';
             $.each(t,function(k,v){
                 if(v.type=='text'){
@@ -1706,7 +1723,6 @@ function lib_listarCadastro(res,obj){
     }
 }
 function lib_abrirModalConsultaVinculo(campo,ac){
-
     var btnAbrir = $('#row-'+campo+' .btn-consulta-vinculo'),btnFechar = $('#row-'+campo+' .btn-voltar-vinculo'),ef='slow';
     if(ac=='abrir'){
         btnAbrir.hide(ef);
@@ -1754,28 +1770,20 @@ function lib_autocomplete(obs){
         },
     });
 }
-function carregaMatricula(val,local){
+function carregaDados(obj,alvo){
     if(typeof local=='undefined'){
         local='';
     }
-    if(val==''|| val=='cad'|| val=='ger' || !val)
-        return ;
-    if(local=='familias'){
-        carregaQuadras(val);
-        lib_abrirModalConsultaVinculo('loteamento','fechar');
+    if(typeof alvo=='undefined'){
+        alvo = function (val) {
+            console.log(val);
+        };
     }
-    getAjax({
-        url:'/bairros/'+val+'/edit?ajax=s',
-    },function(res){
-        $('#preload').fadeOut("fast");
-        if(m=res.value.matricula){
-            $('[name="matricula"]').val(m);
-            $('#txt-matricula').html(m);
-        }else{
-            $('[name="matricula"]').val('');
-            $('#txt-matricula').html('');
-        }
-    });
+    var dados = obj.options[obj.selectedIndex].getAttribute('dados');
+    if(dados){
+        arrd = decodeArray(dados);
+    }
+    alvo(arrd);
 }
 function carregaBairro(val){
     if(val==''|| val=='cad'|| val=='ger' || !val)
@@ -2086,6 +2094,7 @@ function checkTodosAnos() {
     $('#preload').show();
 }
 function lib_autocompleteGeral(cl,funCall){
+
     var urlAuto = $(cl).attr('url');
     if(typeof funCall=='undefined'){
         $( cl ).autocomplete({
@@ -2107,6 +2116,10 @@ function update_status_post(obj){
     let id = obj.getAttribute('data-id');
     let status = obj.checked;
     let tab = obj.getAttribute('data-tab');
+    let campo = obj.getAttribute('data-campo');
+    if(typeof campo =='undefined'){
+        campo = 'post_status';
+    }
     getAjax({
         url:'/admin/ajax/chage_status',
         type: 'POST',
@@ -2116,6 +2129,7 @@ function update_status_post(obj){
             id: id,
             status: status,
             tab: tab,
+            campo: campo,
         }
     },function(res){
         $('#preload').fadeOut("fast");

@@ -1,5 +1,6 @@
 @if (isset($config['type']))
     @if ($config['type']=='select')
+
         @if (isset($config['arr_opc']))
         <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
             @if ($config['label'])
@@ -14,7 +15,11 @@
                     @if(isset($v['attr_option']))
                         <option value="{{$k}}" {{@$v['attr_option']}}  class="opcs" @if(isset($config['value']) && $config['value'] == $k) selected @endif>{{@$v['label']}}</option>
                     @else
-                      <option value="{{$k}}" class="opcs" @if(isset($config['value']) && $config['value'] == $k) selected @endif>{{$v}}</option>
+                        @if(is_array($v))
+                            <option value="{{$k}}" class="opcs" @if(isset($config['value']) && $config['value'] == $k) selected @endif>{{@$v['option']}}</option>
+                        @else
+                            <option value="{{$k}}" class="opcs" @if(isset($config['value']) && $config['value'] == $k) selected @endif>{{$v}}</option>
+                        @endif
                     @endif
                 @endforeach
             </select>
@@ -61,7 +66,11 @@
                     <option value="" disabled class="option_select">--------------</option>
 
                     @foreach ($config['arr_opc'] as $k=>$v)
-                        <option value="{{$k}}" class="opcs" @if(isset($config['value']) && $config['value'] == $k) selected @endif>{{$v}}</option>
+                        @if (is_array($v))
+                            <option value="{{$k}}" class="opcs" dados="{{@$v['attr_data']}}" @if(isset($config['value']) && $config['value'] == $k) selected @endif>{{@$v['option']}}</option>
+                        @else
+                            <option value="{{$k}}" class="opcs" @if(isset($config['value']) && $config['value'] == $k) selected @endif>{{$v}}</option>
+                        @endif
                     @endforeach
                 </select>
                 @error($config['campo'])
@@ -79,7 +88,23 @@
                 @if(is_array($config['arr_opc']))
                     @foreach ($config['arr_opc'] as $k=>$v)
                     <label class="{{ $config['class'] }} @if(isset($config['value']) && $config['value'] == $k) active @endif ">
-                        <input type="{{$config['type']}}" name="{{ $config['campo']}}" {{$config['event']}} value="{{$k}}" id="" @if(isset($config['value']) && $config['value'] == $k) checked @endif > {{ $v }}
+                        <input type="radio" name="{{ $config['campo']}}" {{$config['event']}} class="" value="{{$k}}" id="" @if(isset($config['value']) && $config['value'] == $k) checked @endif > {{ $v }}
+                    </label>
+                    @endforeach
+                @endif
+            </div>
+        </div>
+    @elseif ($config['type']=='radio_btn')
+        <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}} @error($config['campo']) is-invalid @enderror">
+            <div class="btn-group" data-toggle="buttons">
+                @if ($config['label'])
+                    <label for="{{$config['campo']}}">{{$config['label']}}</label>
+                @endif
+                {{-- {{dd($config)}} --}}
+                @if(is_array($config['arr_opc']))
+                    @foreach ($config['arr_opc'] as $k=>$v)
+                    <label class="{{ $config['class'] }} @if(isset($config['value']) && $config['value'] == $k) active @endif ">
+                        <input type="radio" name="{{ $config['campo']}}" {{$config['event']}} class="" value="{{$k}}" id="" @if(isset($config['value']) && $config['value'] == $k) checked @endif > {{ $v }}
                     </label>
                     @endforeach
                 @endif
@@ -111,10 +136,12 @@
                 <label for="{{$config['campo']}}">{{$config['label']}}:</label>
             @endif
             <span id="txt-{{$config['campo']}}" class="{{$config['class']}}">
-                @if (isset($config['arr_opc']) && is_array($config['arr_opc']))
-                {!!@$config['arr_opc'][$config['value']]!!}
+                @if (isset($config['value_text']) && is_array($config['arr_opc']))
+                    {!!$config['value_text']!!}
+                @elseif (isset($config['arr_opc']) && is_array($config['arr_opc']))
+                    {!!@$config['arr_opc'][$config['value']]!!}
                 @else
-                {!!$config['value']!!}
+                    {!!$config['value']!!}
                 @endif
             </span>
             <input type="hidden" class="form-control @error($config['campo']) is-invalid @enderror" id="inp-{{$config['campo']}}" name="{{$config['campo']}}" aria-describedby="{{$config['campo']}}" placeholder="{{$config['placeholder']}}" value="@if(isset($config['value'])){{$config['value']}}@elseif($config['ac']=='cad'){{old($config['campo'])}}@endif" {{$config['event']}} />
@@ -169,6 +196,7 @@
     @elseif ($config['type']=='html_vinculo')
         @php
            $config['script'] = isset($config['script'])?$config['script']:false;
+           $url_list_autocomplete = $config['data_selector']['route_index'];
         @endphp
         <div class="col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
             <div class="card card-secondary">
@@ -194,7 +222,7 @@
                         </div>
                         <div class="col-md-12 mb-2" style="display: none;" id="inp-cad-{{$config['data_selector']['campo']}}">
                             <input id="inp-auto-{{$config['data_selector']['campo']}}" type="text"
-                                url="{{$config['data_selector']['route_index']}}"
+                                _url="{{$url_list_autocomplete}}"
                                 class="autocomplete form-control"
                                 data-selector="{{App\Qlib\Qlib::encodeArray(@$config['data_selector'])}}"
                                 placeholder="{{__(@$config['data_selector']['placeholder'])}}"
@@ -294,7 +322,7 @@
                 }
             @endphp
 
-            <input type="text" {!!$title!!} class="form-control @error($config['campo']) is-invalid @enderror {{$class}}" id="inp-{{$config['campo']}}" name="{{$config['campo']}}" aria-describedby="{{$config['campo']}}" placeholder="{{$config['placeholder']}}" value="@if(isset($value)){{$value}}@elseif($config['ac']=='cad'){{old($config['campo'])}}@endif" {{$config['event']}} />
+            <input type="tel" {!!$title!!} class="form-control @error($config['campo']) is-invalid @enderror {{$class}}" id="inp-{{$config['campo']}}" name="{{$config['campo']}}" aria-describedby="{{$config['campo']}}" placeholder="{{$config['placeholder']}}" value="@if(isset($value)){{$value}}@elseif($config['ac']=='cad'){{old($config['campo'])}}@endif" {{$config['event']}} />
             @error($config['campo'])
                 <div class="alert alert-danger">{{ $message }}</div>
             @enderror
@@ -305,6 +333,22 @@
             <label for="{{$config['campo']}}">{{$config['label']}}</label>
         @endif
         <input type="{{$config['type']}}" class="form-control @error($config['campo']) is-invalid @enderror {{$config['class']}}" id="inp-{{$config['campo']}}" name="{{$config['campo']}}" aria-describedby="{{$config['campo']}}" placeholder="{{$config['placeholder']}}" value="@if(isset($config['value'])){{$config['value']}}@elseif($config['ac']=='cad'){{old($config['campo'])}}@endif" {{$config['event']}} />
+        @error($config['campo'])
+            <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
+    </div>
+    @elseif($config['type'] == 'color')
+    <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}" >
+        @php
+            $title = false;
+            if(isset($config['title']) && !empty($config['title'])){
+                $title = 'data-toggle="tooltip" data-placement="top" title="'.__($config['title']).'"';
+            }
+        @endphp
+        @if ($config['label'])
+            <label for="{{$config['campo']}}">{{$config['label']}}</label>
+        @endif
+        <input type="text" {!!$title!!} class="form-control @error($config['campo']) is-invalid @enderror {{$config['class']}}" id="inp-{{$config['campo']}}" name="{{$config['campo']}}" aria-describedby="{{$config['campo']}}" placeholder="{{$config['placeholder']}}" value="@if(isset($config['value'])){{$config['value']}}@elseif($config['ac']=='cad'){{old($config['campo'])}}@endif" data-jscolor="{}" {{$config['event']}} />
         @error($config['campo'])
             <div class="alert alert-danger">{{ $message }}</div>
         @enderror

@@ -59,6 +59,10 @@ class Qlib
 		}
 		return $ret;
 	}
+    static function ultimoDiaMes($mes,$ano){
+        $ultimo_dia = date("t", mktime(0,0,0,$mes,'01',$ano));
+        return $ultimo_dia;
+    }
     static function documento($code,$select='conteudo'){
         $ret = false;
         $d = Documento::where('url','=',$code)->
@@ -322,6 +326,9 @@ class Qlib
                 $table[$i] = (array)$table[$i];
                 if($ind_3 == ''){
                     $userinfo[$table[$i][$ind_2]] =  $table[$i][$ind];
+                }elseif($ind_3 == 'attr_data'){
+                    //neste caso vai retornar um array como valor para ser gravado em um optio de select como atributo dados
+                    $userinfo[$table[$i][$ind_2]] = ['option'=>$table[$i][$ind],'attr_data'=>self::encodeArray($table[$i])];
                 }elseif(is_array($ind_3) && isset($ind_3['tab'])){
                     /*É sinal que o valor vira de banco de dados*/
                     $sql = "SELECT ".$ind_3['campo_enc']." FROM `".$ind_3['tab']."` WHERE ".$ind_3['campo_bus']." = '".$table[$i][$ind_2]."'";

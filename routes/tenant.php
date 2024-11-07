@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\admin\AttachmentsController;
 use App\Http\Controllers\admin\ConfigController;
+use App\Http\Controllers\admin\FinanceiroController;
 use App\Http\Controllers\admin\HomeController;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\EtapaController;
@@ -81,8 +82,29 @@ Route::middleware([
             Route::put('/{id}',[UserController::class,'update'])->where('id', '[0-9]+')->name('users.update');
             Route::delete('/{id}',[UserController::class,'destroy'])->where('id', '[0-9]+')->name('users.destroy');
         });
+        Route::resource('fornecedores','\App\Http\Controllers\UserController',['parameters' => [
+            'fornecedores' => 'id'
+        ]]);
         Route::resource('posts','\App\Http\Controllers\admin\PostsController',['parameters' => [
             'posts' => 'id'
+        ]]);
+        Route::resource('cat_receitas','\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'cat_receitas' => 'id'
+        ]]);
+        Route::resource('cat_despesas','\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'cat_despesas' => 'id'
+        ]]);
+        Route::resource('tipo_receitas','\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'tipo_receitas' => 'id'
+        ]]);
+        Route::resource('tipo_despesas','\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'tipo_despesas' => 'id'
+        ]]);
+        Route::resource('contas','\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'contas' => 'id'
+        ]]);
+        Route::resource('f_pagamento','\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'f_pagamento' => 'id'
         ]]);
         Route::resource('api-wp','\App\Http\Controllers\wp\ApiWpController',['parameters' => [
             'api-wp' => 'id'
@@ -167,9 +189,20 @@ Route::middleware([
         Route::resource('/attachments', '\App\Http\Controllers\admin\AttachmentsController', ['except' => ['show'],'parameters'=>[
             'attachments' => 'id'
         ]]);
-        // Route::resource('biddings.attachments', '\App\Http\Controllers\admin\AttachmentsController', ['except' => ['show'],'parameters'=>[
-        //     'biddings.attachments' => 'id'
-        // ]]);
+        Route::prefix('/financeiro')->group(function(){
+            Route::resource('receitas', '\App\Http\Controllers\admin\FinanceiroController', ['parameters'=>[
+                'receitas' => 'id'
+            ]]);
+            Route::resource('despesas', '\App\Http\Controllers\admin\FinanceiroController', ['parameters'=>[
+                'despesas' => 'id'
+            ]]);
+            Route::resource('extrato', '\App\Http\Controllers\admin\FinanceiroController', ['parameters'=>[
+                'extrato' => 'id'
+            ]]);
+            // Route::get('receitas', [FinanceiroController::class,'receitas'])->name('financeiro.receitas');
+            Route::get('despesas', [FinanceiroController::class,'despesas'])->name('financeiro.despesas');
+            Route::get('extrato', [FinanceiroController::class,'extrato'])->name('financeiro.extrato');
+        });
         // Route::resource('biddings.notifications', '\App\Http\Controllers\admin\NotificationsController', ['except' => ['show']]);
         // Route::resource('biddings.newsletters', '\App\Http\Controllers\admin\BiddingNewslettersController', ['except' => ['show']]);
         Route::resource('/biddings/{parent_id}/attachments/order','\App\Http\Controllers\admin\AttachmentsController@postSort');

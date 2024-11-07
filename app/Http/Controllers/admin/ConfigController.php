@@ -20,8 +20,9 @@ class ConfigController extends Controller
     {
         $this->middleware('auth');
         $seg1 = request()->segment(1);
+        $seg2 = request()->segment(2);
         $routeName = isset($config['route']) ? $config['route'] : false;
-        $routeName = $routeName ? $routeName : explode('.',request()->route()->getName())[0];
+        $routeName = $routeName ? $routeName : $seg2;
         // $routeName = $routeName ? $routeName : '';
         $this->routa = $routeName;
         if($this->routa == 'enterprise'){
@@ -42,7 +43,7 @@ class ConfigController extends Controller
         $id = isset($d['id']) ? $d['id'] : false;
         $status = isset($d['status']) ? $d['status'] : false;
         $tab = isset($d['tab']) ? $d['tab'] : false;
-        // $status = (int)$status;
+        $campo = isset($d['campo']) ? $d['campo'] : 'ativo';
         $ret['exec'] = false;
         // $ret['d'] = $d;
         $ret['mens'] = 'Erro ao atualizar!';
@@ -60,7 +61,7 @@ class ConfigController extends Controller
             }else{
                 $arr_status = ['true'=>'s','false'=>'n'];//(new PostsController)->campos()['post_status']['arr_opc'];
                 $ret['status'] = $arr_status[$status];
-                $dsalv = ['ativo' => $arr_status[$status]];
+                $dsalv = [$campo => $arr_status[$status]];
             }
             if(isset($arr_status[$status]) && $dsalv){
                 $ret['salv'] = DB::table($tab)->where('id',$id)->update($dsalv);
@@ -69,6 +70,8 @@ class ConfigController extends Controller
                     $ret['mens'] = 'Atualizado com sucesso!';
                     $ret['color'] ='success';
                 }
+                // dump($ret);
+                // dd($dsalv);
             }
         }
         return $ret;

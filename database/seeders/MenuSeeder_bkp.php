@@ -234,76 +234,40 @@ class MenuSeeder extends Seeder
                 'pai'=>'licitacoes'
             ],
             [
-                'categoria'=>'FINANCEIRO',
-                'description'=>'Receitas',
+                'categoria'=>'',
+                'description'=>'Financeiro',
                 'icon'=>'fas fa-cash-register',
                 'actived'=>true,
-                'url'=>'receitas_pai',
+                'url'=>'financeiro',
                 'route'=>'',
                 'pai'=>''
             ],
             [
                 'categoria'=>'',
-                'description'=>'Todas Receitas',
+                'description'=>'Extrato',
+                'icon'=>'fas fa-file-excel',
+                'actived'=>true,
+                'url'=>'extrato',
+                'route'=>'financeiro.extrato',
+                'pai'=>'financeiro'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Receitas',
                 'icon'=>'fas fa-arrow-up',
                 'actived'=>true,
                 'url'=>'receitas',
                 'route'=>'financeiro.receitas',
-                'pai'=>'receitas_pai'
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Tipos de Receitas',
-                'icon'=>'fas fa-cash-register',
-                'actived'=>true,
-                'url'=>'tipo_receitas',
-                'route'=>'tipo_receitas.index',
-                'pai'=>'receitas_pai'
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Categorias de Receitas',
-                'icon'=>'fas fa-cash-register',
-                'actived'=>true,
-                'url'=>'cat_receitas',
-                'route'=>'cat_receitas.index',
-                'pai'=>'receitas_pai'
+                'pai'=>'financeiro'
             ],
             [
                 'categoria'=>'',
                 'description'=>'Despesas',
-                'icon'=>'fas fa-cash-register',
-                'actived'=>true,
-                'url'=>'despesas_pai',
-                'route'=>'',
-                'pai'=>''
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Todas Despesas',
                 'icon'=>'fas fa-arrow-down',
                 'actived'=>true,
                 'url'=>'despesas',
                 'route'=>'financeiro.despesas',
-                'pai'=>'despesas_pai'
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Tipos de Despesas',
-                'icon'=>'fas fa-cash-register',
-                'actived'=>true,
-                'url'=>'tipo_despesas',
-                'route'=>'tipo_despesas.index',
-                'pai'=>'despesas_pai'
-            ],
-            [
-                'categoria'=>'',
-                'description'=>'Categorias de Despesas',
-                'icon'=>'fas fa-cash-register',
-                'actived'=>true,
-                'url'=>'cat_despesas',
-                'route'=>'cat_despesas.index',
-                'pai'=>'despesas_pai'
+                'pai'=>'financeiro'
             ],
             // [
             //     'categoria'=>'',
@@ -357,6 +321,42 @@ class MenuSeeder extends Seeder
                 'actived'=>true,
                 'url'=>'fornecedores',
                 'route'=>'fornecedores.index',
+                'pai'=>'config'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Categorias de Receitas',
+                'icon'=>'fas fa-cash-register',
+                'actived'=>true,
+                'url'=>'cat_receitas',
+                'route'=>'cat_receitas.index',
+                'pai'=>'config'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Categorias de Despesas',
+                'icon'=>'fas fa-cash-register',
+                'actived'=>true,
+                'url'=>'cat_despesas',
+                'route'=>'cat_despesas.index',
+                'pai'=>'config'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Tipos de Receitas',
+                'icon'=>'fas fa-cash-register',
+                'actived'=>true,
+                'url'=>'tipo_receitas',
+                'route'=>'tipo_receitas.index',
+                'pai'=>'config'
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Tipos de Despesas',
+                'icon'=>'fas fa-cash-register',
+                'actived'=>true,
+                'url'=>'tipo_despesas',
+                'route'=>'tipo_despesas.index',
                 'pai'=>'config'
             ],
             [
