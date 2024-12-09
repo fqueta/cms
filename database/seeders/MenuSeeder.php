@@ -23,7 +23,7 @@ class MenuSeeder extends Seeder
                 'icon'=>'fa fa-tachometer-alt',
                 'actived'=>true,
                 'url'=>'painel',
-                'route'=>'home.admin',
+                'route'=>'home',
                 'pai'=>''
             ],
             [

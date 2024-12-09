@@ -2356,3 +2356,8 @@ h6,
 .td-contrato{
     width: 15%;
 }
+.img-logo-footer{
+    width: auto;
+    height: 100px;
+    max-width: 248px;
+}
