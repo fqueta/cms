@@ -63,6 +63,9 @@
             @can('create',$config['route'])
                 <a href="{{$r_novo_cadastro}}" class="btn btn-default"> <i class="fas fa-plus"></i> Novo cadastro</a>
             @endcan
+            @if ($config['route']=='perfil')
+                <button type="submit" btn="permanecer" class="btn btn-primary">{{$label_btn_permanecer}}</button>
+            @endif
             @can('update',$config['route'])
                 @if($btn_continuar=='true')
                     <button type="submit" btn="permanecer" class="btn btn-primary">{{$label_btn_permanecer}}</button>

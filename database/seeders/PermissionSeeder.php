@@ -347,6 +347,13 @@ class PermissionSeeder extends Seeder
                 'id_menu'=>json_encode([]),
             ],
             [
+                'name'=>'Servidores',
+                'redirect_login'=>'/admin/home',
+                'description'=>'Servidores publicos',
+                'active'=>'s',
+                'id_menu'=>json_encode([]),
+            ],
+            [
                 'name'=>'Fornecedores',
                 'redirect_login'=>'/admin/home',
                 'description'=>'Fornecedores de serviços',

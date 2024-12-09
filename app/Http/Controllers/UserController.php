@@ -77,16 +77,7 @@ class UserController extends Controller
 
             }
             $user = DB::select($sql);
-            // if(isset($get['familias'])&&$get['familias']=='s' && is_array($user)){
-            //     foreach ($user as $k => $v) {
-            //         $sqlF = "SELECT f.*,b.nome,b.cpf FROM familias As f
-            //         JOIN beneficiarios As b ON b.id=f.id_beneficiario
-            //         WHERE f.useramento LIKE '%\"".$v->id."\"%' AND ".Qlib::compleDelete('f')." AND ".Qlib::compleDelete('b');
-            //         $user[$k]->familias = DB::select($sqlF);
-            //     }
-            // }
             $ret['user'] = $user;
-            //dd($ret);
             return $ret;
         }else{
             if($this->routa == 'fornecedores'){
@@ -589,7 +580,6 @@ class UserController extends Controller
                 'campos'=>$campos,
                 'exec'=>true,
             ];
-
             return view($routa.'.show',$ret);
         }else{
             $ret = [
@@ -637,6 +627,54 @@ class UserController extends Controller
                 'exec'=>true,
             ];
 
+            return view($view.'.createedit',$ret);
+            // return view('admin.padrao.createedit',$ret);
+        }else{
+            $ret = [
+                'exec'=>false,
+            ];
+            return redirect()->route($routa.'.index',$ret);
+        }
+    }
+    public function perfilEdit(Request $request)
+    {
+        $d = Auth::user();
+        $id = $d['id'];
+        $dados = User::where('id',$id)->get();
+        $routa = $this->routa;//'users';
+        $view = $this->view;//'users';
+        $this->authorize('is_admin', $routa);
+
+        if(!empty($dados)){
+            $title = 'Editar Cadastro de users';
+            $titulo = $title;
+            $dados[0]['ac'] = 'alt';
+            if(isset($dados[0]['config'])){
+                $dados[0]['config'] = Qlib::lib_json_array($dados[0]['config']);
+            }
+            $listFiles = false;
+            if(isset($dados[0]['token'])){
+                $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
+            }
+            $config = [
+                'ac'=>'alt',
+                'frm_id'=>'frm-users',
+                'route'=>$this->routa,
+                'route_update'=>'users',
+                'url'=>$this->url,
+                'id'=>$id,
+            ];
+            $dcampo = $dados[0];
+            $campos = $this->campos($dcampo,'edit');
+            $ret = [
+                'value'=>$dados[0],
+                'config'=>$config,
+                'title'=>$title,
+                'titulo'=>$titulo,
+                'listFiles'=>$listFiles,
+                'campos'=>$campos,
+                'exec'=>true,
+            ];
             return view($view.'.createedit',$ret);
             // return view('admin.padrao.createedit',$ret);
         }else{

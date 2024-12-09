@@ -46,6 +46,33 @@ class MenuSeeder extends Seeder
             ],
             [
                 'categoria'=>'',
+                'description'=>'Secretarias',
+                'icon'=>'fas fa-briefcase',
+                'actived'=>true,
+                'url'=>'secretarias',
+                'route'=>'',
+                'pai'=>'',
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Cadastros',
+                'icon'=>'fas fa-list',
+                'actived'=>true,
+                'url'=>'secretarias',
+                'route'=>'secretarias.index',
+                'pai'=>'secretarias',
+            ],
+            [
+                'categoria'=>'',
+                'description'=>'Servidores',
+                'icon'=>'fas fa-users',
+                'actived'=>true,
+                'url'=>'servidores',
+                'route'=>'servidores.index',
+                'pai'=>'secretarias',
+            ],
+            [
+                'categoria'=>'',
                 'description'=>'Documentos',
                 'icon'=>'fas fa-file-word',
                 'actived'=>true,
@@ -248,7 +275,7 @@ class MenuSeeder extends Seeder
                 'icon'=>'fas fa-arrow-up',
                 'actived'=>true,
                 'url'=>'receitas',
-                'route'=>'financeiro.receitas',
+                'route'=>'receitas.index',
                 'pai'=>'receitas_pai'
             ],
             [
@@ -284,7 +311,7 @@ class MenuSeeder extends Seeder
                 'icon'=>'fas fa-arrow-down',
                 'actived'=>true,
                 'url'=>'despesas',
-                'route'=>'financeiro.despesas',
+                'route'=>'despesas.index',
                 'pai'=>'despesas_pai'
             ],
             [

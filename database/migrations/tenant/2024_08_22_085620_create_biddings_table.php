@@ -15,11 +15,11 @@ return new class extends Migration
             $table->increments('id');
             $table->integer('genre_id')->nullable();
             $table->integer('phase_id')->nullable();
-            $table->string('title', 255)->nullable();
-            $table->string('subtitle', 255)->nullable();
+            $table->string('title', 355)->nullable();
+            $table->string('subtitle', 355)->nullable();
             $table->string('indentifier', 255)->nullable();
             $table->text('description')->nullable();
-            $table->string('object', 255)->nullable();
+            $table->longText('object')->nullable();
             $table->integer('order')->nullable();
             $table->integer('bidding_category_id')->nullable();
             $table->integer('type_id')->nullable();

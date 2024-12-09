@@ -291,12 +291,12 @@
                     <div class="col-12" data-id="497d4082" data-element_type="widget" data-widget_type="image.default">
                         <div class="widget-container">
                             <a href="/">
-                                <img
+                                <img class="img-logo-footer"
                                     src="{{@$midias[2]}}"
-                                    title="Pratápolis"
-                                    alt="Pratápolis"
+                                    title="{{config('app.name')}}"
+                                    alt="{{config('app.name')}}"
                                 />
-                                <noscript><img src="{{@$midias[2]}}" title="Pratápolis" alt="Pratápolis" loading="lazy" data-eio="l" /></noscript>
+                                <noscript><img src="{{@$midias[2]}}" title="{{config('app.name')}}" alt="{{config('app.name')}}" loading="lazy" data-eio="l" /></noscript>
                             </a>
                         </div>
                     </div>

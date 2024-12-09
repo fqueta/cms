@@ -246,6 +246,12 @@ Route::middleware([
         Route::resource('/portarias', '\App\Http\Controllers\admin\PostsController',['parameters' => [
             'portarias' => 'id'
         ]]);
+        Route::resource('/secretarias', '\App\Http\Controllers\admin\PostsController',['parameters' => [
+            'secretarias' => 'id'
+        ]]);
+        Route::resource('/servidores', '\App\Http\Controllers\admin\UserController',['parameters' => [
+            'servidores' => 'id'
+        ]]);
         Route::resource('/convenios', '\App\Http\Controllers\admin\PostsController',['parameters' => [
             'convenios' => 'id'
         ]]);
@@ -258,9 +264,11 @@ Route::middleware([
         Route::resource('/enterprise', '\App\Http\Controllers\admin\ConfigController',['parameters' => [
             'enterprise' => 'id'
         ]]);
-        Route::get('/pefil',[EtapaController::class,'index'])->name('sistema.perfil');
-        Route::get('/pefil',[UserController::class,'perfilShow'])->name('perfil.show');
-        Route::get('/pefil/edit',[UserController::class,'perfilEdit'])->name('perfil.edit');
+        Route::get('/perfil',[UserController::class,'perfilShow'])->name('perfil.index');
+        Route::get('/perfil/show',[UserController::class,'perfilShow'])->name('perfil.show');
+        Route::get('/perfil/create',[UserController::class,'perfilShow'])->name('perfil.create');
+        Route::get('/perfil/edit/{id}',[UserController::class,'perfilEdit'])->name('perfil.edit');
+        Route::put('/perfil/update/{id}',[UploadController::class,'update'])->where('id', '[0-9]+')->name('perfil.update');
 
         Route::get('/config',[EtapaController::class,'config'])->name('sistema.config');
         Route::post('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('sistema.update-ajax');
@@ -301,12 +309,10 @@ Route::name('api.')->prefix('api/v1')->middleware([
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
-
     // Route::redirect('/', 'api.login');
     Route::fallback(function () {
         return view('erro404_site');
     });
-
     Route::post('/login',[ '\App\Http\Controllers\api\AuthController','login']);
     // Route::resource('/pages', 'PostsController', ['only' => ['index', 'show']]);
     // Route::resource('/posts', 'PostsController', ['only' => ['index', 'show', 'update']]);

@@ -3,10 +3,10 @@
     $campos     = $conf['campos'];
     $value      = $conf['value'];
     $ambiente   = isset($config['ambiente'])?$config['ambiente']:'back'; //back = bakend  //front =  frontend
-
+    $route_update = isset($config['route_update']) ? $config['route_update'] : $config['route'];
 @endphp
 
-<form id="{{$config['frm_id']}}" class="{{@$config['frm_class']}}" action="@if($config['ac']=='cad'){{ route($config['route'].'.store') }}@elseif($config['ac']=='alt'){{ route($config['route'].'.update',['id'=>$config['id']]) }}@endif" method="post" {{@$config['event']}}>
+<form id="{{$config['frm_id']}}" class="{{@$config['frm_class']}}" action="@if($config['ac']=='cad'){{ route($config['route'].'.store') }}@elseif($config['ac']=='alt'){{ route($route_update.'.update',['id'=>$config['id']]) }}@endif" method="post" {{@$config['event']}}>
     @if($config['ac']=='alt')
     @method('PUT')
     @endif

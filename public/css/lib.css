@@ -125,6 +125,11 @@ label.error{
 .underline{
     text-decoration: underline;
 }
+.img-logo-footer{
+    width: auto;
+    height: 100px;
+    max-width: 248px;
+}
   @keyframes lds-dual-ring {
     0% {
       transform: rotate(0deg);
