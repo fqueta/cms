@@ -36,7 +36,7 @@
   <link href="{{url('/assets/vendor/swiper/swiper-bundle.min.css')}}" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="{{url('/assets/css/style.css')}}" rel="stylesheet">
+  <link href="{{url('/assets/css/style.css')}}?ver={{config('app.version')}}" rel="stylesheet">
   @yield('css')
   <!-- =======================================================
   * Template Name: Moderna - v4.11.0
