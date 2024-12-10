@@ -71,7 +71,7 @@
     @else
     <div class="col-md-12">
 
-        <h3>Seja bem vindo ao painel caso não tenha a permissão de acesso, entre em contato com o suporte</h3>
+        <h4>Seja bem vindo ao painel caso não tenha a permissão de acesso, entre em contato com o suporte</h4>
     </div>
 
     @endcan
