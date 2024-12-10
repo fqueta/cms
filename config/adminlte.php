@@ -30,8 +30,8 @@ $config = [
     |
     */
 
-    'use_ico_only' => false,
-    'use_full_favicon' => false,
+    'use_ico_only' => 'vendor/adminlte/dist/img/favicon-32x32',
+    'use_full_favicon' => 'vendor/adminlte/dist/img/favicon-32x32',
 
     /*
     |--------------------------------------------------------------------------
@@ -51,7 +51,7 @@ $config = [
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'DataBrasil',
+    'logo_img_alt' => 'ams',
 
     /*
     |--------------------------------------------------------------------------

@@ -230,7 +230,7 @@ class BiddingsController extends Controller
     public function index()
     {
         $this->authorize('ler', $this->routa);
-        $title = 'Cadastro de Biddings';
+        $title = 'Cadastro de Processos';
         $titulo = $title;
         $queryBiddings = $this->queryBiddings($_GET);
         $queryBiddings['config']['exibe'] = 'html';
