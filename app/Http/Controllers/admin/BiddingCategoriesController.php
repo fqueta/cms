@@ -100,11 +100,11 @@ class BiddingCategoriesController extends Controller
     }
     public function campos(){
         return [
-            'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'id'=>['label'=>'Id','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             // 'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'autor'=>['label'=>'autor','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'name'=>['label'=>'Nome','active'=>true,'placeholder'=>'Ex.: Saúde','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            'ativo'=>['label'=>'Ativado','tab'=>'bidding_categories','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'autor'=>['label'=>'autor','active'=>false,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'name'=>['label'=>'Nome','active'=>true,'js'=>true,'placeholder'=>'Ex.: Saúde','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'ativo'=>['label'=>'Ativado','js'=>true,'tab'=>'bidding_categories','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             // 'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
         ];
     }

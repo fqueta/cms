@@ -720,6 +720,8 @@ function listFiles(arquivos,token_produto,painel){
     return ret;
 }
 function list_arquivos_biddings(sel){
+    console.log(sel);
+
     var code_arquivos = document.querySelector(sel).value,arquivos = decodeArray(code_arquivos);
     var mont_file = listFiles(arquivos,false,'biddings');
     console.log(arquivos);
