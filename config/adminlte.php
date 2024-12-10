@@ -45,8 +45,8 @@ $config = [
     |
     */
 
-    'logo' => '<img class="d-none" src="/vendor/adminlte/dist/img/logo-h.png"/>',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+    'logo' => '<img class="d-none" src="/vendor/adminlte/dist/img/logo1.png"/>',
+    'logo_img' => 'vendor/adminlte/dist/img/logo2.png',
     //'logo_img' => 'vendor/adminlte/dist/img/logo.jpeg',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
