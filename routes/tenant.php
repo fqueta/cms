@@ -249,7 +249,7 @@ Route::middleware([
         Route::resource('/secretarias', '\App\Http\Controllers\admin\PostsController',['parameters' => [
             'secretarias' => 'id'
         ]]);
-        Route::resource('/servidores', '\App\Http\Controllers\admin\UserController',['parameters' => [
+        Route::resource('/servidores', '\App\Http\Controllers\UserController',['parameters' => [
             'servidores' => 'id'
         ]]);
         Route::resource('/convenios', '\App\Http\Controllers\admin\PostsController',['parameters' => [

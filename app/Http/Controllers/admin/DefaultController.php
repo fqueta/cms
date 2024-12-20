@@ -23,13 +23,15 @@ class DefaultController extends Controller
     public function __construct($config=[])
     {
         $user = Auth::user();
-        $this->middleware('auth');
         $this->user = $user;
         $routeName = isset($config['route']) ? $config['route'] : false;
-        $getName = '';
-        if(function_exists('getName')){
-            $getName = request()->route()->getName();
-        }
+        $getName = request()->segment(2);
+        // // if(function_exists('getName')){
+        // // }
+        // // $getName = request()->route()->getName();
+        // dd($getName);
+        $this->middleware('auth');
+
         $routeName = $routeName ? $routeName : explode('.',$getName)[0];
         // $routeName = $routeName ? $routeName : '';
         $this->routa = $routeName;
@@ -237,6 +239,7 @@ class DefaultController extends Controller
     public function store(Request $request)
     {
         $campos = $this->campos();
+        // dd($this->routa);
         $this->authorize('create', $this->routa);
         $arr_validate = array();
         if(is_array($campos)){
