@@ -51,6 +51,8 @@ class PostController extends Controller
             // ->get();
             if($request->has('description'))
                 $files = $posts->where('post_content', 'LIKE', '%'.$request->get("description").'%');
+            if($request->has('title'))
+                $files = $posts->where('post_title', 'LIKE', '%'.$request->get("title").'%');
 
             if($request->has('code')){
                 $files = $posts->where('guid', '=', $request->get("code"));
