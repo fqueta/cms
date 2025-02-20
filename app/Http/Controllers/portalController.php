@@ -70,7 +70,7 @@ class portalController extends Controller
     public function cadInternautas($tipo = null)
     {
         if(Auth::check()){
-            return redirect()->route('internautas.index');
+            return redirect()->route('sic.index');
         }
         $tp = $tipo?$tipo:'pf';
         $config = [

@@ -4,7 +4,11 @@
 @endsection
 
 @section('content')
-  <h3>Layout site em construção</h3>
+<div class="container">
+    <div class="row">
+        <h3>Página em construção</h3>
+    </div>
+</div>
 @endsection
 
 @section('css')
