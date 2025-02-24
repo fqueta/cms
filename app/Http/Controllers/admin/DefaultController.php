@@ -161,7 +161,7 @@ class DefaultController extends Controller
                 'id'=>['label'=>'Id','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                 // 'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                 'autor'=>['label'=>'autor','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-                'name'=>['label'=>'Nome','active'=>true,'js'=>true,'placeholder'=>'Ex.: Suspenso','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12','validate'=>['required','string',Rule::unique($this->tab)->ignore($id)]],
+                'name'=>['label'=>'Nome','active'=>true,'js'=>true,'placeholder'=>'Ex.: Suspenso','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12','validate'=>['required','string',Rule::unique($this->tab)->where(fn ($query) => $query->where('excluido', 'n'))->ignore($id)]],
                 'ativo'=>['label'=>'Ativado','tab'=>$this->tab ,'active'=>true,'js'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
                 // 'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             ];

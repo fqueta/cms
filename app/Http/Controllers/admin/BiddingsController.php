@@ -350,7 +350,7 @@ class BiddingsController extends Controller
                 'pasta'=>'/biddings/'.date('Y').'/'.date('m'),
                 'local'=>'attachments', //a tabela de armazenandmo dos arquivos
                 'token_produto'=>$dados[0]['token'],
-                'arquivos'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg',
+                'arquivos'=>'docx,doc,PDF,pdf,jpg,xlsx,xls,png,jpeg',
                 'compleUrl'=>"+$('#files').serialize()"//complemento de url ao postar via ajax
             ];
 
