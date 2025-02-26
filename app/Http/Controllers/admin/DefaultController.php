@@ -171,7 +171,7 @@ class DefaultController extends Controller
                 'id'=>['label'=>'Id','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                 'pai'=>['label'=>'pai','active'=>true,'js'=>true,'value'=>$id_pai,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                 // 'value'=>['label'=>'Valor','active'=>false,'value'=>$this->routa,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-                'token'=>['label'=>'token','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+                'token'=>['label'=>'token','active'=>false,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                 'autor'=>['label'=>'autor','active'=>true,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                 'nome'=>['label'=>'Nome','active'=>true,'js'=>true,'placeholder'=>'Ex.: Contratações','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12','validate'=>['required','string',Rule::unique($this->tab)->ignore($id)]],
                 'obs'=>['label'=>'Descrição','active'=>false,'js'=>true,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
