@@ -71,6 +71,11 @@ class PostController extends Controller
             if($request->has('page'))
                 $page = $request->get('page') - 1;
 
+            if($request->has('order')  && ($orderId = $request->get('order'))){
+                if($orderId=='asc' || $orderId=='desc'){
+                    $files = $posts->orderBy('ID',$orderId);
+                }
+            }
             if($limit)
                 $files = $posts->take($limit)->skip($limit * $page);
             $doc = $posts->get();
