@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 /**
- * 1|vohDWlfJFrs2l0mXJFX3SKxcBVcDZDhkkOqjfgtr3aab67ac
+ * 1|vohDWlfJFrs2l0mXJFX3SKxcBVcDZDhkkOqjfgtr3aab67aclad
  *
  */
 class AuthController extends Controller
