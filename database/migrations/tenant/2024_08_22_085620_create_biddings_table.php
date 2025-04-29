@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('phase_id')->nullable();
             $table->string('title', 355)->nullable();
             $table->string('subtitle', 355)->nullable();
-            $table->string('indentifier', 255)->nullable();
+            $table->integer('indentifier')->nullable();
             $table->text('description')->nullable();
             $table->longText('object')->nullable();
             $table->integer('order')->nullable();

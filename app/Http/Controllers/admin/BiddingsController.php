@@ -133,9 +133,9 @@ class BiddingsController extends Controller
         $tambcampos1 = 12;
         $ret = [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2','title'=>'Este número será usado para ordenação dos porcessos no site'],
             // 'config[NumLicitacao]'=>['label'=>'Número da licitação','cp_busca'=>'config][NumLicitacao','active'=>true,'type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>4,'placeholder'=>''],
-            'indentifier'=>['label'=>'Número do processo','active'=>true,'placeholder'=>'Processo','type'=>'tel','exibe_busca'=>'d-block','event'=>'required','tam'=>6,'validate'=>['required']],
+            'indentifier'=>['label'=>'N° do processo (Apenas números)','active'=>true,'placeholder'=>'Processo','type'=>'number','exibe_busca'=>'d-block','event'=>'required','tam'=>6,'validate'=>['required']],
             'year'=>['label'=>'Ano','active'=>true,'placeholder'=>'Ex: '.date('Y'),'type'=>'number','exibe_busca'=>'d-block','event'=>'required','tam'=>6,'validate'=>['required']],
             'title'=>['label'=>'Título','active'=>true,'placeholder'=>'Título','type'=>'text','exibe_busca'=>'d-block','event'=>'required','tam'=>$tambcampos,'validate'=>['required','string', Rule::unique($this->tab)->ignore($id)]],
             'subtitle'=>['label'=>'Subtítulo (opcional)','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>$tambcampos],
