@@ -2168,3 +2168,19 @@ function exibeTpc(val){
         $('.tpc-a').show();
     }
 }
+function zeroFill(num, numZeros) {
+    var n = Math.abs(num);
+    var zeros = Math.max(0, numZeros - Math.floor(n).toString().length );
+    var zeroString = Math.pow(10,zeros).toString().substr(1);
+    if( num < 0 ) {
+        zeroString = '-' + zeroString;
+    }
+
+    return zeroString+n;
+}
+function sugere_titulo(obj){
+    var tit = $('[name="genre_id"] :selected').text(),n=$('[name="indentifier"]').val(),y=$('[name="year"]').val(),nt=tit+' N.° '+zeroFill(n,3)+'/'+y;
+    obj.value = nt.toUpperCase();
+    obj.select();
+    // alert(tit);
+}

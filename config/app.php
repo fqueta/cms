@@ -16,9 +16,9 @@ return [
 
     'name' => env('APP_NAME', 'C.M.S.P'),
     'dominio' => 'https://amsloja.com.br/',
-    'version' => '1.0.0.1',
+    'version' => '1.0.0.2',
     'id_app' => env('ID_APP', 'cmspf'),
-    'last_update' => '16/10/2024',
+    'last_update' => '29/04/2025',
 
     /*
     |--------------------------------------------------------------------------
