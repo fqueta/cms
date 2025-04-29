@@ -2178,9 +2178,14 @@ function zeroFill(num, numZeros) {
 
     return zeroString+n;
 }
-function sugere_titulo(obj){
-    var tit = $('[name="genre_id"] :selected').text(),n=$('[name="indentifier"]').val(),y=$('[name="year"]').val(),nt=tit+' N.° '+zeroFill(n,3)+'/'+y;
-    obj.value = nt.toUpperCase();
-    obj.select();
-    // alert(tit);
+function sugere_titulo(obj,ed){
+    try {
+        var tit = $('[name="genre_id"] :selected').text(),n=$('[name="indentifier"]').val(),y=$('[name="year"]').val(),nt=tit+' N.° '+zeroFill(n,3)+'/'+y;
+        obj.value = nt.toUpperCase();
+        if(ed=='s'){
+            obj.select();
+        }
+    } catch (error) {
+        console.log(error);
+    }
 }

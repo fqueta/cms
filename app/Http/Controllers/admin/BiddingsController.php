@@ -155,7 +155,7 @@ class BiddingsController extends Controller
                 'tam'=>$tambcampos,
                 'value'=>@$_GET['genre_id'],
             ],
-            'title'=>['label'=>'Título','active'=>true,'placeholder'=>'Título','type'=>'text','exibe_busca'=>'d-block','event'=>'required onclick=sugere_titulo(this);','tam'=>$tambcampos,'validate'=>['required','string', Rule::unique($this->tab)->ignore($id)]],
+            'title'=>['label'=>'Título','active'=>true,'placeholder'=>'Título','type'=>'text','exibe_busca'=>'d-block','event'=>'required onclick=sugere_titulo(this); ondblclick=sugere_titulo(this,\'s\');','tam'=>$tambcampos,'validate'=>['required','string', Rule::unique($this->tab)->ignore($id)]],
             'subtitle'=>['label'=>'Subtítulo (opcional)','active'=>false,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>$tambcampos],
             'bidding_category_id'=>[
                 'label'=>'Categoria',
