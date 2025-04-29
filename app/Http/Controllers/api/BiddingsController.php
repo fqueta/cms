@@ -19,11 +19,13 @@ class BiddingsController extends Controller
         // $dt = attachment::where('bidding_id',3)->select(['id', 'title', 'file_file_name as file_name', 'order', 'bidding_id'])->with('file_path')->orderBy('order', 'ASC')->get();
         $limit = false;
         $page = 0;
+        $campo_order = 'indentifier';
+        $order = 'DESC';
         if($request->has('title') && trim($request->get('title')) !== ""){
-            $biddings = Biddings::where('title', 'LIKE', '%'.$request->get("title").'%')->orderBy('opening', 'DESC');
+            $biddings = Biddings::where('title', 'LIKE', '%'.$request->get("title").'%')->orderBy($campo_order, $order);
             $biddings = $biddings->orWhere('object', 'LIKE', '%'.$request->get("title").'%');
         }else{
-            $biddings = Biddings::orderBy('opening', 'DESC');
+            $biddings = Biddings::orderBy($campo_order, $order);
         }
         if($request->has('year') && trim($request->get('year')) !== "")
             $biddings = $biddings->where(['year' => $request->get('year')]);
@@ -52,7 +54,7 @@ class BiddingsController extends Controller
         // dd($anos);
         $biddings = $biddings->where(['active' => 's'])
             // ->orderBy('opening', 'desc')
-            ->orderBy('indentifier', 'desc')
+            ->orderBy($campo_order, $order)
             ->select(['id', 'title','subtitle', 'opening', 'indentifier','year', 'object', 'genre_id', 'phase_id', 'bidding_category_id', 'created_at','active'])
             ->with('genre')
             ->with('phase')
