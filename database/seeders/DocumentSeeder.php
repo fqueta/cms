@@ -24,7 +24,7 @@ class DocumentSeeder extends Seeder
                     'ID'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                     'post_type'=>['label'=>'tipo de post','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=> 'leis'],
                     'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-                    'guid'=>['label'=>'Nº da edição','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+                    'comment_count'=>['label'=>'Nº da edição','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                     'post_title'=>['label'=>'Nome','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'onkeyup=lib_typeSlug(this) required','tam'=>'12'],
                     'post_name'=>['label'=>'Slug','active'=>false,'placeholder'=>'Ex.: slug-do-post','type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                     'post_date_gmt'=>['label'=>'Data','active'=>true,'placeholder'=>'','type'=>'date','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
@@ -50,7 +50,7 @@ class DocumentSeeder extends Seeder
                     'ID'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                     'post_type'=>['label'=>'tipo de post','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=> 'concursos'],
                     'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-                    'guid'=>['label'=>'Nº da edição','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+                    'comment_count'=>['label'=>'Nº da edição','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                     'post_title'=>['label'=>'Nome','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'onkeyup=lib_typeSlug(this) required','tam'=>'12'],
                     'post_name'=>['label'=>'Slug','active'=>false,'placeholder'=>'Ex.: slug-do-post','type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                     'post_date_gmt'=>['label'=>'Data','active'=>true,'placeholder'=>'','type'=>'date','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
@@ -76,7 +76,7 @@ class DocumentSeeder extends Seeder
                     'ID'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                     'post_type'=>['label'=>'tipo de post','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=> 'decretos'],
                     'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-                    'guid'=>['label'=>'Nº da edição','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+                    'comment_count'=>['label'=>'Nº da edição','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                     'post_title'=>['label'=>'Nome','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'onkeyup=lib_typeSlug(this) required','tam'=>'12'],
                     'post_name'=>['label'=>'Slug','active'=>false,'placeholder'=>'Ex.: slug-do-post','type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                     'post_date_gmt'=>['label'=>'Data','active'=>true,'placeholder'=>'','type'=>'date','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
@@ -102,7 +102,7 @@ class DocumentSeeder extends Seeder
                     'ID'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                     'post_type'=>['label'=>'tipo de post','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=> 'diarios'],
                     'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-                    'guid'=>['label'=>'Nº da edição','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+                    'comment_count'=>['label'=>'Nº da edição','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                     'post_title'=>['label'=>'Nome','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'onkeyup=lib_typeSlug(this) required','tam'=>'12'],
                     'post_name'=>['label'=>'Slug','active'=>false,'placeholder'=>'Ex.: slug-do-post','type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                     'post_date_gmt'=>['label'=>'Data','active'=>true,'placeholder'=>'','type'=>'date','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
@@ -128,7 +128,7 @@ class DocumentSeeder extends Seeder
                     'ID'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                     'post_type'=>['label'=>'tipo de post','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=> 'portarias'],
                     'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-                    'guid'=>['label'=>'Nº da edição','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+                    'comment_count'=>['label'=>'Nº da edição','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                     'post_title'=>['label'=>'Nome','active'=>true,'placeholder'=>'','type'=>'text','exibe_busca'=>'d-block','event'=>'onkeyup=lib_typeSlug(this) required','tam'=>'12'],
                     'post_name'=>['label'=>'Slug','active'=>false,'placeholder'=>'Ex.: slug-do-post','type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                     'post_date_gmt'=>['label'=>'Data','active'=>true,'placeholder'=>'','type'=>'date','exibe_busca'=>'d-block','event'=>'required','tam'=>'12'],
@@ -165,7 +165,7 @@ class DocumentSeeder extends Seeder
                         'cp_busca'=>'config][situacao','class_div'=>'',
                     ],
 
-                    'guid'=>['label'=>'Nº da convênio','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+                    'comment_count'=>['label'=>'Nº da convênio','active'=>true,'placeholder'=>'','type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
                     'config[esfera]'=>[
                         'label'=>'Esfera',
                         'active'=>true,
@@ -210,7 +210,7 @@ class DocumentSeeder extends Seeder
                     'post_type'=>['label'=>'tipo de post','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=> 'archives'],
                     'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                     'html1'=>['label'=>'titulo','active'=>false,'type'=>'html','script'=>''],
-                    'guid'=>[
+                    'comment_count'=>[
                         'label'=>'Categoria',
                         'active'=>true,
                         'type'=>'select',
@@ -247,7 +247,7 @@ class DocumentSeeder extends Seeder
                     'post_type'=>['label'=>'tipo de post','active'=>false,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=> 'cat_receitas'],
                     'token'=>['label'=>'token','active'=>false,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                     'html1'=>['label'=>'titulo','active'=>false,'type'=>'html','script'=>''],
-                    'guid'=>[
+                    'comment_count'=>[
                         'label'=>'Categoria pai',
                         'active'=>true,
                         'type'=>'select',
@@ -285,7 +285,7 @@ class DocumentSeeder extends Seeder
                     'post_type'=>['label'=>'tipo de post','active'=>false,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=> 'cat_despesas'],
                     'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                     'html1'=>['label'=>'titulo','active'=>false,'type'=>'html','script'=>''],
-                    'guid'=>[
+                    'comment_count'=>[
                         'label'=>'Categoria pai',
                         'active'=>true,
                         'type'=>'select',
@@ -323,7 +323,7 @@ class DocumentSeeder extends Seeder
                     'post_type'=>['label'=>'tipo de post','active'=>false,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=> 'tipo_receitas'],
                     'token'=>['label'=>'token','active'=>false,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                     'html1'=>['label'=>'titulo','active'=>false,'js'=>true,'type'=>'html','script'=>''],
-                    'guid'=>[
+                    'comment_count'=>[
                         'label'=>'Tipo pai',
                         'active'=>true,
                         'js'=>true,'type'=>'select',
@@ -361,7 +361,7 @@ class DocumentSeeder extends Seeder
                     'post_type'=>['label'=>'tipo de post','active'=>false,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-none','event'=>'','tam'=>'2','value'=> 'tipo_receitas'],
                     'token'=>['label'=>'token','active'=>false,'js'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
                     'html1'=>['label'=>'titulo','active'=>false,'js'=>true,'type'=>'html','script'=>''],
-                    'guid'=>[
+                    'comment_count'=>[
                         'label'=>'Tipo pai',
                         'active'=>true,
                         'js'=>true,'type'=>'select',

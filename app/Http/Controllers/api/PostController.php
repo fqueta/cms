@@ -24,7 +24,7 @@ class PostController extends Controller
                 $all_categories = Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='$id_pai'",'nome','id');
             }else{
                 $all_categories = [];
-                $fcode = 'guid as code';
+                $fcode = 'comment_count as code';
             }
             $posts = Post::select(
                 'ID as id',
@@ -55,7 +55,7 @@ class PostController extends Controller
                 $files = $posts->where('post_title', 'LIKE', '%'.$request->get("title").'%');
 
             if($request->has('code')){
-                $files = $posts->where('guid', '=', $request->get("code"));
+                $files = $posts->where('comment_count', '=', $request->get("code"));
             }elseif($request->has('category')){
                 $files = $posts->where('guid', '=', $request->get("category"));
             }
@@ -73,11 +73,15 @@ class PostController extends Controller
 
             if($request->has('order')  && ($orderId = $request->get('order'))){
                 if($orderId=='asc' || $orderId=='desc'){
-                    $files = $posts->orderBy('ID',$orderId);
+                    // $files = $posts->orderBy('ID',$orderId);
+                    $files = $posts->orderBy('code',$orderId);
                 }
             }
             if($limit)
                 $files = $posts->take($limit)->skip($limit * $page);
+
+            // $debug_sql = Qlib::eloquent_to_sql($posts);
+            //     echo $debug_sql;
             $doc = $posts->get();
             // dd($doc);
             if($doc->count() > 0){

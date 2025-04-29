@@ -215,7 +215,6 @@ class PostsController extends Controller
                 // $ret['post_name']['type'] = 'text';
             }
         }
-        // dump($ret);
         return $ret;
     }
     /**

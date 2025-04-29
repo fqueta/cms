@@ -1212,4 +1212,17 @@ class Qlib
         $ret = DB::select($sql);
         return $ret;
     }
+    /**
+     * Para exibir uma string sql de uma determinada consulta do eloquent
+     * @param object $query da consulta do eloquent
+     */
+    static function eloquent_to_sql($query){
+        $sql = $query->toSql();
+        $bindings = $query->getBindings();
+
+        foreach ($bindings as $binding) {
+            $sql = preg_replace('/\?/', "'$binding'", $sql, 1);
+        }
+        return $sql;
+    }
 }

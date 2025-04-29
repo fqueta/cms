@@ -51,7 +51,8 @@ class BiddingsController extends Controller
         $anos = Qlib::sql_distinct('biddings','year','ano');
         // dd($anos);
         $biddings = $biddings->where(['active' => 's'])
-            ->orderBy('opening', 'desc')
+            // ->orderBy('opening', 'desc')
+            ->orderBy('indentifier', 'desc')
             ->select(['id', 'title','subtitle', 'opening', 'indentifier','year', 'object', 'genre_id', 'phase_id', 'bidding_category_id', 'created_at','active'])
             ->with('genre')
             ->with('phase')
