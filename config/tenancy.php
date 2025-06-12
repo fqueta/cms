@@ -20,6 +20,7 @@ return [
         'localhost',
         'amsloja.com.br',
         'maisaqui.com.br',
+        'pratapolis.mg.gov.br',
     ],
 
     /**
