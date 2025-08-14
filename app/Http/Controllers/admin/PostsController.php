@@ -542,7 +542,7 @@ class PostsController extends Controller
                 'view'=>$this->view,
                 'sec'=>$this->sec,
                 'id'=>$id,
-                'arquivos'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg',
+                'arquivos'=>'docx,PDF,pdf,jpg,xlsx,png,jpeg,mp4',
                 'tam_col1'=>'col-md-6',
                 'tam_col2'=>'col-md-6',
 
@@ -883,6 +883,7 @@ class PostsController extends Controller
             $tema_gal2 = '<div class="col-md-{tam_file} text-center"><a class="venobox" href="{link}" {target}><img src="{link_img}" class="w-100"/></a><br>{name}</div>';
             $gal = false;
             $tam_file = 2;
+            // dd($list_files);
             foreach ($list_files as $kf => $vf) {
                 $ex = isset($vf['extension']) ? $vf['extension'] : '';
                 $target = 'target="_BLANK"';
@@ -895,7 +896,10 @@ class PostsController extends Controller
                     $link_img = asset('/images/word.png');
                 }elseif($ex == 'pdf' || $ex == 'PDF'){
                     $link_img = asset('/images/pdf.png');
+                }elseif($ex == 'mp4' || $ex == 'MP4'){
+                    $link_img = asset('/images/video.png');
                 }else{
+                    // dump($)
                     $link_img = asset('/images/file.png');
                 }
                 $gal .= str_replace('{link}',tenant_asset($vf['link']),$tema_gal2);
