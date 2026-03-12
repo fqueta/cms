@@ -23,7 +23,8 @@ class BiddingsController extends Controller
         $order = 'DESC';
         if($request->has('title') && trim($request->get('title')) !== ""){
             $biddings = Biddings::where('title', 'LIKE', '%'.$request->get("title").'%')->orderBy($campo_order, $order);
-            $biddings = $biddings->orWhere('object', 'LIKE', '%'.$request->get("title").'%');
+            $biddings = $biddings->orWhere('object', 'LIKE', '%'.$request->get("title").'%')
+            ->orderBy($campo_order, $order);
         }else{
             $biddings = Biddings::orderBy($campo_order, $order);
         }
@@ -54,7 +55,6 @@ class BiddingsController extends Controller
         // dd($anos);
         $biddings = $biddings->where(['active' => 's'])
             // ->orderBy('opening', 'desc')
-            ->orderBy($campo_order, $order)
             ->select(['id', 'title','subtitle', 'opening', 'indentifier','year', 'object', 'genre_id', 'phase_id', 'bidding_category_id', 'created_at','active'])
             ->with('genre')
             ->with('phase')

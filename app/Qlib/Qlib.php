@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Permission;
 use App\Models\Qoption;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Str;
+
 
 class Qlib
 {
@@ -811,6 +813,42 @@ class Qlib
 
 		return $string;
 	}
+
+    static function maxUploadSize($format = 'MB') {
+        $max_upload = Qlib::parseSize(ini_get('upload_max_filesize'));
+        $max_post = Qlib::parseSize(ini_get('post_max_size'));
+        $memory_limit = Qlib::parseSize(ini_get('memory_limit'));
+        $limit = min($max_upload, $max_post);
+        if ($memory_limit > 0) {
+            $limit = min($limit, $memory_limit);
+        }
+
+        if ($format == 'bytes') {
+            return $limit;
+        }
+
+        return Qlib::formatBytes($limit, 0);
+    }
+
+    static function parseSize($size) {
+        $unit = preg_replace('/[^bkmgtp]/i', '', $size);
+        $size = preg_replace('/[^0-9\.]/', '', $size);
+        if ($unit) {
+            return round($size * pow(1024, stripos('bkmgtp', $unit[0])));
+        } else {
+            return round($size);
+        }
+    }
+
+    static function formatBytes($bytes, $precision = 2) {
+        $units = array('B', 'KB', 'MB', 'GB', 'TB');
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+
     static function limpar_texto($str){
         return preg_replace("/[^0-9]/", "", $str);
     }

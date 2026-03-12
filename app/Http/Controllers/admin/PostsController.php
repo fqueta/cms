@@ -204,11 +204,12 @@ class PostsController extends Controller
                 'post_excerpt'=>['label'=>'Resumo (Opcional)','active'=>true,'placeholder'=>'Uma síntese do um post','type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
                 // 'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
                 'post_content'=>['label'=>'Conteudo','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>$hidden_editor,'tam'=>'12','class_div'=>'','class'=>'summernote','placeholder'=>__('Escreva seu conteúdo aqui..')],
+                'post_date_gmt'=>['label'=>'Data de publicação','active'=>false,'type'=>'date','exibe_busca'=>'d-block','event'=>$hidden_editor,'tam'=>'12','class_div'=>'','class'=>'','placeholder'=>__('DD/MM/YYYY')],
                 'post_status'=>['label'=>'Publicar','active'=>true,'type'=>'chave_checkbox','value'=>'publish','valor_padrao'=>'publish','exibe_busca'=>'d-block','event'=>'','tam'=>'6','arr_opc'=>['publish'=>'Publicado','pending'=>'Pendente'],'tab'=>'posts'],
             ];
             if($this->post_type=='posts'){
                 if($this->ac=='alt'){
-                    $ret['html1']['script'] = '<div class="col-12 text-right">Id: '.@$d['ID'].' Data: '. Qlib::dataExibe( @$d['post_date']).'</div>';
+                    $ret['html1']['script'] = '<div class="col-12 text-right">Id: '.@$d['ID'].' Data do cadastro '. Qlib::dataExibe( @$d['post_date']).'</div>';
                     $ret['html1']['script'] .= '<div class="col-12"><a class="underline" target="_BLANK" href="'.$this->lib_preview($d['post_name']).'">Visualizar Conteúdo púbilco</a></div>';
                 }
                 $ret['config[capa_artigo]']=['label'=>'Capa no artigo','cp_busca'=>'config][capa_artigo','active'=>false,'','type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não'],'title'=>'Função para exibir imagem de capa dentro do artigo.'];

@@ -67,7 +67,7 @@
                       <div class="card-body">
                         <div class="tab-content" id="myTabContent">
                           <div class="tab-pane fade show active" id="upload" role="tabpanel" aria-labelledby="upload-tab">
-                            <p>Tipos de arquivos suportados: <b>{{$files_types}}</b></p>
+                            <p>Tipos de arquivos suportados: <b>{{$files_types}}</b> | Tamanho máximo: <b>{{App\Qlib\Qlib::maxUploadSize()}}</b></p>
 
                             <form id="file-upload" action="{{route('media.store')}}" method="post" class="dropzone" enctype="multipart/form-data">
                                 @csrf
@@ -80,6 +80,12 @@
                                     <input name="file" type="file" multiple />
                                 </div>
                             </form>
+                            <script>
+                                Dropzone.options.fileUpload = {
+                                    maxFilesize: {{ (int)App\Qlib\Qlib::maxUploadSize('bytes') / 1024 / 1024 }},
+                                    dictFileTooBig: "{{__('O arquivo é muito grande ({{filesize}}MB). O tamanho máximo permitido é {{maxFilesize}}MB.')}}",
+                                };
+                            </script>
                           </div>
                           <div class="tab-pane fade text-left" id="library" role="tabpanel" aria-labelledby="library-tab"><span class="d-none" id="media-route">{{route('media.index')}}</span>
                             <span id="list-libarary">

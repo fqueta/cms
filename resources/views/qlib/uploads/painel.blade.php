@@ -47,7 +47,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="container-fluid">
-                            <p>Tipos de arquivos suportados: <b>{{$config['arquivos']}}</b></p>
+                            <p>Tipos de arquivos suportados: <b>{{$config['arquivos']}}</b> | Tamanho máximo: <b>{{App\Qlib\Qlib::maxUploadSize()}}</b></p>
                             <form id="file-upload" action="{{route('uploads.store')}}" method="post" class="dropzone" enctype="multipart/form-data">
                                 @csrf
                                 <input type="hidden" name="token_produto" value="{{$config['token_produto']}}" />
@@ -59,6 +59,12 @@
                                     <input name="file" type="file" multiple />
                                 </div>
                             </form>
+                            <script>
+                                Dropzone.options.fileUpload = {
+                                    maxFilesize: {{ (int)App\Qlib\Qlib::maxUploadSize('bytes') / 1024 / 1024 }},
+                                    dictFileTooBig: "{{__('O arquivo é muito grande ({{filesize}}MB). O tamanho máximo permitido é {{maxFilesize}}MB.')}}",
+                                };
+                            </script>
                         </div>
                     </div>
                     <div class="modal-footer">
