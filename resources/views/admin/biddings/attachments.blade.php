@@ -58,7 +58,7 @@
                     <script>
                         Dropzone.options.fileUpload = {
                             maxFilesize: {{ (int)App\Qlib\Qlib::maxUploadSize('bytes') / 1024 / 1024 }},
-                            dictFileTooBig: "{{__('O arquivo é muito grande ({{filesize}}MB). O tamanho máximo permitido é {{maxFilesize}}MB.')}}",
+                            dictFileTooBig: "{{__('O arquivo é muito grande (:fsize MB). O tamanho máximo permitido é :maxfsize MB.',['fsize'=>'{{filesize}}','maxfsize'=>'{{maxFilesize}}'])}}",
                         };
                     </script>
                 </div>
