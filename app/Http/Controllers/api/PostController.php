@@ -43,7 +43,7 @@ class PostController extends Controller
             ->where('post_status','=','publish');
             $anos = Post::select(DB::raw('YEAR(post_date_gmt) as ano'))->distinct()
             ->where('post_type', 'LIKE', $request->get("type"))
-            ->orderBy('ano', 'asc')
+            ->orderBy('ano', 'desc')
             ->get();
             if($request->has('year') && trim($request->get('year')) !== ""){
                 $posts = $posts->whereYear('post_date_gmt','=',$request->get('year'));
