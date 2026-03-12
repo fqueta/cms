@@ -43,7 +43,7 @@ class PostController extends Controller
             ->where('post_status','=','publish');
             $anos = Post::select(DB::raw('YEAR(post_date_gmt) as ano'))->distinct()
             ->where('post_type', 'LIKE', $request->get("type"))
-            ->orderBy('ano', 'desc')
+            ->orderBy('ano', 'asc')
             ->get();
             if($request->has('year') && trim($request->get('year')) !== ""){
                 $posts = $posts->whereYear('post_date_gmt','=',$request->get('year'));
@@ -70,10 +70,14 @@ class PostController extends Controller
                 $limit = $request->get('limit');
             if($request->has('page'))
                 $page = $request->get('page') - 1;
-            $orderId = $request->get('order') ? $request->get('order') : 'desc';
-            if($orderId=='asc' || $orderId=='desc'){
-                // $files = $posts->orderBy('ID',$orderId);
-                $files = $posts->orderBy('code',$orderId);
+            if($type == 'posts'){
+                $posts = $posts->orderBy('post_date','desc');
+            }else{
+                $orderId = $request->get('order') ? $request->get('order') : 'desc';
+                if($orderId=='asc' || $orderId=='desc'){
+                    // $files = $posts->orderBy('ID',$orderId);
+                    $posts = $posts->orderBy('code',$orderId);
+                }
             }
             if($limit)
                 $files = $posts->take($limit)->skip($limit * $page);
