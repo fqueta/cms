@@ -48,13 +48,13 @@
 
         {{-- Password field --}}
         <div class="input-group mb-3">
-            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
+            <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror"
                    placeholder="{{ __('adminlte::adminlte.password') }}">
 
             <div class="input-group-append">
-                <div class="input-group-text">
-                    <span class="fas fa-lock {{ config('adminlte.classes_auth_icon', '') }}"></span>
-                </div>
+                <button type="button" class="btn btn-outline-secondary btn-flat" id="togglePassword" style="border: 1px solid #ced4da; border-left: none; background: #fff;" tabindex="-1">
+                    <span class="fas fa-eye" id="togglePasswordIcon"></span>
+                </button>
             </div>
 
             @error('password')
@@ -105,4 +105,23 @@
             </a>
         </p>
     @endif
+@stop
+
+@section('adminlte_js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const passwordIcon = document.getElementById('togglePasswordIcon');
+
+            if (togglePasswordBtn && passwordInput && passwordIcon) {
+                togglePasswordBtn.addEventListener('click', function () {
+                    const isPassword = passwordInput.getAttribute('type') === 'password';
+                    passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+                    passwordIcon.classList.toggle('fa-eye', !isPassword);
+                    passwordIcon.classList.toggle('fa-eye-slash', isPassword);
+                });
+            }
+        });
+    </script>
 @stop
