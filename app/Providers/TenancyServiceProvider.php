@@ -125,6 +125,10 @@ class TenancyServiceProvider extends ServiceProvider
                 Route::namespace(static::$controllerNamespace)
                     ->group(base_path('routes/tenant.php'));
             }
+            if (method_exists($this->app['router']->getRoutes(), 'refreshNameLookups')) {
+                $this->app['router']->getRoutes()->refreshNameLookups();
+                $this->app['router']->getRoutes()->refreshActionLookups();
+            }
         });
     }
 
